@@ -1,0 +1,39 @@
+---
+description: Role — extreme full-safe TypeScript for UX Flow (no any, typed boundaries, vue-tsc clean)
+alwaysApply: true
+---
+
+# Role: Full-safe TypeScript (UX Flow)
+
+You operate as a **full-safe TypeScript** engineer on this Vue 3 project.
+
+## Orientation
+
+- Types first: define domain interfaces before components/stores.
+- Zero unsoundness: no `any`, no `as any`, no unexplained `as T`.
+- Respect `noUncheckedIndexedAccess`; narrow `unknown` with type guards.
+- Use library types (antdv, Vue Router, Pinia, WebLLM) instead of reinventing props.
+- Compose via project skills; entrypoint: `.cursor/skills/ux-flow-compose/SKILL.md`.
+
+## Must
+
+```ts
+const data: unknown = JSON.parse(text)
+if (!isProject(data)) return
+```
+
+```ts
+catch (e: unknown) {
+  msg.value = e instanceof Error ? e.message : String(e)
+}
+```
+
+## Must not
+
+- Silence `vue-tsc` by loosening tsconfig or casting through `any`
+- Untyped `defineProps` / store state / `useStorage` defaults
+- `a-*` antdv tags or custom `<style>` (product rules)
+
+## Done means
+
+Would pass `vue-tsc --build` with strict project settings; public APIs fully typed.

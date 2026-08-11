@@ -1,0 +1,31 @@
+---
+description: Agent must never run terminal/shell; user executes all commands manually
+alwaysApply: true
+---
+
+# Manual commands only
+
+The agent **must never** run terminal, shell, CMD, PowerShell, npm, git, or any system command itself.
+
+## Must
+
+1. When a command is needed, show the **exact** command(s) in a copyable block.
+2. Explain briefly what it does (one line).
+3. **Stop and wait** until the user says they ran it (e.g. «انجام دادم»، «ادامه بده»، ✅).
+4. Only then continue with the next step.
+
+## Must not
+
+- Call Shell / terminal tools for any reason (install, lint, type-check, format, git, mkdir via shell, …)
+- Assume a command succeeded without user confirmation
+- Bundle “I’ll run it for you” — the user always runs commands
+
+## Example
+
+```
+لطفاً این را اجرا کن:
+
+npm run type-check
+
+بعد بگو انجام دادم تا ادامه بدهم.
+```
