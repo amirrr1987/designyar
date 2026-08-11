@@ -105,11 +105,7 @@ async function onSubmit(): Promise<void> {
           <Paragraph>{{ idea.detail || '—' }}</Paragraph>
 
           <Space wrap>
-            <Tag
-              v-for="tag in idea.tags"
-              :key="`${idea.id}-${tag}`"
-              color="processing"
-            >
+            <Tag v-for="tag in idea.tags" :key="`${idea.id}-${tag}`" color="processing">
               {{ tag }}
             </Tag>
             <Tag color="blue">{{ idea.votes }} رأی</Tag>

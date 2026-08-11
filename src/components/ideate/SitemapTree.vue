@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import {
-  Button,
-  Card,
-  Empty,
-  Input,
-  Popconfirm,
-  Space,
-  Tree,
-  message,
-} from 'ant-design-vue'
+import { Button, Card, Empty, Input, Popconfirm, Space, Tree, message } from 'ant-design-vue'
 import type { TreeProps } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
@@ -95,11 +86,7 @@ function onDeleteSelected(): void {
   <Space direction="vertical" size="middle">
     <Card size="small" title="افزودن صفحه ریشه">
       <Space wrap>
-        <Input
-          v-model:value="rootTitle"
-          placeholder="مثلاً محصولات"
-          @press-enter="onAddRoot"
-        />
+        <Input v-model:value="rootTitle" placeholder="مثلاً محصولات" @press-enter="onAddRoot" />
         <Button type="primary" @click="onAddRoot">
           <template #icon><PlusOutlined /></template>
           ریشه

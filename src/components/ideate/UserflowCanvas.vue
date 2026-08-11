@@ -47,12 +47,7 @@ function onAdd(): void {
 }
 
 function onKindChange(id: string, value: unknown): void {
-  if (
-    value === 'start' ||
-    value === 'action' ||
-    value === 'decision' ||
-    value === 'end'
-  ) {
+  if (value === 'start' || value === 'action' || value === 'decision' || value === 'end') {
     ideateStore.updateFlowNode(id, { kind: value })
   }
 }

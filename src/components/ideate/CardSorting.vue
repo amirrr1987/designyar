@@ -89,11 +89,7 @@ function currentCategoryId(cardId: string): string | undefined {
   <Space direction="vertical" size="large">
     <Card size="small" title="افزودن کارت محتوا">
       <Space wrap>
-        <Input
-          v-model:value="draftLabel"
-          placeholder="مثلاً فیلتر قیمت"
-          @press-enter="onAddCard"
-        />
+        <Input v-model:value="draftLabel" placeholder="مثلاً فیلتر قیمت" @press-enter="onAddCard" />
         <Button type="primary" @click="onAddCard">
           <template #icon><PlusOutlined /></template>
           کارت
@@ -101,10 +97,7 @@ function currentCategoryId(cardId: string): string | undefined {
       </Space>
     </Card>
 
-    <Empty
-      v-if="cardSort.cards.length === 0"
-      description="کارت‌هایی برای مرتب‌سازی اضافه کنید"
-    />
+    <Empty v-if="cardSort.cards.length === 0" description="کارت‌هایی برای مرتب‌سازی اضافه کنید" />
 
     <template v-else>
       <Card size="small" title="اختصاص دسته">
@@ -118,11 +111,7 @@ function currentCategoryId(cardId: string): string | undefined {
                   placeholder="بدون دسته"
                   @change="(v: unknown) => onAssign(item.id, v)"
                 >
-                  <SelectOption
-                    v-for="opt in categoryOptions"
-                    :key="opt.value"
-                    :value="opt.value"
-                  >
+                  <SelectOption v-for="opt in categoryOptions" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
                   </SelectOption>
                 </Select>
@@ -154,27 +143,14 @@ function currentCategoryId(cardId: string): string | undefined {
             <Empty v-if="unassignedCards.length === 0" description="خالی" />
           </Card>
         </Col>
-        <Col
-          v-for="cat in cardSort.categories"
-          :key="cat.id"
-          :xs="24"
-          :md="12"
-          :lg="6"
-        >
+        <Col v-for="cat in cardSort.categories" :key="cat.id" :xs="24" :md="12" :lg="6">
           <Card size="small" :title="cat.title">
             <Space wrap>
-              <Tag
-                v-for="card in cardsInCategory(cat.id)"
-                :key="card.id"
-                color="processing"
-              >
+              <Tag v-for="card in cardsInCategory(cat.id)" :key="card.id" color="processing">
                 {{ card.label }}
               </Tag>
             </Space>
-            <Empty
-              v-if="cardsInCategory(cat.id).length === 0"
-              description="خالی"
-            />
+            <Empty v-if="cardsInCategory(cat.id).length === 0" description="خالی" />
           </Card>
         </Col>
       </Row>

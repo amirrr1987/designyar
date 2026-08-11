@@ -20,10 +20,7 @@ export const useIdeateStore = defineStore('ideate', () => {
   const sitemap = useStorage<SitemapNode[]>('ux-flow-sitemap', [
     { key: 'home', title: 'خانه', children: [] },
   ])
-  const cardSort = useStorage<CardSortState>(
-    'ux-flow-card-sort',
-    createEmptyCardSortState(),
-  )
+  const cardSort = useStorage<CardSortState>('ux-flow-card-sort', createEmptyCardSortState())
 
   function addIdea(input: { title: string; detail: string; tags?: string[] }): IdeaCard {
     const idea: IdeaCard = {
@@ -71,10 +68,7 @@ export const useIdeateStore = defineStore('ideate', () => {
     return node
   }
 
-  function updateFlowNode(
-    id: string,
-    patch: Partial<Pick<FlowNode, 'kind' | 'label'>>,
-  ): void {
+  function updateFlowNode(id: string, patch: Partial<Pick<FlowNode, 'kind' | 'label'>>): void {
     const index = flowNodes.value.findIndex((n) => n.id === id)
     if (index < 0) return
     const current = flowNodes.value[index]

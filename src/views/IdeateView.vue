@@ -1,12 +1,41 @@
 <script setup lang="ts">
-import { Card } from 'ant-design-vue'
+import { ref } from 'vue'
+import { Card, Space, Tabs, Typography } from 'ant-design-vue'
+import BrainstormBoard from '@/components/ideate/BrainstormBoard.vue'
+import CardSorting from '@/components/ideate/CardSorting.vue'
+import SitemapTree from '@/components/ideate/SitemapTree.vue'
+import UserflowCanvas from '@/components/ideate/UserflowCanvas.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
+type IdeateTabKey = 'brainstorm' | 'userflow' | 'sitemap' | 'cardsort'
+
+const { Title, Paragraph } = Typography
 const step = getStepByKey('ideate')
+const activeKey = ref<IdeateTabKey>('brainstorm')
 </script>
 
 <template>
-  <Card :title="step.title">
-    {{ step.description }}
-  </Card>
+  <Space direction="vertical" size="large">
+    <Card>
+      <Title :level="3">{{ step.title }}</Title>
+      <Paragraph>{{ step.description }}</Paragraph>
+    </Card>
+
+    <Card>
+      <Tabs v-model:activeKey="activeKey">
+        <Tabs.TabPane key="brainstorm" tab="طوفان فکری">
+          <BrainstormBoard />
+        </Tabs.TabPane>
+        <Tabs.TabPane key="userflow" tab="جریان کاربر">
+          <UserflowCanvas />
+        </Tabs.TabPane>
+        <Tabs.TabPane key="sitemap" tab="نقشه سایت">
+          <SitemapTree />
+        </Tabs.TabPane>
+        <Tabs.TabPane key="cardsort" tab="مرتب‌سازی کارت">
+          <CardSorting />
+        </Tabs.TabPane>
+      </Tabs>
+    </Card>
+  </Space>
 </template>

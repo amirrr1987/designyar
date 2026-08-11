@@ -75,12 +75,7 @@ export function isFlowNode(value: unknown): value is FlowNode {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
   const nextOk = v.nextId === undefined || typeof v.nextId === 'string'
-  return (
-    typeof v.id === 'string' &&
-    isFlowNodeKind(v.kind) &&
-    typeof v.label === 'string' &&
-    nextOk
-  )
+  return typeof v.id === 'string' && isFlowNodeKind(v.kind) && typeof v.label === 'string' && nextOk
 }
 
 function isSitemapNode(value: unknown): value is SitemapNode {

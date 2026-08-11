@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - بوم جریان کاربر به‌صورت لیست گام‌های typed در `UserflowCanvas.vue`
 - درخت نقشه سایت قابل ویرایش در `SitemapTree.vue`
 - مرتب‌سازی کارت‌ها با دسته‌بندی در `CardSorting.vue`
+- ترکیب IdeateView با Tabs: طوفان فکری | جریان کاربر | نقشه سایت | مرتب‌سازی
 
 ## [0.4.0] - 2026-08-11
 
