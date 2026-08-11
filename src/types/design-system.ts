@@ -1,3 +1,5 @@
+import { blue, gold, generate } from '@ant-design/colors'
+
 /** Ant Design–style color ramp (typically 10 hex strings). */
 export type ColorRamp = readonly string[]
 
@@ -37,12 +39,17 @@ export interface DesignSystem {
   spacing: SpacingConfig
 }
 
+export function rampFromSeed(seed: string): string[] {
+  return generate(seed)
+}
+
 export function createDefaultDesignSystem(): DesignSystem {
+  const seed = blue[5] ?? '#1677ff'
   return {
     palette: {
-      seed: '#1677ff',
-      primary: [],
-      accent: [],
+      seed,
+      primary: [...blue],
+      accent: [...gold],
     },
     typography: {
       baseSize: 16,

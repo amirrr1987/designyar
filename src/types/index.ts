@@ -12,7 +12,7 @@ export type {
   SpacingConfig,
   DesignSystem,
 } from './design-system'
-export { createDefaultDesignSystem, isDesignSystem } from './design-system'
+export { createDefaultDesignSystem, isDesignSystem, rampFromSeed } from './design-system'
 
 export type { EmpathyQuadrants, EmpathyMapEntry, EmpathyMapsByPersona } from './empathy-map'
 export { createEmptyQuadrants, isEmpathyQuadrants, isEmpathyMapEntry } from './empathy-map'
