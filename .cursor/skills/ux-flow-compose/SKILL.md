@@ -81,10 +81,10 @@ Load **only** skills relevant to the current task after the product + typing bas
 5. Implement with named antdv imports / PascalCase tags
 6. Persist via useStorage inside Pinia (typed generics)
 7. Run type-check mindset: code must pass vue-tsc --build
-8. Phase done → load keep-a-changelog (SemVer + CHANGELOG.md)
-9. Ask before next file/phase
+8. End of work → load phase-wrap-up-commit (phase status + commit message text)
+9. Phase done → load keep-a-changelog (SemVer + CHANGELOG.md)
+10. Ask before next file/phase
 ```
-
 ## Full-safe type contracts
 
 ### Forbidden
