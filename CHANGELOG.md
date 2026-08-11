@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-08-11
+
+### Added
+
+- **`AiSectionAssist.vue`** — الگوی مشترک AI در هر بخش فرم با hint بخش + «AI از کل داده پروژه context می‌گیرد»
+- **`ai-context-coverage.ts`** — نمایش پوشش context پروژه در پنل AI
+- AI در بخش‌های قبلاً بدون کمک: Persona، Design System (رنگ/تایپ/گرید/فاصله/چک‌لیست)، WCAG، ContrastChecker، ارزیابی اکتشافی
+
+### Changed
+
+- **`AiAssistButton`** — prop اختیاری `section` برای hint بخش جاری
+- **`ai` store** — `openPanel(action, sectionHint?)` و مصرف hint در prompt
+- همه فرم‌ها و viewها — `section` روی دکمه‌های AI برای context دقیق‌تر
+
 ## [0.17.0] - 2026-08-11
 
 ### Added

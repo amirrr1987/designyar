@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Card, CheckboxGroup, Progress, Space, Tag, Typography } from 'ant-design-vue'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useWCAG } from '@/composables/useWCAG'
 
 const { Paragraph, Text } = Typography
@@ -15,6 +16,13 @@ const helpItems = items.filter((item) => item.help !== undefined)
 
 <template>
   <Space direction="vertical" size="middle">
+    <AiSectionAssist
+      action="summarize-test"
+      label="خلاصه WCAG با AI"
+      section="چک‌لیست WCAG"
+      secondary-action="test-to-hmw"
+      secondary-label="HMW از تست"
+    />
     <Paragraph type="secondary">
       موارد مرتبط WCAG را که در محصول رعایت شده علامت بزنید. پیشرفت به‌صورت خودکار ذخیره می‌شود.
     </Paragraph>

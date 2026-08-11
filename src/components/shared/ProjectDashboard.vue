@@ -184,7 +184,7 @@ function statFor(key: DesignStepKey): StepStat | undefined {
         </FormItem>
         <FormItem>
           <Space wrap>
-            <AiAssistButton action="improve-project-brief" label="بهبود شرح با AI" />
+            <AiAssistButton action="improve-project-brief" label="بهبود شرح با AI" section="شرح پروژه" />
           </Space>
         </FormItem>
       </Form>

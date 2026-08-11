@@ -29,8 +29,8 @@ function onToggle(id: string, checked: boolean | string | number): void {
 <template>
   <Space direction="vertical" size="middle">
     <Space wrap>
-      <AiAssistButton action="suggest-wireframe-blocks" label="پیشنهاد چیدمان با AI" />
-      <AiAssistButton action="wireframe-critique" label="نقد وایرفریم با AI" />
+      <AiAssistButton action="suggest-wireframe-blocks" label="پیشنهاد چیدمان با AI" section="وایرفریم" />
+      <AiAssistButton action="wireframe-critique" label="نقد وایرفریم با AI" section="وایرفریم" />
     </Space>
     <Paragraph type="secondary">
       بلوک‌های ساختاری وایر فریم را انتخاب کنید (فقط ساختار — بدون استایل سفارشی).

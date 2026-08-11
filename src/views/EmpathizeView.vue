@@ -26,10 +26,10 @@ const activeKey = ref<EmpathizeTabKey>('personas')
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
         <AiChainButton chain="empathize-starter" label="زنجیره Empathize" />
-        <AiAssistButton action="seed-research-notes" label="پیشنهاد یادداشت" />
-        <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا" />
-        <AiAssistButton action="analyze-notes" label="تحلیل یادداشت" />
-        <AiAssistButton action="analyze-competitors" label="تحلیل رقبا" />
+        <AiAssistButton action="seed-research-notes" label="پیشنهاد یادداشت" section="Empathize" />
+        <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا" section="Empathize" />
+        <AiAssistButton action="analyze-notes" label="تحلیل یادداشت" section="Empathize" />
+        <AiAssistButton action="analyze-competitors" label="تحلیل رقبا" section="Empathize" />
       </Space>
     </Card>
 

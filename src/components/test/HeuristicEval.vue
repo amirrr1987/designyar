@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, Col, Input, Rate, Row, Space, Statistic, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   HEURISTIC_RULES,
@@ -45,6 +46,13 @@ function setNotes(ruleId: string, notes: string): void {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiSectionAssist
+      action="summarize-test"
+      label="خلاصه ارزیابی با AI"
+      section="ارزیابی اکتشافی"
+      secondary-action="ux-improve"
+      secondary-label="پیشنهاد بهبود UX"
+    />
     <Card size="small">
       <Statistic title="میانگین امتیاز (از ۵)" :value="average" :precision="1" suffix="/ ۵" />
       <Paragraph type="secondary"

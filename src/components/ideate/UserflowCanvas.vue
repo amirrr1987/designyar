@@ -56,7 +56,7 @@ function onKindChange(id: string, value: unknown): void {
 
 <template>
   <Space direction="vertical" size="middle">
-    <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان با AI" />
+    <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان با AI" section="جریان کاربر" />
     <Card size="small" title="افزودن گام">
       <Space wrap>
         <Select v-model:value="draftKind">

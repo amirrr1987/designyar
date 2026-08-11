@@ -7,6 +7,8 @@ import type { AiActionId } from '@/utils/ai-prompts'
 interface AiAssistButtonProps {
   action: AiActionId
   label?: string
+  /** Current form/section name — added to AI user hint alongside full project context. */
+  section?: string
 }
 
 const props = withDefaults(defineProps<AiAssistButtonProps>(), {
@@ -16,7 +18,7 @@ const props = withDefaults(defineProps<AiAssistButtonProps>(), {
 const aiStore = useAiStore()
 
 function onClick(): void {
-  aiStore.openPanel(props.action)
+  aiStore.openPanel(props.action, props.section)
 }
 </script>
 

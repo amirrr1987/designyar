@@ -65,7 +65,7 @@ const cells: { key: keyof EmpathyQuadrants; title: string; placeholder: string }
 
 <template>
   <Space direction="vertical" size="middle">
-    <AiAssistButton action="synthesize-empathy" label="سنتز نقشه همدلی با AI" />
+    <AiAssistButton action="synthesize-empathy" label="سنتز نقشه همدلی با AI" section="نقشه همدلی" />
     <Row :gutter="[16, 8]">
       <Col :xs="24" :md="12" :lg="8">
         <Text strong>مرتبط با پرسونا</Text>

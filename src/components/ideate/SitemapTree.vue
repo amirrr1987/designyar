@@ -85,7 +85,7 @@ function onDeleteSelected(): void {
 
 <template>
   <Space direction="vertical" size="middle">
-    <AiAssistButton action="suggest-sitemap" label="پیشنهاد IA با AI" />
+    <AiAssistButton action="suggest-sitemap" label="پیشنهاد IA با AI" section="نقشه سایت" />
 
     <Card size="small" title="افزودن صفحه ریشه">
       <Space wrap>

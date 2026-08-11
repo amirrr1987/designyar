@@ -30,6 +30,7 @@ import { useGroq } from '@/composables/useGroq'
 import { useAiStore } from '@/stores/ai'
 import type { AiApplyPayload } from '@/types/ai-response'
 import { getContextReadiness } from '@/utils/ai-context-readiness'
+import { getProjectContextCoverage } from '@/utils/ai-context-coverage'
 import { parseApplyPayload, supportsApply } from '@/utils/ai-response-parse'
 import {
   AI_ACTIONS_BY_PHASE,
@@ -80,6 +81,8 @@ const contextHints = computed(() => getContextHints(actionId.value, contextPrevi
 
 const readiness = computed(() => getContextReadiness(actionId.value, contextPreview.value))
 
+const projectCoverage = computed(() => getProjectContextCoverage(contextPreview.value))
+
 const chainProgress = computed(() => aiStore.getChainProgress())
 
 const canApply = computed(
@@ -100,6 +103,10 @@ watch(
     }
     const pending = aiStore.consumePendingAction()
     if (pending) actionId.value = pending
+    const sectionHint = aiStore.consumePendingSectionHint()
+    if (sectionHint) {
+      prompt.value = `بخش فعلی: ${sectionHint}`
+    }
   },
   { immediate: true },
 )
@@ -301,8 +308,21 @@ function onClearResponse(): void {
       type="info"
       show-icon
       message="دستیار Design Thinking (Groq)"
-      description="اکشن یا زنجیره را انتخاب کنید؛ AI از داده پروژه context می‌گیرد."
+      description="هر اکشن از کل artifactهای پروژه (شرح، Empathize، Define، Ideate، Prototype، Test) context می‌گیرد — نه فقط همین صفحه."
     />
+
+    <Card size="small" title="پوشش داده پروژه در AI">
+      <Progress :percent="projectCoverage.percent" status="active" />
+      <Space wrap>
+        <Tag
+          v-for="item in projectCoverage.items.filter((i) => i.filled)"
+          :key="item.id"
+          color="success"
+        >
+          ✓ {{ item.label }}
+        </Tag>
+      </Space>
+    </Card>
 
     <Alert
       v-if="!isReady"

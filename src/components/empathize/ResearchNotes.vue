@@ -17,9 +17,9 @@ const notes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
       description="متن را بنویسید؛ سپس با AI تحلیل کنید یا از آن برای پیشنهاد پرسونا استفاده کنید."
     />
     <Space wrap>
-      <AiAssistButton action="seed-research-notes" label="پیشنهاد اسکلت یادداشت" />
-      <AiAssistButton action="analyze-notes" label="تحلیل این یادداشت" />
-      <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا از یادداشت" />
+      <AiAssistButton action="seed-research-notes" label="پیشنهاد اسکلت یادداشت" section="یادداشت تحقیق" />
+      <AiAssistButton action="analyze-notes" label="تحلیل این یادداشت" section="یادداشت تحقیق" />
+      <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا از یادداشت" section="یادداشت تحقیق" />
     </Space>
     <Card size="small" title="یادداشت‌ها">
       <Textarea

@@ -73,8 +73,8 @@ function onRemove(id: string): void {
 
 <template>
   <Space direction="vertical" size="large">
-    <AiAssistButton action="suggest-competitors" label="پیشنهاد رقبا با AI" />
-    <AiAssistButton action="analyze-competitors" label="تحلیل رقبا با AI" />
+    <AiAssistButton action="suggest-competitors" label="پیشنهاد رقبا با AI" section="جدول رقبا" />
+    <AiAssistButton action="analyze-competitors" label="تحلیل رقبا با AI" section="جدول رقبا" />
     <Form ref="formRef" layout="vertical" :model="model" :rules="rules" @finish="onAdd">
       <FormItem label="نام رقیب" name="name">
         <Input v-model:value="model.name" placeholder="نام محصول یا شرکت" />

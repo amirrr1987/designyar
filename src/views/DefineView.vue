@@ -18,10 +18,10 @@ const step = getStepByKey('define')
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
         <AiChainButton chain="define-complete" label="زنجیره Define (مسئله→POV→HMW)" />
-        <AiAssistButton action="generate-hmw" label="تولید HMW با AI" />
-        <AiAssistButton action="refine-problem" label="پیشنهاد بیان مسئله" />
-        <AiAssistButton action="refine-pov" label="پیشنهاد POV" />
-        <AiAssistButton action="ux-improve" label="پیشنهاد بهبود UX" />
+        <AiAssistButton action="generate-hmw" label="تولید HMW با AI" section="Define" />
+        <AiAssistButton action="refine-problem" label="پیشنهاد بیان مسئله" section="Define" />
+        <AiAssistButton action="refine-pov" label="پیشنهاد POV" section="Define" />
+        <AiAssistButton action="ux-improve" label="پیشنهاد بهبود UX" section="Define" />
       </Space>
     </Card>
 

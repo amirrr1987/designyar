@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, CheckboxGroup, Progress, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import {
   COMPONENT_CHECKLIST_OPTIONS,
   DEFAULT_COMPONENT_CHECKLIST,
@@ -20,6 +21,13 @@ const progress = computed(() => {
 
 <template>
   <Space direction="vertical" size="middle">
+    <AiSectionAssist
+      action="review-design-system"
+      label="بازبینی UI kit با AI"
+      section="چک‌لیست کامپوننت"
+      secondary-action="wireframe-critique"
+      secondary-label="نقد وایرفریم"
+    />
     <Paragraph type="secondary">
       چک‌لیست کامپوننت‌های antdv استفاده‌شده در پروژه را علامت بزنید.
     </Paragraph>

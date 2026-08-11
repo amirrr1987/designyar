@@ -85,7 +85,7 @@ async function onSubmit(): Promise<void> {
         <template #icon><PlusOutlined /></template>
         ایده جدید
       </Button>
-      <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" />
+      <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" section="طوفان فکری" />
     </Space>
 
     <Empty v-if="ideas.length === 0" description="هنوز ایده‌ای ثبت نشده است" />

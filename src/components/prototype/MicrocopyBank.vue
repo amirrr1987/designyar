@@ -52,7 +52,7 @@ function removeEntry(id: string): void {
       میکروکپی‌های تولیدشده با AI اینجا ذخیره می‌شوند — برای copy/paste در طراحی UI.
     </Paragraph>
 
-    <AiAssistButton action="microcopy" label="تولید میکروکپی با AI" />
+    <AiAssistButton action="microcopy" label="تولید میکروکپی با AI" section="بانک میکروکپی" />
 
     <Empty v-if="sortedEntries.length === 0" description="بانک میکروکپی خالی است" />
 

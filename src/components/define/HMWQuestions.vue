@@ -39,7 +39,7 @@ function onAdd(): void {
 <template>
   <Space direction="vertical" size="middle">
     <Space wrap>
-      <AiAssistButton action="generate-hmw" label="تولید سوالات HMW با AI" />
+      <AiAssistButton action="generate-hmw" label="تولید سوالات HMW با AI" section="سوالات HMW" />
     </Space>
     <Space.Compact block>
       <Input

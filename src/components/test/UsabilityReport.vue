@@ -84,7 +84,7 @@ function clearSummary(): void {
     <Card size="small" title="خلاصه AI (گزارش نهایی)">
       <Space direction="vertical" size="middle">
         <Space wrap>
-          <AiAssistButton action="summarize-test" label="تولید/به‌روزرسانی خلاصه با AI" />
+          <AiAssistButton action="summarize-test" label="تولید/به‌روزرسانی خلاصه با AI" section="گزارش کاربردپذیری" />
           <Button v-if="reportSummary.trim()" @click="clearSummary">پاک کردن خلاصه</Button>
         </Space>
         <Empty v-if="!reportSummary.trim()" description="هنوز خلاصه AI ذخیره نشده — از دکمه بالا استفاده کنید" />

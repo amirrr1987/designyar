@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button, Card, Input, Space, Tag, Typography, message } from 'ant-design-vue'
+import { Button, Card, Col, Input, Row, Space, Tag, Typography, message } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { gold } from '@ant-design/colors'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDesignSystemStore } from '@/stores/designSystem'
 import { rampFromSeed } from '@/types/design-system'
 
@@ -57,6 +58,11 @@ function onPreviewOnly(): void {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiSectionAssist
+      action="review-design-system"
+      label="بازبینی پالت با AI"
+      section="پالت رنگ"
+    />
     <Card size="small" title="رنگ اصلی (Primary)">
       <Space wrap>
         <Input v-model:value="seedDraft" placeholder="#1677ff" allow-clear />

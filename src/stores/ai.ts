@@ -38,6 +38,7 @@ export const useAiStore = defineStore('ai', () => {
   const error = ref('')
   const panelOpen = ref(false)
   const pendingAction = ref<AiActionId | null>(null)
+  const pendingSectionHint = ref('')
   const pendingChain = ref<AiChainId | null>(null)
   const activeChainId = ref<AiChainId | null>(null)
   const chainStepIndex = ref(0)
@@ -69,8 +70,9 @@ export const useAiStore = defineStore('ai', () => {
     error.value = value
   }
 
-  function openPanel(action?: AiActionId): void {
+  function openPanel(action?: AiActionId, sectionHint?: string): void {
     if (action) pendingAction.value = action
+    pendingSectionHint.value = sectionHint?.trim() ?? ''
     panelOpen.value = true
   }
 
@@ -86,6 +88,12 @@ export const useAiStore = defineStore('ai', () => {
     const action = pendingAction.value
     pendingAction.value = null
     return action
+  }
+
+  function consumePendingSectionHint(): string {
+    const hint = pendingSectionHint.value
+    pendingSectionHint.value = ''
+    return hint
   }
 
   function clearSessionOutput(): void {
@@ -146,6 +154,7 @@ export const useAiStore = defineStore('ai', () => {
     error.value = ''
     panelOpen.value = false
     pendingAction.value = null
+    pendingSectionHint.value = ''
     pendingChain.value = null
     activeChainId.value = null
     chainStepIndex.value = 0
@@ -174,6 +183,7 @@ export const useAiStore = defineStore('ai', () => {
     closePanel,
     setPanelOpen,
     consumePendingAction,
+    consumePendingSectionHint,
     openChain,
     consumePendingChain,
     startChain,

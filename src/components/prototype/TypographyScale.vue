@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, Form, FormItem, Input, InputNumber, Slider, Space, Typography } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDesignSystemStore } from '@/stores/designSystem'
 
 const { Title, Paragraph, Text } = Typography
@@ -49,6 +50,11 @@ function titleLevel(index: number): 1 | 2 | 3 | 4 | 5 {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiSectionAssist
+      action="review-design-system"
+      label="بازبینی تایپ با AI"
+      section="تایپوگرافی"
+    />
     <Card size="small" title="مقیاس تایپوگرافی">
       <Form layout="vertical">
         <FormItem label="اندازه پایه (px)">

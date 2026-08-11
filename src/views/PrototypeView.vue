@@ -26,9 +26,9 @@ const activeKey = ref<PrototypeTabKey>('color')
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
         <AiChainButton chain="prototype-starter" label="زنجیره Prototype (wireframe→microcopy)" />
-        <AiAssistButton action="review-design-system" label="بازبینی Design System" />
-        <AiAssistButton action="wireframe-critique" label="نقد وایرفریم" />
-        <AiAssistButton action="microcopy" label="تولید میکروکپی" />
+        <AiAssistButton action="review-design-system" label="بازبینی Design System" section="Prototype" />
+        <AiAssistButton action="wireframe-critique" label="نقد وایرفریم" section="Prototype" />
+        <AiAssistButton action="microcopy" label="تولید میکروکپی" section="Prototype" />
       </Space>
     </Card>
 

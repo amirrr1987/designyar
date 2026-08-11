@@ -11,6 +11,7 @@ import {
   Space,
   Typography,
 } from 'ant-design-vue'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useGrid } from '@/composables/useGrid'
 
 const { Text } = Typography
@@ -27,6 +28,7 @@ function onNumber(
 
 <template>
   <Space direction="vertical" size="large">
+    <AiSectionAssist action="review-design-system" label="بازبینی گرید با AI" section="گرید" />
     <Card size="small" title="پیکربندی گرید">
       <Form layout="vertical">
         <FormItem label="تعداد ستون">

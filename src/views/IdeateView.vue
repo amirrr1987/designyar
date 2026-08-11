@@ -23,8 +23,8 @@ const activeKey = ref<IdeateTabKey>('brainstorm')
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
         <AiChainButton chain="ideate-complete" label="زنجیره Ideate (ایده→flow→IA→cards)" />
-        <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" />
-        <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان کاربر" />
+        <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" section="Ideate" />
+        <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان کاربر" section="Ideate" />
       </Space>
     </Card>
 

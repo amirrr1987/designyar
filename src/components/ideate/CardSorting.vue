@@ -88,7 +88,7 @@ function currentCategoryId(cardId: string): string | undefined {
 
 <template>
   <Space direction="vertical" size="large">
-    <AiAssistButton action="suggest-card-sort" label="پیشنهاد کارت‌ها با AI" />
+    <AiAssistButton action="suggest-card-sort" label="پیشنهاد کارت‌ها با AI" section="مرتب‌سازی کارت" />
 
     <Card size="small" title="افزودن کارت محتوا">
       <Space wrap>

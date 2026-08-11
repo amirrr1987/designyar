@@ -12,6 +12,7 @@ import {
   message,
 } from 'ant-design-vue'
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { usePersona } from '@/composables/usePersona'
 import { getPersonaTemplate } from '@/utils/persona-templates'
 
@@ -97,7 +98,16 @@ async function onSubmit(): Promise<void> {
 </script>
 
 <template>
-  <Form ref="formRef" layout="vertical" :model="model" :rules="rules" @finish="onSubmit">
+  <Space direction="vertical" size="middle">
+    <AiSectionAssist
+      action="persona-suggest"
+      label="پیشنهاد پرسونا با AI"
+      section="فرم پرسونا"
+      secondary-action="synthesize-empathy"
+      secondary-label="سنتز empathy"
+    />
+
+    <Form ref="formRef" layout="vertical" :model="model" :rules="rules" @finish="onSubmit">
     <FormItem label="قالب آماده" name="templateId">
       <Select
         v-model:value="model.templateId"
@@ -146,4 +156,5 @@ async function onSubmit(): Promise<void> {
       </Space>
     </FormItem>
   </Form>
+  </Space>
 </template>

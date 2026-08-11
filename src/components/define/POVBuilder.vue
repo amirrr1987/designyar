@@ -62,7 +62,7 @@ function onPersonaChange(value: unknown): void {
 <template>
   <Space direction="vertical" size="middle">
     <Space wrap>
-      <AiAssistButton action="refine-pov" label="پیشنهاد POV با AI" />
+      <AiAssistButton action="refine-pov" label="پیشنهاد POV با AI" section="نقطه دید (POV)" />
     </Space>
     <Card size="small" title="نقطه دید (POV)">
       <Form layout="vertical">

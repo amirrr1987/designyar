@@ -20,7 +20,7 @@ const previewReady = computed(() => {
 
 <template>
   <Space direction="vertical" size="middle">
-    <AiAssistButton action="refine-problem" label="پیشنهاد بیان مسئله با AI" />
+    <AiAssistButton action="refine-problem" label="پیشنهاد بیان مسئله با AI" section="بیان مسئله" />
     <Card size="small" title="بیان مسئله">
       <Form layout="vertical">
         <FormItem label="کاربر (چه کسی؟)">

@@ -15,6 +15,7 @@ import {
   Tag,
 } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDesignSystemStore } from '@/stores/designSystem'
 import { SPACING_8PT, buildSpacingScale, toSpacingTokenRows } from '@/utils/spacing-scale'
 
@@ -39,6 +40,7 @@ function applyCanonical8pt(): void {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiSectionAssist action="review-design-system" label="بازبینی فاصله با AI" section="فاصله‌گذاری" />
     <Card size="small" title="فاصله‌گذاری (Spacing)">
       <Form layout="inline">
         <FormItem label="واحد پایه (px)">
