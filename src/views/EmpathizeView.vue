@@ -3,6 +3,7 @@ import { Card, Col, Empty, Row, Space, Typography } from 'ant-design-vue'
 import EmpathyMap from '@/components/empathize/EmpathyMap.vue'
 import PersonaBuilder from '@/components/empathize/PersonaBuilder.vue'
 import PersonaCard from '@/components/empathize/PersonaCard.vue'
+import ResearchNotes from '@/components/empathize/ResearchNotes.vue'
 import { usePersona } from '@/composables/usePersona'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
@@ -33,6 +34,10 @@ const { personas, removePersona } = usePersona()
 
     <Card title="نقشه همدلی">
       <EmpathyMap />
+    </Card>
+
+    <Card title="یادداشت تحقیق">
+      <ResearchNotes />
     </Card>
   </Space>
 </template>
