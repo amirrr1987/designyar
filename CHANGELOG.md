@@ -7,12 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-08-11
+
 ### Added
 
 - composable `useWebLLM` و استور AI با وضعیت بارگذاری/پاسخ (مدل کوچک پیش‌فرض)
 - پنل AI در Drawer هدر (`AIPanel.vue`)
 - اکشن‌های تایپ‌شده و prompt فارسی در `utils/ai-prompts.ts` + جمع‌آوری context
 - دکمه‌های `AiAssistButton` روی Empathize / Define / Test با preset اکشن
+
+### Fixed
+
+- سازگاری `Select` مدل AI با نوع `SelectValue` آنتدیزاین
 
 ## [0.7.0] - 2026-08-11
 
