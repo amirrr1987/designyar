@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { Card, Space, Tabs, Typography } from 'ant-design-vue'
 import ColorPalette from '@/components/prototype/ColorPalette.vue'
 import ComponentLibrary from '@/components/prototype/ComponentLibrary.vue'
+import MicrocopyBank from '@/components/prototype/MicrocopyBank.vue'
 import GridConfigurator from '@/components/prototype/GridConfigurator.vue'
 import SpacingScale from '@/components/prototype/SpacingScale.vue'
 import TypographyScale from '@/components/prototype/TypographyScale.vue'
@@ -10,7 +11,7 @@ import WireframeBuilder from '@/components/prototype/WireframeBuilder.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
-type PrototypeTabKey = 'color' | 'type' | 'grid' | 'spacing' | 'wireframe' | 'checklist'
+type PrototypeTabKey = 'color' | 'type' | 'grid' | 'spacing' | 'wireframe' | 'checklist' | 'microcopy'
 
 const { Title, Paragraph } = Typography
 const step = getStepByKey('prototype')
@@ -25,6 +26,7 @@ const activeKey = ref<PrototypeTabKey>('color')
       <Space wrap>
         <AiAssistButton action="review-design-system" label="بازبینی Design System" />
         <AiAssistButton action="wireframe-critique" label="نقد وایرفریم" />
+        <AiAssistButton action="microcopy" label="تولید میکروکپی" />
       </Space>
     </Card>
 
@@ -47,6 +49,9 @@ const activeKey = ref<PrototypeTabKey>('color')
         </Tabs.TabPane>
         <Tabs.TabPane key="checklist" tab="چک‌لیست">
           <ComponentLibrary />
+        </Tabs.TabPane>
+        <Tabs.TabPane key="microcopy" tab="میکروکپی">
+          <MicrocopyBank />
         </Tabs.TabPane>
       </Tabs>
     </Card>

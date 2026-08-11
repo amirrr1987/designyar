@@ -2,6 +2,8 @@ import type { EmpathyQuadrants } from '@/types/empathy-map'
 import { isEmpathyQuadrants } from '@/types/empathy-map'
 import type { FlowNodeKind } from '@/types/ideate'
 import { isFlowNodeKind } from '@/types/ideate'
+import type { MicrocopyCategory } from '@/types/microcopy'
+import { isMicrocopyCategory } from '@/types/microcopy'
 
 export interface AiPersonaDraft {
   name: string
@@ -39,6 +41,12 @@ export interface AiEmpathyMapDraft {
   quadrants: EmpathyQuadrants
 }
 
+export interface AiMicrocopyDraft {
+  category: MicrocopyCategory
+  text: string
+  context?: string
+}
+
 export interface AiSitemapNodeDraft {
   title: string
   children?: AiSitemapNodeDraft[]
@@ -57,6 +65,7 @@ export type AiApplyPayload =
   | { type: 'empathyMaps'; items: AiEmpathyMapDraft[] }
   | { type: 'sitemap'; items: AiSitemapNodeDraft[] }
   | { type: 'sortCards'; items: string[] }
+  | { type: 'microcopy'; items: AiMicrocopyDraft[] }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -107,6 +116,12 @@ export function isAiEmpathyMapDraft(value: unknown): value is AiEmpathyMapDraft 
   return typeof value.personaId === 'string' && isEmpathyQuadrants(value.quadrants)
 }
 
+export function isAiMicrocopyDraft(value: unknown): value is AiMicrocopyDraft {
+  if (!isRecord(value)) return false
+  const contextOk = value.context === undefined || typeof value.context === 'string'
+  return isMicrocopyCategory(value.category) && typeof value.text === 'string' && contextOk
+}
+
 function isAiSitemapNodeDraft(value: unknown): value is AiSitemapNodeDraft {
   if (!isRecord(value)) return false
   if (typeof value.title !== 'string') return false
@@ -132,6 +147,7 @@ export interface AiStructuredJson {
   empathyMaps?: unknown
   sitemapNodes?: unknown
   sortCards?: unknown
+  microcopyItems?: unknown
 }
 
 export function isAiStructuredJson(value: unknown): value is AiStructuredJson {

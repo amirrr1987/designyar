@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-08-11
+
+### Added
+
+- **`test-to-ideas`** — بازخورد Test به Ideate (ایده patch با tag `test-fix`)
+- **بانک میکروکپی** — ذخیره و مدیریت میکروکپی‌های AI در Prototype
+- اکشن `microcopy` با اعمال مستقیم در بانک
+- **چک‌لیست کامپوننت** در context AI (`review-design-system`, `wireframe-critique`, `microcopy`)
+- export/import نسخه **3** با `microcopyBank`
+
+### Changed
+
+- دکمه میکروکپی از Define به Prototype منتقل شد
+- Phase Coach: راهنمای میکروکopi در Prototype و بازخورد حلقه‌ای Test
+
 ## [0.14.0] - 2026-08-11
 
 ### Added

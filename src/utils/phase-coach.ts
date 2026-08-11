@@ -13,6 +13,7 @@ export interface PhaseCoachSnapshot {
   sitemapCount: number
   cardSortCount: number
   hasTestSummary: boolean
+  microcopyCount: number
   wcagProgress: number
 }
 
@@ -47,6 +48,7 @@ export function buildPhaseCoachSnapshot(input: {
   sitemap: { children?: unknown[] }[]
   cardSortCardCount: number
   testSummary: string
+  microcopyCount: number
   wcagProgress: number
 }): PhaseCoachSnapshot {
   return {
@@ -62,6 +64,7 @@ export function buildPhaseCoachSnapshot(input: {
     sitemapCount: countSitemapNodes(input.sitemap),
     cardSortCount: input.cardSortCardCount,
     hasTestSummary: Boolean(input.testSummary.trim()),
+    microcopyCount: input.microcopyCount,
     wcagProgress: input.wcagProgress,
   }
 }
@@ -176,6 +179,13 @@ export function getPhaseCoachHint(
         actionId: 'review-design-system',
       }
     case 'prototype':
+      if (snapshot.microcopyCount === 0) {
+        return {
+          hint: 'میکروکپی UI را با AI تولید و در بانک ذخیره کنید.',
+          actionLabel: 'تولید میکروکپی',
+          actionId: 'microcopy',
+        }
+      }
       return {
         hint: 'توکن‌ها و وایرفریم را تنظیم کنید؛ سپس Test.',
         actionLabel: 'نقد وایرفریم',
@@ -193,7 +203,7 @@ export function getPhaseCoachHint(
         }
       }
       return {
-        hint: 'یافته‌های تست را به HMW تبدیل کنید (بازخورد به Define).',
+        hint: 'بازخورد حلقه‌ای: HMW به Define یا «ایده patch از تست» به Ideate.',
         actionLabel: 'HMW از تست',
         actionId: 'test-to-hmw',
       }

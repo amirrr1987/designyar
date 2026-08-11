@@ -22,7 +22,6 @@ const step = getStepByKey('define')
         <AiAssistButton action="refine-problem" label="پیشنهاد بیان مسئله" />
         <AiAssistButton action="refine-pov" label="پیشنهاد POV" />
         <AiAssistButton action="ux-improve" label="پیشنهاد بهبود UX" />
-        <AiAssistButton action="microcopy" label="تولید میکروکپی" />
       </Space>
     </Card>
 

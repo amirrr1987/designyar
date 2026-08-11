@@ -37,6 +37,10 @@ export function hydrateFromExport(payload: UxFlowExport): void {
       ? d.usabilityReportSummary
       : '',
   )
+  writeJson(
+    STORAGE_KEYS.microcopyBank,
+    'microcopyBank' in d && Array.isArray(d.microcopyBank) ? d.microcopyBank : [],
+  )
 }
 
 export async function importUxFlowFromFile(file: File): Promise<ImportResult> {

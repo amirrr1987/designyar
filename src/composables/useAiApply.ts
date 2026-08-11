@@ -6,6 +6,7 @@ import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { AiApplyPayload, AiSitemapNodeDraft } from '@/types/ai-response'
+import type { MicrocopyEntry } from '@/types/microcopy'
 import type { SitemapNode } from '@/types/ideate'
 
 function draftToSitemapNode(draft: AiSitemapNodeDraft): SitemapNode {
@@ -39,6 +40,7 @@ export function useAiApply() {
   const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
   const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
   const empathySelectedPersona = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, 'general')
+  const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
 
   function applyPayload(payload: AiApplyPayload): number {
     switch (payload.type) {
@@ -166,6 +168,23 @@ export function useAiApply() {
           ideateStore.addSortCard(trimmed)
           added += 1
         }
+        return added
+      }
+      case 'microcopy': {
+        let added = 0
+        const next = [...microcopyBank.value]
+        for (const draft of payload.items) {
+          if (!draft.text.trim()) continue
+          next.push({
+            id: crypto.randomUUID(),
+            category: draft.category,
+            text: draft.text.trim(),
+            context: draft.context?.trim() ?? '',
+            createdAt: new Date().toISOString(),
+          })
+          added += 1
+        }
+        microcopyBank.value = next
         return added
       }
       default: {

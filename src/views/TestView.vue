@@ -23,6 +23,7 @@ const activeKey = ref<TestTabKey>('contrast')
       <Space wrap>
         <AiAssistButton action="summarize-test" label="خلاصه یافته‌ها با AI" />
         <AiAssistButton action="test-to-hmw" label="HMW از یافته‌های تست" />
+        <AiAssistButton action="test-to-ideas" label="ایده patch از تست" />
       </Space>
     </Card>
 

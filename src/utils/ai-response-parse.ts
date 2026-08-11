@@ -8,6 +8,7 @@ import {
   isAiStatementDraft,
   isAiStructuredJson,
   isAiSitemapNodeDraftArray,
+  isAiMicrocopyDraft,
   type AiApplyPayload,
   type AiStructuredJson,
 } from '@/types/ai-response'
@@ -151,6 +152,13 @@ function parseSortCards(value: unknown): AiApplyPayload | null {
   return { type: 'sortCards', items }
 }
 
+function parseMicrocopyItems(value: unknown): AiApplyPayload | null {
+  if (!Array.isArray(value)) return null
+  const items = value.filter(isAiMicrocopyDraft).filter((item) => item.text.trim().length > 0)
+  if (items.length === 0) return null
+  return { type: 'microcopy', items }
+}
+
 export function parseApplyPayload(action: AiActionId, responseText: string): AiApplyPayload | null {
   const parsed = extractJsonCandidate(responseText)
   const root = normalizeStructuredRoot(parsed)
@@ -176,6 +184,10 @@ export function parseApplyPayload(action: AiActionId, responseText: string): AiA
       return parseSortCards(root.sortCards)
     case 'test-to-hmw':
       return parseHmw(root.hmwQuestions)
+    case 'test-to-ideas':
+      return parseIdeas(root.ideas)
+    case 'microcopy':
+      return parseMicrocopyItems(root.microcopyItems)
     case 'refine-problem':
       return parseProblem(root.problem)
     case 'refine-pov':
@@ -202,6 +214,8 @@ export function supportsApply(action: AiActionId): boolean {
     action === 'suggest-sitemap' ||
     action === 'suggest-card-sort' ||
     action === 'test-to-hmw' ||
+    action === 'test-to-ideas' ||
+    action === 'microcopy' ||
     action === 'refine-problem' ||
     action === 'refine-pov' ||
     action === 'improve-project-brief' ||

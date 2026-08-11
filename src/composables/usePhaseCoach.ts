@@ -11,6 +11,7 @@ import { useIdeateStore } from '@/stores/ideate'
 import { useProjectStore } from '@/stores/project'
 import { useAiStore } from '@/stores/ai'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
+import type { MicrocopyEntry } from '@/types/microcopy'
 import type { DesignStepKey } from '@/types/project'
 import { isAiActionId } from '@/utils/ai-prompts'
 import {
@@ -46,6 +47,7 @@ export function usePhaseCoach(): {
   const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
   const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
   const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
+  const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
 
   const stepKey = computed((): DesignStepKey | 'home' => {
     const name = route.name
@@ -76,6 +78,7 @@ export function usePhaseCoach(): {
       sitemap: sitemap.value,
       cardSortCardCount: cardSort.value.cards.length,
       testSummary: testSummary.value,
+      microcopyCount: microcopyBank.value.length,
       wcagProgress: wcagProgress.value,
     })
     return getPhaseCoachHint(stepKey.value, snapshot)

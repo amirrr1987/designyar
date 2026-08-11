@@ -207,9 +207,73 @@ function checksFor(action: AiActionId): CheckDef[] {
           label: 'WCAG یا هیوریستیک',
           essential: true,
           test: (ctx) =>
+            hasText(ctx.testSummary) ||
             (ctx.wcagProgress !== undefined && ctx.wcagProgress > 0) ||
-            (ctx.heuristicAverage !== undefined && ctx.heuristicAverage > 0) ||
-            hasText(ctx.testSummary),
+            (ctx.heuristicAverage !== undefined && ctx.heuristicAverage > 0),
+        },
+      ]
+    case 'test-to-ideas':
+      return [
+        {
+          id: 'test-summary',
+          label: 'خلاصه تست',
+          essential: false,
+          test: (ctx) => hasText(ctx.testSummary),
+        },
+        {
+          id: 'wcag-or-heuristic',
+          label: 'WCAG یا هیوریستیک',
+          essential: true,
+          test: (ctx) =>
+            hasText(ctx.testSummary) ||
+            (ctx.wcagProgress !== undefined && ctx.wcagProgress > 0) ||
+            (ctx.heuristicAverage !== undefined && ctx.heuristicAverage > 0),
+        },
+      ]
+    case 'microcopy':
+      return [
+        {
+          id: 'wireframe',
+          label: 'وایرفریم',
+          essential: false,
+          test: (ctx) => hasText(ctx.wireframeSummary),
+        },
+        {
+          id: 'problem',
+          label: 'بیان مسئله',
+          essential: false,
+          test: (ctx) => hasText(ctx.problemSentence),
+        },
+        brief,
+      ]
+    case 'review-design-system':
+      return [
+        {
+          id: 'design-system',
+          label: 'توکن Design System',
+          essential: true,
+          test: (ctx) => hasText(ctx.designSystemSummary),
+        },
+        {
+          id: 'components',
+          label: 'چک‌لیست کامپوننت',
+          essential: false,
+          test: (ctx) => hasText(ctx.componentChecklistSummary),
+        },
+      ]
+    case 'wireframe-critique':
+      return [
+        {
+          id: 'wireframe',
+          label: 'بلوک وایرفریم',
+          essential: true,
+          test: (ctx) => hasText(ctx.wireframeSummary),
+        },
+        {
+          id: 'components',
+          label: 'چک‌لیست کامپوننت',
+          essential: false,
+          test: (ctx) => hasText(ctx.componentChecklistSummary),
         },
       ]
     case 'summarize-test':

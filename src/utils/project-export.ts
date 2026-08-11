@@ -7,6 +7,7 @@ import type { DesignSystem } from '@/types/design-system'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { CardSortState, FlowNode, IdeaCard, SitemapNode } from '@/types/ideate'
 import type { Persona } from '@/types/persona'
+import type { MicrocopyEntry } from '@/types/microcopy'
 import type { Project } from '@/types/project'
 import {
   createDefaultDesignSystem,
@@ -28,8 +29,9 @@ import {
   isIdeaCard,
   isSitemapNodeArray,
 } from '@/types/ideate'
+import { isMicrocopyEntryArray } from '@/types/microcopy'
 
-export const UX_FLOW_EXPORT_VERSION = 2 as const
+export const UX_FLOW_EXPORT_VERSION = 3 as const
 
 export interface UxFlowExport {
   version: typeof UX_FLOW_EXPORT_VERSION
@@ -55,6 +57,7 @@ export interface UxFlowExport {
     heuristicEval: HeuristicEvalMap
     aiPrefs: AiPrefs
     usabilityReportSummary: string
+    microcopyBank: MicrocopyEntry[]
   }
 }
 
@@ -134,15 +137,22 @@ function isString(value: unknown): value is string {
 
 export function isUxFlowExport(value: unknown): value is UxFlowExport {
   if (!isRecord(value)) return false
-  if (value.version !== UX_FLOW_EXPORT_VERSION && value.version !== 1) return false
+  if (value.version !== UX_FLOW_EXPORT_VERSION && value.version !== 2 && value.version !== 1) {
+    return false
+  }
   if (typeof value.exportedAt !== 'string') return false
   if (!isRecord(value.data)) return false
   const d = value.data
   const summaryOk =
     value.version === 1 ||
     typeof d.usabilityReportSummary === 'string'
+  const microcopyOk =
+    value.version <= 2 ||
+    isMicrocopyEntryArray(d.microcopyBank) ||
+    d.microcopyBank === undefined
   return (
     summaryOk &&
+    microcopyOk &&
     isProject(d.project) &&
     isPersonaArray(d.personas) &&
     isEmpathyMaps(d.empathyMaps) &&
@@ -196,6 +206,7 @@ export function buildUxFlowExport(): UxFlowExport {
         isAiPrefs,
       ),
       usabilityReportSummary: readOr(STORAGE_KEYS.usabilityReportSummary, '', isString),
+      microcopyBank: readOr(STORAGE_KEYS.microcopyBank, [], isMicrocopyEntryArray),
     },
   }
 }

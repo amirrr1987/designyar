@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
 import { useWCAG } from '@/composables/useWCAG'
 import { HEURISTIC_RULES, type HeuristicEvalMap } from '@/constants/heuristic-rules'
+import { summarizeComponentChecklist } from '@/constants/component-checklist'
 import { WCAG_CHECKLIST } from '@/constants/wcag-checklist'
 import { useDefineStore } from '@/stores/define'
 import { useDesignSystemStore } from '@/stores/designSystem'
@@ -12,6 +13,8 @@ import { useProjectStore } from '@/stores/project'
 import type { CompetitorRow } from '@/types/competitor'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { SitemapNode } from '@/types/ideate'
+import type { MicrocopyEntry } from '@/types/microcopy'
+import { MICROCOPY_CATEGORY_LABELS } from '@/types/microcopy'
 import { evaluateContrast } from '@/utils/contrast'
 import type { AiPromptContext } from '@/utils/ai-prompts'
 
@@ -83,6 +86,8 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
   ])
   const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
   const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
+  const componentChecklist = useStorage<string[]>(STORAGE_KEYS.componentChecklist, [])
+  const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
 
   function buildContext(userHint?: string): AiPromptContext {
     const personasSummary = personas.value
@@ -171,6 +176,19 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
     const contrast = evaluateContrast(fg, bg)
     const contrastSummary = contrast ? `${contrast.ratio}:1 (${contrast.level})` : undefined
 
+    const componentChecklistSummary = summarizeComponentChecklist(componentChecklist.value)
+
+    const microcopySummary =
+      microcopyBank.value.length > 0
+        ? microcopyBank.value
+            .slice(0, 12)
+            .map(
+              (entry) =>
+                `- [${MICROCOPY_CATEGORY_LABELS[entry.category]}] ${entry.text}${entry.context ? ` (${entry.context})` : ''}`,
+            )
+            .join('\n')
+        : undefined
+
     return {
       projectName: projectStore.name,
       projectBrief: formatProjectBrief(
@@ -188,6 +206,8 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
       userflowSummary: userflowSummary || undefined,
       sitemapSummary,
       cardSortSummary: cardSortSummary || undefined,
+      componentChecklistSummary,
+      microcopySummary,
       designSystemSummary,
       wireframeSummary: wireframeSummary || undefined,
       wcagProgress: wcagProgress.value,

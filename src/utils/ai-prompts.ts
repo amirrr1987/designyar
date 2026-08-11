@@ -23,6 +23,7 @@ export type AiActionId =
   | 'wireframe-critique'
   | 'summarize-test'
   | 'test-to-hmw'
+  | 'test-to-ideas'
 
 export interface AiActionDef {
   id: AiActionId
@@ -116,8 +117,9 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     id: 'microcopy',
     label: 'تولید میکروکپی',
     description: 'CTA، خطا، empty state و راهنمای کوتاه',
-    phase: 'define',
-    structured: false,
+    phase: 'prototype',
+    structured: true,
+    applyLabel: 'ذخیره در بانک میکروکپی',
   },
   {
     id: 'brainstorm-ideas',
@@ -181,6 +183,14 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     structured: true,
     applyLabel: 'افزودن سوالات HMW',
   },
+  {
+    id: 'test-to-ideas',
+    label: 'ایده patch از تست',
+    description: 'ایده‌های بهبود UI از ریسک‌های تست',
+    phase: 'test',
+    structured: true,
+    applyLabel: 'افزودن ایده‌ها به برد',
+  },
 ] as const
 
 export function isAiActionId(value: string): value is AiActionId {
@@ -207,6 +217,8 @@ export interface AiPromptContext {
   userflowSummary?: string
   sitemapSummary?: string
   cardSortSummary?: string
+  componentChecklistSummary?: string
+  microcopySummary?: string
   designSystemSummary?: string
   wireframeSummary?: string
   wcagProgress?: number
@@ -292,10 +304,19 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
     '{"hmwQuestions":["چگونه می‌توانیم …؟"]}',
     '۴ تا ۶ سوال HMW بر اساس یافته‌های تست؛ فقط JSON معتبر.',
   ].join('\n'),
+  'test-to-ideas': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"ideas":[{"title":"","detail":"","tags":["test-fix"]}]}',
+    '۳ تا ۵ ایده patch برای ریسک‌های تست؛ tags شامل test-fix؛ فقط JSON معتبر.',
+  ].join('\n'),
+  microcopy: [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"microcopyItems":[{"category":"cta|error|empty|hint|label","text":"","context":""}]}',
+    '۶ تا ۱۰ مورد کاربردی؛ فقط JSON معتبر.',
+  ].join('\n'),
   'analyze-notes': undefined,
   'analyze-competitors': undefined,
   'ux-improve': undefined,
-  microcopy: undefined,
   'review-design-system': undefined,
   'wireframe-critique': undefined,
 }
@@ -315,7 +336,7 @@ export function buildSystemPrompt(action: AiActionId): string {
     'refine-problem': 'ابتدا یک جمله پیش‌نمایش مسئله. سپس JSON problem.',
     'refine-pov': 'ابتدا یک جمله پیش‌نمایش POV. سپس JSON pov.',
     'ux-improve': 'خروجی: ۳–۵ پیشنهاد با اولویت (بالا/متوسط/پایین) و دلیل.',
-    microcopy: 'خروجی: CTA، پیام خطا، empty state، راهنمای کوتاه — هر کدام یک خط.',
+    microcopy: 'ابتدا ۱ جمله خلاصه. سپس JSON microcopyItems.',
     'brainstorm-ideas': 'ابتدا ۱ جمله جهت‌گیری. سپس JSON ایده‌ها.',
     'suggest-userflow': 'ابتدا ۱ جمله هدف جریان. سپس JSON مراحل.',
     'suggest-sitemap': 'ابتدا ۱ جمله خلاصه IA. سپس JSON sitemapNodes.',
@@ -328,6 +349,8 @@ export function buildSystemPrompt(action: AiActionId): string {
       'خروجی: وضعیت کنتراست/WCAG/هیوریستیک، ۳ ریسک، ۳ اقدام بعدی؛ سپس JSON testSummary.',
     'test-to-hmw':
       'ابتدا ۲ جمله جمع‌بندی یافته‌ها. سپس JSON سوالات HMW برای بازگشت به Define.',
+    'test-to-ideas':
+      'ابتدا ۲ جمله خلاصه ریسک‌ها. سپس JSON ایده‌های patch برای Ideate.',
   }
 
   const jsonPart = JSON_FOOTER[action]
@@ -401,6 +424,9 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
     case 'microcopy':
       if (ctx.problemSentence?.trim()) parts.push(`زمینه مسئله: ${ctx.problemSentence}`)
       if (ctx.wireframeSummary?.trim()) parts.push(`وایرفریم: ${ctx.wireframeSummary}`)
+      if (ctx.componentChecklistSummary?.trim())
+        parts.push(`کامپوننت‌های UI:\n${ctx.componentChecklistSummary}`)
+      if (ctx.microcopySummary?.trim()) parts.push(`بانک فعلی:\n${ctx.microcopySummary}`)
       parts.push('میکروکپی‌های کاربردی برای UI پیشنهاد بده.')
       break
     case 'brainstorm-ideas':
@@ -432,12 +458,16 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
     case 'review-design-system':
       if (ctx.designSystemSummary?.trim()) parts.push(`Design System:\n${ctx.designSystemSummary}`)
       if (ctx.contrastSummary?.trim()) parts.push(`کنتراست: ${ctx.contrastSummary}`)
+      if (ctx.componentChecklistSummary?.trim())
+        parts.push(`چک‌لیست کامپوننت:\n${ctx.componentChecklistSummary}`)
       parts.push('Design System را بازبینی کن.')
       break
     case 'wireframe-critique':
       if (ctx.wireframeSummary?.trim()) parts.push(`بلوک‌های وایرفریم: ${ctx.wireframeSummary}`)
       if (ctx.problemSentence?.trim()) parts.push(`مسئله: ${ctx.problemSentence}`)
       if (ctx.sitemapSummary?.trim()) parts.push(`IA:\n${ctx.sitemapSummary}`)
+      if (ctx.componentChecklistSummary?.trim())
+        parts.push(`کامپوننت‌های انتخاب‌شده:\n${ctx.componentChecklistSummary}`)
       parts.push('وایرفریم را نقد کن.')
       break
     case 'summarize-test':
@@ -459,6 +489,15 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
         parts.push(`هیوریستیک ضعیف:\n${ctx.heuristicWeakSummary}`)
       if (ctx.povSentence?.trim()) parts.push(`POV: ${ctx.povSentence}`)
       parts.push('از یافته‌های تست سوالات HMW برای دور بعد Design Thinking بساز.')
+      break
+    case 'test-to-ideas':
+      if (ctx.testSummary?.trim()) parts.push(`خلاصه تست:\n${ctx.testSummary}`)
+      if (ctx.heuristicWeakSummary?.trim())
+        parts.push(`هیوریستیک ضعیف:\n${ctx.heuristicWeakSummary}`)
+      if (ctx.wcagUncheckedSummary?.trim())
+        parts.push(`WCAG بررسی‌نشده:\n${ctx.wcagUncheckedSummary}`)
+      if (ctx.ideasSummary?.trim()) parts.push(`ایده‌های فعلی:\n${ctx.ideasSummary}`)
+      parts.push('ایده‌های patch برای رفع ریسک‌های تست پیشنهاد بده (بازخورد به Ideate).')
       break
     default: {
       const _exhaustive: never = action
@@ -533,6 +572,11 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         hints.push('بلوک‌های وایرفریم را در Prototype انتخاب کنید.')
       }
       break
+    case 'microcopy':
+      if (!ctx.problemSentence?.trim() && !ctx.wireframeSummary?.trim()) {
+        hints.push('بیان مسئله یا وایرفریم به میکروکopi کمک می‌کند.')
+      }
+      break
     case 'summarize-test':
       if (
         ctx.wcagProgress === undefined &&
@@ -547,9 +591,9 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         hints.push('خلاصه تست یا داده WCAG/هیوریستیک را پر کنید.')
       }
       break
-    case 'microcopy':
-      if (!ctx.problemSentence?.trim()) {
-        hints.push('بیان مسئله در Define به میکروکپی کمک می‌کند.')
+    case 'test-to-ideas':
+      if (!ctx.testSummary?.trim() && ctx.wcagProgress === 0 && !ctx.heuristicWeakSummary?.trim()) {
+        hints.push('خلاصه تست یا یافته‌های WCAG/هیوریستیک را پر کنید.')
       }
       break
     default:
