@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- موتور کنتراست WCAG (`utils/contrast.ts`)، `useContrast` و `ContrastChecker.vue`
+
+## [0.6.0] - 2026-08-11
+
+### Added
+
 - تکمیل دیزاین‌سیستم با رمپ پیش‌فرض `@ant-design/colors` و `generatePrimaryFromSeed`
 - پیش‌نمایش و ذخیره پالت رنگ در `ColorPalette.vue`
 - مقیاس تایپوگرافی با Slider/InputNumber در `TypographyScale.vue`
@@ -16,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - مقیاس فاصله ۸pt و نمایش توکن‌ها در `SpacingScale.vue`
 - وایر فریم بلوکی و چک‌لیست کامپوننت در `WireframeBuilder` / `ComponentLibrary`
 - ترکیب PrototypeView با Tabs ابزارهای دیزاین‌سیستم
+
+### Fixed
+
+- سازگاری Slider تایپوگرافی با نوع `Value` آنتدیزاین و حذف import بلااستفاده
 
 ## [0.5.0] - 2026-08-11
 
