@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - لایه Layout: `AppHeader` (نام پروژه)، `AppSider` (منوی خانه + ۵ مرحله با آیکون)، `AppLayout`
 - نگاشت تایپ‌شده آیکون‌های مراحل در `constants/step-icons.ts`
 - `StepProgress` با antdv `Steps` همگام با route/store؛ نمایش بالای محتوا در `AppLayout`
+- `ProjectDashboard` با نام پروژه و کارت لینک به پنج مرحله؛ اتصال در `HomeView`
 
 ## [0.1.0] - 2026-08-11
 
