@@ -21,10 +21,7 @@ export const useIdeateStore = defineStore('ideate', () => {
   const sitemap = useStorage<SitemapNode[]>(STORAGE_KEYS.sitemap, [
     { key: 'home', title: 'خانه', children: [] },
   ])
-  const cardSort = useStorage<CardSortState>(
-    STORAGE_KEYS.cardSort,
-    createEmptyCardSortState(),
-  )
+  const cardSort = useStorage<CardSortState>(STORAGE_KEYS.cardSort, createEmptyCardSortState())
 
   function addIdea(input: { title: string; detail: string; tags?: string[] }): IdeaCard {
     const idea: IdeaCard = {

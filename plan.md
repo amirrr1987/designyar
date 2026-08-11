@@ -602,5 +602,5 @@ Skills: ux-flow-compose + ux-flow + ant-design-vue + full-safe-type-ts rule.
 | 5 Prototype | ☑ | 0.6.0 |
 | 6 Test | ☑ | 0.7.0 |
 | 7 WebLLM | ☑ | 0.8.0 |
-| 8 Export | ☐ | in progress — polish |
+| 8 Export | ☑ | 0.9.0 |
 | 9 Release | ☐ | |

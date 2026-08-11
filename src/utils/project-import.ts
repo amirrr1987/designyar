@@ -2,9 +2,7 @@ import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { UxFlowExport } from '@/utils/project-export'
 import { isUxFlowExport } from '@/utils/project-export'
 
-export type ImportResult =
-  | { ok: true; exportedAt: string }
-  | { ok: false; error: string }
+export type ImportResult = { ok: true; exportedAt: string } | { ok: false; error: string }
 
 function writeJson(key: string, value: unknown): void {
   localStorage.setItem(key, JSON.stringify(value))

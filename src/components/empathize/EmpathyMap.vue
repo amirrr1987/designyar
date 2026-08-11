@@ -16,10 +16,7 @@ const { Text, Paragraph } = Typography
 const { personas } = usePersona()
 
 const maps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
-const selectedPersonaId = useStorage<string>(
-  STORAGE_KEYS.empathySelectedPersona,
-  GENERAL_KEY,
-)
+const selectedPersonaId = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, GENERAL_KEY)
 
 const personaOptions = computed(() => [
   { value: GENERAL_KEY, label: 'عمومی (بدون پرسونا)' },

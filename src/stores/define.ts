@@ -13,10 +13,7 @@ import {
 } from '@/types/define'
 
 export const useDefineStore = defineStore('define', () => {
-  const problem = useStorage<ProblemStatement>(
-    STORAGE_KEYS.problem,
-    createEmptyProblemStatement(),
-  )
+  const problem = useStorage<ProblemStatement>(STORAGE_KEYS.problem, createEmptyProblemStatement())
   const pov = useStorage<POV>(STORAGE_KEYS.pov, createEmptyPOV())
   const hmw = useStorage<HMWItem[]>(STORAGE_KEYS.hmw, [])
 

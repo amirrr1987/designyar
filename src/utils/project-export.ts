@@ -5,12 +5,7 @@ import type { CompetitorRow } from '@/types/competitor'
 import type { HMWItem, POV, ProblemStatement } from '@/types/define'
 import type { DesignSystem } from '@/types/design-system'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
-import type {
-  CardSortState,
-  FlowNode,
-  IdeaCard,
-  SitemapNode,
-} from '@/types/ideate'
+import type { CardSortState, FlowNode, IdeaCard, SitemapNode } from '@/types/ideate'
 import type { Persona } from '@/types/persona'
 import type { Project } from '@/types/project'
 import {
@@ -172,33 +167,17 @@ export function buildUxFlowExport(): UxFlowExport {
       project: readOr(STORAGE_KEYS.project, createDefaultProject(), isProject),
       personas: readOr(STORAGE_KEYS.personas, [], isPersonaArray),
       empathyMaps: readOr(STORAGE_KEYS.empathyMaps, {}, isEmpathyMaps),
-      empathySelectedPersona: readOr(
-        STORAGE_KEYS.empathySelectedPersona,
-        'general',
-        isString,
-      ),
+      empathySelectedPersona: readOr(STORAGE_KEYS.empathySelectedPersona, 'general', isString),
       researchNotes: readOr(STORAGE_KEYS.researchNotes, '', isString),
       competitors: readOr(STORAGE_KEYS.competitors, [], isCompetitorRowArray),
-      problem: readOr(
-        STORAGE_KEYS.problem,
-        createEmptyProblemStatement(),
-        isProblemStatement,
-      ),
+      problem: readOr(STORAGE_KEYS.problem, createEmptyProblemStatement(), isProblemStatement),
       pov: readOr(STORAGE_KEYS.pov, createEmptyPOV(), isPOV),
       hmw: readOr(STORAGE_KEYS.hmw, [], isHMWItemArray),
       ideas: readOr(STORAGE_KEYS.ideas, [], isIdeaCardArray),
       userflow: readOr(STORAGE_KEYS.userflow, [], isFlowNodeArray),
       sitemap: readOr(STORAGE_KEYS.sitemap, [], isSitemapNodeArray),
-      cardSort: readOr(
-        STORAGE_KEYS.cardSort,
-        createEmptyCardSortState(),
-        isCardSortState,
-      ),
-      designSystem: readOr(
-        STORAGE_KEYS.designSystem,
-        createDefaultDesignSystem(),
-        isDesignSystem,
-      ),
+      cardSort: readOr(STORAGE_KEYS.cardSort, createEmptyCardSortState(), isCardSortState),
+      designSystem: readOr(STORAGE_KEYS.designSystem, createDefaultDesignSystem(), isDesignSystem),
       wireframeBlocks: readOr(STORAGE_KEYS.wireframeBlocks, [], isStringArray),
       componentChecklist: readOr(STORAGE_KEYS.componentChecklist, [], isStringArray),
       wcagChecked: readOr(STORAGE_KEYS.wcagChecked, [], isStringArray),

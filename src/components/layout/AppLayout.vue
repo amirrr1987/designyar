@@ -10,7 +10,7 @@ const { Content } = Layout
 <template>
   <Layout style="height: 100vh">
     <AppSider />
-    <Layout >
+    <Layout>
       <AppHeader />
       <Content style="overflow: auto; padding: 16px">
         <StepProgress />

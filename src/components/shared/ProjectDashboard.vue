@@ -85,10 +85,7 @@ const stepStats = computed((): StepStat[] => {
   ]
   const ideateDone = ideateChecks.filter(Boolean).length
 
-  const prototypeChecks = [
-    palette.value.primary.length > 0,
-    palette.value.accent.length > 0,
-  ]
+  const prototypeChecks = [palette.value.primary.length > 0, palette.value.accent.length > 0]
   const prototypeDone = prototypeChecks.filter(Boolean).length
 
   const testPercent = wcagProgress.value
@@ -184,11 +181,7 @@ function statFor(key: DesignStepKey): StepStat | undefined {
           <Card size="small" :title="step.title">
             <Paragraph>{{ step.description }}</Paragraph>
             <Space direction="vertical">
-              <Progress
-                :percent="statFor(step.key)?.percent ?? 0"
-                size="small"
-                status="active"
-              />
+              <Progress :percent="statFor(step.key)?.percent ?? 0" size="small" status="active" />
               <Tag>{{ statFor(step.key)?.detail ?? '—' }}</Tag>
               <Button type="primary" @click="goToStep(step.route, step.step)">
                 <template #icon>

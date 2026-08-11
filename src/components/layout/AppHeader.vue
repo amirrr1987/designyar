@@ -78,7 +78,11 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
       </Col>
       <Col>
         <Space wrap>
-          <Upload :before-upload="beforeUpload" :show-upload-list="false" accept=".json,application/json">
+          <Upload
+            :before-upload="beforeUpload"
+            :show-upload-list="false"
+            accept=".json,application/json"
+          >
             <Button>
               <template #icon><UploadOutlined /></template>
               ورود JSON

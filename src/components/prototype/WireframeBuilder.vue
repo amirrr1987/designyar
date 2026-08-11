@@ -22,11 +22,7 @@ const BLOCKS: readonly WireframeBlock[] = [
   { id: 'footer', label: 'فوتر', description: 'لینک‌ها و اطلاعات تماس' },
 ] as const
 
-const selected = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
-  'header',
-  'content',
-  'footer',
-])
+const selected = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, ['header', 'content', 'footer'])
 
 const selectedSet = computed(() => new Set(selected.value))
 
