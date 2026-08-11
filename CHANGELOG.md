@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-08-11
+
+### Added
+
+- ۶ اکشن AI جدید: تحلیل رقبا، تولید HMW، طوفان ایده، پیشنهاد جریان کاربر، بازبینی Design System، نقد وایرفریم
+- Context غنی از empathy map، رقبا، HMW، userflow، sitemap، card sort، design tokens و WCAG/هیوریستیک
+- parse JSON و «اعمال مستقیم» برای پرسونا، HMW، ایده و مراحل userflow
+- دکمه‌های AI در Ideate/Prototype و کنار فرم‌های ResearchNotes، HMW، Brainstorm، Wireframe، Competitors
+- هشدار context خالی، کپی/تکرار/پاک پاسخ در پنل AI
+
+### Changed
+
+- اکشن‌ها در Select پنل AI بر اساس فاز Design Thinking گروه‌بندی شدند
+
 ## [0.10.0] - 2026-08-11
 
 ### Added

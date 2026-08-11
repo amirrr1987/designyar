@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, Checkbox, Col, Row, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 const { Text, Paragraph } = Typography
@@ -42,6 +43,9 @@ function onToggle(id: string, checked: boolean | string | number): void {
 
 <template>
   <Space direction="vertical" size="middle">
+    <Space wrap>
+      <AiAssistButton action="wireframe-critique" label="نقد وایرفریم با AI" />
+    </Space>
     <Paragraph type="secondary">
       بلوک‌های ساختاری وایر فریم را انتخاب کنید (فقط ساختار — بدون استایل سفارشی).
     </Paragraph>

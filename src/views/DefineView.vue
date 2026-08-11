@@ -16,6 +16,7 @@ const step = getStepByKey('define')
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
+        <AiAssistButton action="generate-hmw" label="تولید HMW با AI" />
         <AiAssistButton action="ux-improve" label="پیشنهاد بهبود UX" />
         <AiAssistButton action="microcopy" label="تولید میکروکپی" />
       </Space>

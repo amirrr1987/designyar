@@ -5,6 +5,7 @@ import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 import type { TableColumnsType } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { CompetitorRow } from '@/types/competitor'
 
@@ -72,6 +73,7 @@ function onRemove(id: string): void {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiAssistButton action="analyze-competitors" label="تحلیل رقبا با AI" />
     <Form ref="formRef" layout="vertical" :model="model" :rules="rules" @finish="onAdd">
       <FormItem label="نام رقیب" name="name">
         <Input v-model:value="model.name" placeholder="نام محصول یا شرکت" />

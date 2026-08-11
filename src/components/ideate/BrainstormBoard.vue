@@ -19,6 +19,7 @@ import {
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 import { DeleteOutlined, LikeOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useIdeateStore } from '@/stores/ideate'
 
 interface IdeaForm {
@@ -79,10 +80,13 @@ async function onSubmit(): Promise<void> {
 
 <template>
   <Space direction="vertical" size="middle">
-    <Button type="primary" @click="openModal">
-      <template #icon><PlusOutlined /></template>
-      ایده جدید
-    </Button>
+    <Space wrap>
+      <Button type="primary" @click="openModal">
+        <template #icon><PlusOutlined /></template>
+        ایده جدید
+      </Button>
+      <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" />
+    </Space>
 
     <Empty v-if="ideas.length === 0" description="هنوز ایده‌ای ثبت نشده است" />
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Alert, Card, Input, Space } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 const Textarea = Input.TextArea
@@ -13,8 +14,12 @@ const notes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
       type="info"
       show-icon
       message="یادداشت تحقیق"
-      description="متن را اینجا بنویسید؛ بعداً می‌توانید از پنل هوش مصنوعی برای تحلیل استفاده کنید."
+      description="متن را بنویسید؛ سپس با AI تحلیل کنید یا از آن برای پیشنهاد پرسونا استفاده کنید."
     />
+    <Space wrap>
+      <AiAssistButton action="analyze-notes" label="تحلیل این یادداشت" />
+      <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا از یادداشت" />
+    </Space>
     <Card size="small" title="یادداشت‌ها">
       <Textarea
         v-model:value="notes"

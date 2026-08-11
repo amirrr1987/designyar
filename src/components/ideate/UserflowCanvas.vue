@@ -13,6 +13,7 @@ import {
   message,
 } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { storeToRefs } from 'pinia'
 import { useIdeateStore } from '@/stores/ideate'
 import type { FlowNodeKind } from '@/types/ideate'
@@ -55,6 +56,7 @@ function onKindChange(id: string, value: unknown): void {
 
 <template>
   <Space direction="vertical" size="middle">
+    <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان با AI" />
     <Card size="small" title="افزودن گام">
       <Space wrap>
         <Select v-model:value="draftKind">

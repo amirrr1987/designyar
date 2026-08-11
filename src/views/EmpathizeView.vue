@@ -24,8 +24,9 @@ const activeKey = ref<EmpathizeTabKey>('personas')
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
-        <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا با AI" />
-        <AiAssistButton action="analyze-notes" label="تحلیل یادداشت با AI" />
+        <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا" />
+        <AiAssistButton action="analyze-notes" label="تحلیل یادداشت" />
+        <AiAssistButton action="analyze-competitors" label="تحلیل رقبا" />
       </Space>
     </Card>
 

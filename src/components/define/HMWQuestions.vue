@@ -14,6 +14,7 @@ import {
 } from 'ant-design-vue'
 import { DeleteOutlined, LikeOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useDefineStore } from '@/stores/define'
 
 const defineStore = useDefineStore()
@@ -37,6 +38,9 @@ function onAdd(): void {
 
 <template>
   <Space direction="vertical" size="middle">
+    <Space wrap>
+      <AiAssistButton action="generate-hmw" label="تولید سوالات HMW با AI" />
+    </Space>
     <Space.Compact block>
       <Input
         v-model:value="draft"
