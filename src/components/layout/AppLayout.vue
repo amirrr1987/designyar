@@ -13,7 +13,7 @@ const showStepProgress = computed(() => typeof route.meta.step === 'number')
 </script>
 
 <template>
-  <Layout style="min-height: 100vh">
+  <Layout style="height: 100vh">
     <AppSider />
     <Layout>
       <AppHeader />

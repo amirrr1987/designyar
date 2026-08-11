@@ -57,14 +57,14 @@ const onSelect: MenuProps['onSelect'] = (info) => {
 </script>
 
 <template>
-  <Sider breakpoint="lg" collapsed-width="0" :width="232" theme="dark">
+  <Sider breakpoint="lg" collapsed-width="0" :width="232" theme="light">
     <Space direction="vertical" size="small" style="width: 100%; padding: 16px 16px 8px">
-      <Title :level="4" style="margin: 0; color: #fff">دیزاین‌یار</Title>
-      <Text style="color: rgba(255, 255, 255, 0.65)">Design Thinking</Text>
+      <Title :level="4" style="margin: 0">دیزاین‌یار</Title>
+      <Text type="secondary">Design Thinking</Text>
     </Space>
     <Menu
       mode="inline"
-      theme="dark"
+      theme="light"
       :selected-keys="selectedKeys"
       :items="menuItems"
       @select="onSelect"

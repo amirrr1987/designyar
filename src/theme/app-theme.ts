@@ -6,6 +6,9 @@ if (primary === undefined) {
   throw new Error('Missing @ant-design/colors geekblue[5]')
 }
 
+/** Shared with Layout header and sidebar menu background. */
+export const APP_HEADER_BG = '#ffffff'
+
 /** App-wide Ant Design Vue theme — tokens only, no custom CSS. */
 export const appTheme: ThemeConfig = {
   token: {
@@ -18,13 +21,13 @@ export const appTheme: ThemeConfig = {
   },
   components: {
     Layout: {
-      colorBgHeader: '#ffffff',
+      colorBgHeader: APP_HEADER_BG,
       colorBgBody: geekblue[0] ?? '#f0f5ff',
       colorBgTrigger: '#002140',
     },
     Menu: {
-      colorItemBg: '#001529',
-      colorSubItemBg: '#000c17',
+      colorItemBg: APP_HEADER_BG,
+      colorSubItemBg: APP_HEADER_BG,
     },
   },
 }
