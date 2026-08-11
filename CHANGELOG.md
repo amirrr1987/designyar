@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - تکمیل دیزاین‌سیستم با رمپ پیش‌فرض `@ant-design/colors` و `generatePrimaryFromSeed`
+- پیش‌نمایش و ذخیره پالت رنگ در `ColorPalette.vue`
 
 ## [0.5.0] - 2026-08-11
 
