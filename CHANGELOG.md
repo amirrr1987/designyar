@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - composable `useWebLLM` و استور AI با وضعیت بارگذاری/پاسخ (مدل کوچک پیش‌فرض)
 - پنل AI در Drawer هدر (`AIPanel.vue`)
+- اکشن‌های تایپ‌شده و prompt فارسی در `utils/ai-prompts.ts` + جمع‌آوری context
 
 ## [0.7.0] - 2026-08-11
 

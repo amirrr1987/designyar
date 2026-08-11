@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   Alert,
   Button,
@@ -9,19 +9,31 @@ import {
   Select,
   Space,
   Spin,
+  Typography,
   message,
 } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { RobotOutlined, SendOutlined } from '@ant-design/icons-vue'
+import { useAiPromptContext } from '@/composables/useAiPromptContext'
 import { useWebLLM } from '@/composables/useWebLLM'
 import { useAiStore } from '@/stores/ai'
+import {
+  AI_ACTIONS,
+  buildSystemPrompt,
+  buildUserPrompt,
+  isAiActionId,
+  type AiActionId,
+} from '@/utils/ai-prompts'
 
 const Textarea = Input.TextArea
+const { Text, Paragraph } = Typography
 const aiStore = useAiStore()
 const { selectedModelId, isLoading, isReady, progress, lastResponse, error } =
   storeToRefs(aiStore)
 const { models, initModel, chat } = useWebLLM()
+const { buildContext } = useAiPromptContext()
 
+const actionId = ref<AiActionId>('persona-suggest')
 const prompt = ref('')
 
 const modelOptions = computed(() =>
@@ -29,6 +41,26 @@ const modelOptions = computed(() =>
     value: id,
     label: id.replace(/-MLC$/, ''),
   })),
+)
+
+const actionOptions = computed(() =>
+  AI_ACTIONS.map((a) => ({
+    value: a.id,
+    label: a.label,
+  })),
+)
+
+const selectedAction = computed(() => AI_ACTIONS.find((a) => a.id === actionId.value))
+
+watch(
+  actionId,
+  (id) => {
+    const def = AI_ACTIONS.find((a) => a.id === id)
+    if (def && !prompt.value.trim()) {
+      prompt.value = ''
+    }
+  },
+  { immediate: true },
 )
 
 async function onLoadModel(): Promise<void> {
@@ -41,19 +73,21 @@ async function onLoadModel(): Promise<void> {
   message.success({ content: 'مدل آماده است', key: 'llm' })
 }
 
-async function onSend(): Promise<void> {
-  const text = prompt.value.trim()
-  if (!text) {
-    message.warning('پیام را وارد کنید')
-    return
+function onActionChange(value: unknown): void {
+  if (typeof value === 'string' && isAiActionId(value)) {
+    actionId.value = value
   }
+}
+
+async function onSend(): Promise<void> {
+  const ctx = buildContext(prompt.value.trim() || undefined)
+  const userPrompt = buildUserPrompt(actionId.value, ctx)
+  const systemPrompt = buildSystemPrompt(actionId.value)
+
   try {
-    await chat(
-      text,
-      'تو دستیار UX و دیزاین تینکینگ هستی. پاسخ‌ها را کوتاه، عملی و به فارسی بده.',
-    )
+    await chat(userPrompt, systemPrompt)
   } catch {
-    // error already in store
+    // error in store
   }
 }
 </script>
@@ -88,19 +122,29 @@ async function onSend(): Promise<void> {
         v-if="isReady"
         type="success"
         show-icon
-        message="مدل آماده است — می‌توانید سوال بپرسید"
+        message="مدل آماده است — اکشن را انتخاب و اجرا کنید"
       />
 
+      <Select
+        :value="actionId"
+        :options="actionOptions"
+        @update:value="onActionChange"
+      />
+      <Paragraph v-if="selectedAction" type="secondary">
+        {{ selectedAction.description }}
+      </Paragraph>
+
+      <Text strong>نکته اختیاری برای مدل</Text>
       <Textarea
         v-model:value="prompt"
-        :rows="4"
+        :rows="3"
         :disabled="!isReady"
-        placeholder="مثلاً سه ایده برای بهبود onboarding پیشنهاد بده"
+        placeholder="مثلاً تمرکز روی کاربران موبایل…"
       />
 
       <Button type="primary" :disabled="!isReady" :loading="isLoading" @click="onSend">
         <template #icon><SendOutlined /></template>
-        ارسال
+        اجرای اکشن AI
       </Button>
 
       <Card v-if="lastResponse" size="small" title="پاسخ">
