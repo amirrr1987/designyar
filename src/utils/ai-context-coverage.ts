@@ -46,6 +46,7 @@ export function getProjectContextCoverage(ctx: AiPromptContext): ContextCoverage
     },
     { id: 'contrast', label: 'کنتراست', filled: hasText(ctx.contrastSummary) },
     { id: 'testSummary', label: 'خلاصه تست', filled: hasText(ctx.testSummary) },
+    { id: 'projectSynthesis', label: 'تحلیل جامع AI', filled: hasText(ctx.projectSynthesis) },
   ]
 
   const filled = items.filter((i) => i.filled).length

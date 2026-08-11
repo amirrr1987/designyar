@@ -36,6 +36,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'خانه' },
   },
   ...stepRoutes,
+  {
+    path: '/synthesis',
+    name: 'synthesis',
+    component: () => import('@/views/SynthesisView.vue'),
+    meta: { title: 'جمع‌بندی پروژه' },
+  },
 ]
 
 const router = createRouter({

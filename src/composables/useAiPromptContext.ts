@@ -77,6 +77,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
   ])
   const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
   const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
+  const projectSynthesisStored = useStorage<string>(STORAGE_KEYS.projectSynthesis, '')
   const componentChecklist = useStorage<string[]>(STORAGE_KEYS.componentChecklist, [])
   const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
 
@@ -214,6 +215,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
       heuristicWeakSummary,
       contrastSummary,
       testSummary: testSummary.value.trim() || undefined,
+      projectSynthesis: projectSynthesisStored.value.trim() || undefined,
       userHint,
     }
   }

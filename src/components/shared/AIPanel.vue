@@ -161,6 +161,10 @@ function applySuccessMessage(payload: AiApplyPayload, count: number): void {
     message.success('خلاصه در گزارش usability ذخیره شد')
     return
   }
+  if (count === 1 && payload.type === 'projectSynthesis') {
+    message.success('تحلیل در صفحه جمع‌بندی ذخیره شد')
+    return
+  }
   if (
     count === 1 &&
     (payload.type === 'problem' ||

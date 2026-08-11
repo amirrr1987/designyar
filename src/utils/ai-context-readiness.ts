@@ -321,6 +321,34 @@ function checksFor(action: AiActionId): CheckDef[] {
           test: (ctx) => hasText(ctx.contrastSummary),
         },
       ]
+    case 'analyze-project':
+      return [
+        { ...brief, essential: true },
+        {
+          id: 'personas',
+          label: 'پرسونا',
+          essential: false,
+          test: (ctx) => hasText(ctx.personasSummary),
+        },
+        {
+          id: 'problem',
+          label: 'بیان مسئله',
+          essential: false,
+          test: (ctx) => hasText(ctx.problemSentence),
+        },
+        {
+          id: 'ideas',
+          label: 'ایده‌ها',
+          essential: false,
+          test: (ctx) => hasText(ctx.ideasSummary),
+        },
+        {
+          id: 'designSystem',
+          label: 'Design System',
+          essential: false,
+          test: (ctx) => hasText(ctx.designSystemSummary),
+        },
+      ]
     default:
       return [brief]
   }

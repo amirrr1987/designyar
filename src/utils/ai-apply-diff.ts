@@ -42,6 +42,7 @@ export interface AiApplyBeforeState {
   briefDescription?: string
   researchNotes?: string
   testSummary?: string
+  projectSynthesis?: string
   sitemapNodeCount?: number
   sitemapTitles?: string[]
   wireframeBlocks?: string[]
@@ -56,6 +57,7 @@ export function captureApplyBeforeState(
     briefDescription: string
     researchNotes: string
     testSummary: string
+    projectSynthesis: string
     sitemap: SitemapNode[]
     wireframeBlocks: string[]
   },
@@ -74,6 +76,8 @@ export function captureApplyBeforeState(
       return { researchNotes: current.researchNotes }
     case 'testSummary':
       return { testSummary: current.testSummary }
+    case 'projectSynthesis':
+      return { projectSynthesis: current.projectSynthesis }
     case 'sitemap':
       return {
         sitemapNodeCount: countSitemapNodes(current.sitemap),
@@ -148,6 +152,14 @@ function buildDiff(payload: AiApplyPayload, before: AiApplyBeforeState): AiHisto
           after: truncate(payload.item),
         },
       ]
+    case 'projectSynthesis':
+      return [
+        {
+          label: 'تحلیل جامع',
+          before: truncate(before.projectSynthesis ?? ''),
+          after: truncate(payload.item),
+        },
+      ]
     case 'researchNotes':
       return [
         {
@@ -219,6 +231,8 @@ function buildSummary(actionId: AiActionId, payload: AiApplyPayload, count: numb
       return `${actionLabel}: شرح پروژه به‌روز شد`
     case 'testSummary':
       return `${actionLabel}: خلاصه گزارش تست ذخیره شد`
+    case 'projectSynthesis':
+      return `${actionLabel}: تحلیل جامع در جمع‌بندی ذخیره شد`
     case 'researchNotes':
       return `${actionLabel}: یادداشت تحقیق به‌روز شد`
     case 'empathyMaps':

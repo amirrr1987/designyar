@@ -1,7 +1,8 @@
 import type { DesignStepKey } from '@/types/project'
+import { formatFullProjectContext } from '@/utils/project-synthesis-sections'
 
-/** AI grouping includes home (project brief) before Design Thinking steps. */
-export type AiPhaseKey = DesignStepKey | 'home'
+/** AI grouping includes home (project brief) and synthesis before/after Design Thinking steps. */
+export type AiPhaseKey = DesignStepKey | 'home' | 'synthesis'
 
 export type AiActionId =
   | 'improve-project-brief'
@@ -26,6 +27,7 @@ export type AiActionId =
   | 'summarize-test'
   | 'test-to-hmw'
   | 'test-to-ideas'
+  | 'analyze-project'
 
 export interface AiActionDef {
   id: AiActionId
@@ -209,6 +211,14 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     structured: true,
     applyLabel: 'افزودن ایده‌ها به برد',
   },
+  {
+    id: 'analyze-project',
+    label: 'تحلیل جامع پروژه',
+    description: 'مرور یکپارچه تمام مراحل Design Thinking با توصیه‌های بعدی',
+    phase: 'synthesis',
+    structured: true,
+    applyLabel: 'ذخیره تحلیل در جمع‌بندی',
+  },
 ] as const
 
 export function isAiActionId(value: string): value is AiActionId {
@@ -246,6 +256,7 @@ export interface AiPromptContext {
   heuristicWeakSummary?: string
   contrastSummary?: string
   testSummary?: string
+  projectSynthesis?: string
   userHint?: string
 }
 
@@ -348,6 +359,10 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
     '{"wireframeBlocks":["header","hero","content","footer"]}',
     'فقط idهای مجاز: header, nav, hero, content, form, list, footer — ۳ تا ۷ بلوک به ترتیب چیدمان؛ فقط JSON معتبر.',
   ].join('\n'),
+  'analyze-project': [
+    'ابتدا تحلیل فارسی ساخت‌یافته بده. در انتها ```json:',
+    '{"projectSynthesis":"تحلیل جامع ذخیره‌شونده"}',
+  ].join('\n'),
 }
 
 export function buildSystemPrompt(action: AiActionId): string {
@@ -383,6 +398,8 @@ export function buildSystemPrompt(action: AiActionId): string {
       'ابتدا ۲ جمله جمع‌بندی یافته‌ها. سپس JSON سوالات HMW برای بازگشت به Define.',
     'test-to-ideas':
       'ابتدا ۲ جمله خلاصه ریسک‌ها. سپس JSON ایده‌های patch برای Ideate.',
+    'analyze-project':
+      'خروجی: ۱) وضعیت هر فاز (Empathize→Test)، ۲) انسجام داستانی، ۳) شکاف‌های داده، ۴) ۵ اولویت بعدی، ۵) ۳ ریسک UX؛ سپس JSON projectSynthesis.',
   }
 
   const jsonPart = JSON_FOOTER[action]
@@ -547,6 +564,12 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       if (ctx.ideasSummary?.trim()) parts.push(`ایده‌های فعلی:\n${ctx.ideasSummary}`)
       parts.push('ایده‌های patch برای رفع ریسک‌های تست پیشنهاد بده (بازخورد به Ideate).')
       break
+    case 'analyze-project':
+      parts.push(`داده کامل پروژه:\n${formatFullProjectContext(ctx)}`)
+      parts.push(
+        'تحلیل جامع بده: وضعیت هر فاز، انسجام داستانی، شکاف‌های داده، ۵ اولویت بعدی و ۳ ریسک UX.',
+      )
+      break
     default: {
       const _exhaustive: never = action
       return _exhaustive
@@ -657,6 +680,18 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         hints.push('خلاصه تست یا یافته‌های WCAG/هیوریستیک را پر کنید.')
       }
       break
+    case 'analyze-project':
+      if (!ctx.projectBrief?.trim()) {
+        hints.push('شرح پروژه را در خانه بنویسید تا تحلیل معنادارتر شود.')
+      }
+      if (
+        !ctx.personasSummary?.trim() &&
+        !ctx.problemSentence?.trim() &&
+        !ctx.ideasSummary?.trim()
+      ) {
+        hints.push('حداقل یکی از فازهای Empathize، Define یا Ideate را پر کنید.')
+      }
+      break
     default:
       break
   }
@@ -665,7 +700,7 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
 }
 
 export const AI_ACTIONS_BY_PHASE = (
-  ['home', 'empathize', 'define', 'ideate', 'prototype', 'test'] as const
+  ['home', 'empathize', 'define', 'ideate', 'prototype', 'test', 'synthesis'] as const
 ).map((phase) => ({
   phase,
   actions: AI_ACTIONS.filter((a) => a.phase === phase),

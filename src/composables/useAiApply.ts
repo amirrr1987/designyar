@@ -55,6 +55,7 @@ export function useAiApply() {
   const { sitemap } = storeToRefs(ideateStore)
 
   const usabilityReportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
+  const projectSynthesis = useStorage<string>(STORAGE_KEYS.projectSynthesis, '')
   const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
   const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
   const empathySelectedPersona = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, 'general')
@@ -75,6 +76,7 @@ export function useAiApply() {
           briefDescription: projectStore.briefDescription,
           researchNotes: researchNotes.value,
           testSummary: usabilityReportSummary.value,
+          projectSynthesis: projectSynthesis.value,
           sitemap: sitemap.value,
           wireframeBlocks: wireframeBlocks.value,
         })
@@ -171,6 +173,10 @@ export function useAiApply() {
       }
       case 'testSummary': {
         usabilityReportSummary.value = payload.item
+        return 1
+      }
+      case 'projectSynthesis': {
+        projectSynthesis.value = payload.item
         return 1
       }
       case 'researchNotes': {

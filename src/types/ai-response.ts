@@ -68,6 +68,7 @@ export type AiApplyPayload =
   | { type: 'pov'; item: AiStatementDraft }
   | { type: 'projectBrief'; item: AiProjectBriefDraft }
   | { type: 'testSummary'; item: string }
+  | { type: 'projectSynthesis'; item: string }
   | { type: 'researchNotes'; item: string }
   | { type: 'empathyMaps'; items: AiEmpathyMapDraft[] }
   | { type: 'sitemap'; items: AiSitemapNodeDraft[] }
@@ -163,6 +164,7 @@ export interface AiStructuredJson {
   briefTitle?: unknown
   briefDescription?: unknown
   testSummary?: unknown
+  projectSynthesis?: unknown
   researchNotes?: unknown
   empathyMaps?: unknown
   sitemapNodes?: unknown

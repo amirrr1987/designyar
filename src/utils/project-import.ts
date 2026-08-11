@@ -45,6 +45,10 @@ export function hydrateFromExport(payload: UxFlowExport): void {
     STORAGE_KEYS.aiHistory,
     'aiHistory' in d && Array.isArray(d.aiHistory) ? d.aiHistory : [],
   )
+  writeJson(
+    STORAGE_KEYS.projectSynthesis,
+    'projectSynthesis' in d && typeof d.projectSynthesis === 'string' ? d.projectSynthesis : '',
+  )
 }
 
 export async function importUxFlowFromFile(file: File): Promise<ImportResult> {

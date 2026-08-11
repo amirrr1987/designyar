@@ -6,7 +6,7 @@ import type { ItemType, MenuProps } from 'ant-design-vue/es/menu'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { resolveStepIcon } from '@/constants/step-icons'
 import { useProjectStore } from '@/stores/project'
-import { HomeOutlined } from '@ant-design/icons-vue'
+import { HomeOutlined, AuditOutlined } from '@ant-design/icons-vue'
 
 const Sider = Layout.Sider
 const route = useRoute()
@@ -30,13 +30,22 @@ const menuItems = computed((): ItemType[] => {
     label: step.title,
     icon: () => h(resolveStepIcon(step.icon)),
   }))
-  return [home, ...steps]
+  const synthesis: ItemType = {
+    key: 'synthesis',
+    label: 'جمع‌بندی',
+    icon: () => h(AuditOutlined),
+  }
+  return [home, ...steps, synthesis]
 })
 
 const onSelect: MenuProps['onSelect'] = (info) => {
   const key = String(info.key)
   if (key === 'home') {
     void router.push({ name: 'home' })
+    return
+  }
+  if (key === 'synthesis') {
+    void router.push({ name: 'synthesis' })
     return
   }
   const step = DESIGN_THINKING_STEPS.find((s) => s.key === key)

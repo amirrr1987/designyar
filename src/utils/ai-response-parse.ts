@@ -127,6 +127,11 @@ function parseTestSummary(value: unknown): AiApplyPayload | null {
   return { type: 'testSummary', item: value.trim() }
 }
 
+function parseProjectSynthesis(value: unknown): AiApplyPayload | null {
+  if (typeof value !== 'string' || !value.trim()) return null
+  return { type: 'projectSynthesis', item: value.trim() }
+}
+
 function parseResearchNotes(value: unknown): AiApplyPayload | null {
   if (typeof value !== 'string' || !value.trim()) return null
   return { type: 'researchNotes', item: value.trim() }
@@ -180,6 +185,9 @@ export function parseApplyPayload(action: AiActionId, responseText: string): AiA
     if (action === 'summarize-test' && responseText.trim()) {
       return { type: 'testSummary', item: responseText.trim() }
     }
+    if (action === 'analyze-project' && responseText.trim()) {
+      return { type: 'projectSynthesis', item: responseText.trim() }
+    }
     return null
   }
 
@@ -218,6 +226,11 @@ export function parseApplyPayload(action: AiActionId, responseText: string): AiA
       return parseEmpathyMaps(root.empathyMaps)
     case 'summarize-test':
       return parseTestSummary(root.testSummary) ?? (responseText.trim() ? { type: 'testSummary', item: responseText.trim() } : null)
+    case 'analyze-project':
+      return (
+        parseProjectSynthesis(root.projectSynthesis) ??
+        (responseText.trim() ? { type: 'projectSynthesis', item: responseText.trim() } : null)
+      )
     default:
       return null
   }
@@ -241,6 +254,7 @@ export function supportsApply(action: AiActionId): boolean {
     action === 'improve-project-brief' ||
     action === 'seed-research-notes' ||
     action === 'synthesize-empathy' ||
-    action === 'summarize-test'
+    action === 'summarize-test' ||
+    action === 'analyze-project'
   )
 }

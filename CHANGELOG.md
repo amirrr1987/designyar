@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-08-11
+
+### Added
+
+- **صفحه «جمع‌بندی پروژه»** (`/synthesis`) — آخرین آیتم منو؛ نمای تحلیل‌شده همه آیتم‌های Design Thinking
+- **`ProjectSynthesisPanel.vue`** — Collapse مرحله‌به‌مرحله + پوشش context + تحلیل AI ذخیره‌شده
+- **`analyze-project`** — اکشن AI برای تحلیل جامع کل پروژه با اعمال در جمع‌بندی
+- **`project-synthesis-sections.ts`** — ساخت بخش‌های ساخت‌یافته از context
+- export/import نسخه **4** با `projectSynthesis`
+
+### Changed
+
+- منوی کناری — آیتم «جمع‌بندی» بعد از فاز Test
+- پوشش context AI — شامل تحلیل جامع ذخیره‌شده
+
 ## [0.18.0] - 2026-08-11
 
 ### Added

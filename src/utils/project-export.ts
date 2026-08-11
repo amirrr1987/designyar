@@ -33,7 +33,7 @@ import {
 } from '@/types/ideate'
 import { isMicrocopyEntryArray } from '@/types/microcopy'
 
-export const UX_FLOW_EXPORT_VERSION = 3 as const
+export const UX_FLOW_EXPORT_VERSION = 4 as const
 
 export interface UxFlowExport {
   version: typeof UX_FLOW_EXPORT_VERSION
@@ -61,6 +61,7 @@ export interface UxFlowExport {
     usabilityReportSummary: string
     microcopyBank: MicrocopyEntry[]
     aiHistory: AiHistoryEntry[]
+    projectSynthesis: string
   }
 }
 
@@ -140,7 +141,7 @@ function isString(value: unknown): value is string {
 
 export function isUxFlowExport(value: unknown): value is UxFlowExport {
   if (!isRecord(value)) return false
-  if (value.version !== UX_FLOW_EXPORT_VERSION && value.version !== 2 && value.version !== 1) {
+  if (value.version !== UX_FLOW_EXPORT_VERSION && value.version !== 3 && value.version !== 2 && value.version !== 1) {
     return false
   }
   if (typeof value.exportedAt !== 'string') return false
@@ -157,10 +158,15 @@ export function isUxFlowExport(value: unknown): value is UxFlowExport {
     value.version <= 2 ||
     isAiHistoryEntryArray(d.aiHistory) ||
     d.aiHistory === undefined
+  const synthesisOk =
+    value.version <= 3 ||
+    typeof d.projectSynthesis === 'string' ||
+    d.projectSynthesis === undefined
   return (
     summaryOk &&
     microcopyOk &&
     historyOk &&
+    synthesisOk &&
     isProject(d.project) &&
     isPersonaArray(d.personas) &&
     isEmpathyMaps(d.empathyMaps) &&
@@ -216,6 +222,7 @@ export function buildUxFlowExport(): UxFlowExport {
       usabilityReportSummary: readOr(STORAGE_KEYS.usabilityReportSummary, '', isString),
       microcopyBank: readOr(STORAGE_KEYS.microcopyBank, [], isMicrocopyEntryArray),
       aiHistory: readOr(STORAGE_KEYS.aiHistory, [], isAiHistoryEntryArray),
+      projectSynthesis: readOr(STORAGE_KEYS.projectSynthesis, '', isString),
     },
   }
 }
