@@ -98,13 +98,14 @@ function onRemove(id: string): void {
       :data-source="competitors"
       row-key="id"
       :pagination="competitors.length > 5 ? { pageSize: 5 } : false"
+      :locale="{ emptyText: 'هنوز رقیبی ثبت نشده است' }"
     >
       <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'url'">
           <a v-if="record.url" :href="record.url" target="_blank" rel="noopener noreferrer">
             {{ record.url }}
           </a>
-          <span v-else>—</span>
+          <template v-else>—</template>
         </template>
         <template v-else-if="column.key === 'actions'">
           <Popconfirm

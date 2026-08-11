@@ -594,13 +594,13 @@ Skills: ux-flow-compose + ux-flow + ant-design-vue + full-safe-type-ts rule.
 
 | Phase | Status | Notes |
 |-------|--------|-------|
-| 0 Foundation | ☐ | |
-| 1 Layout | ☐ | |
-| 2 Empathize | ☐ | |
-| 3 Define | ☐ | |
-| 4 Ideate | ☐ | |
-| 5 Prototype | ☐ | |
-| 6 Test | ☐ | |
-| 7 WebLLM | ☐ | |
-| 8 Export | ☐ | |
+| 0 Foundation | ☑ | 0.1.0 |
+| 1 Layout | ☑ | 0.2.0 |
+| 2 Empathize | ☑ | 0.3.0 |
+| 3 Define | ☑ | 0.4.0 |
+| 4 Ideate | ☑ | 0.5.0 |
+| 5 Prototype | ☑ | 0.6.0 |
+| 6 Test | ☑ | 0.7.0 |
+| 7 WebLLM | ☑ | 0.8.0 |
+| 8 Export | ☐ | in progress — polish |
 | 9 Release | ☐ | |

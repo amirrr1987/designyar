@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - خروجی JSON پروژه (`utils/project-export.ts`) و دکمه «خروجی JSON» در هدر
 - ورود JSON با اعتبارسنجی و hydrate در `utils/project-import.ts`
 - یکپارچه‌سازی کلیدها روی `STORAGE_KEYS`؛ تأیید useStorage برای ماژول‌ها (localStorage خام فقط در import/export)
+- داشبورد خانه با آمار پیشرفت واقعی مراحل؛ بدون `<style>` باقی‌مانده
 
 ## [0.8.0] - 2026-08-11
 
