@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - فهرست کلیدهای LocalStorage در `constants/storage-keys.ts`
+- خروجی JSON پروژه (`utils/project-export.ts`) و دکمه «خروجی JSON» در هدر
 
 ## [0.8.0] - 2026-08-11
 

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Layout, Input, Row, Col, Typography, Button, Drawer } from 'ant-design-vue'
-import { RobotOutlined } from '@ant-design/icons-vue'
+import { Layout, Input, Row, Col, Typography, Button, Drawer, Space, message } from 'ant-design-vue'
+import { DownloadOutlined, RobotOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
 import AIPanel from '@/components/shared/AIPanel.vue'
 import { useAiStore } from '@/stores/ai'
 import { useProjectStore } from '@/stores/project'
+import { downloadUxFlowExport } from '@/utils/project-export'
 
 const Header = Layout.Header
 const { Text } = Typography
@@ -26,6 +27,12 @@ const drawerOpen = computed({
     aiStore.setPanelOpen(value)
   },
 })
+
+function onExport(): void {
+  const safeName = projectStore.project.name.trim().replace(/\s+/g, '-') || 'designyar'
+  downloadUxFlowExport(`${safeName}-export.json`)
+  message.success('خروجی JSON دانلود شد')
+}
 </script>
 
 <template>
@@ -42,10 +49,16 @@ const drawerOpen = computed({
         </Row>
       </Col>
       <Col>
-        <Button type="default" @click="aiStore.openPanel()">
-          <template #icon><RobotOutlined /></template>
-          دستیار AI
-        </Button>
+        <Space>
+          <Button @click="onExport">
+            <template #icon><DownloadOutlined /></template>
+            خروجی JSON
+          </Button>
+          <Button type="default" @click="aiStore.openPanel()">
+            <template #icon><RobotOutlined /></template>
+            دستیار AI
+          </Button>
+        </Space>
       </Col>
     </Row>
 
