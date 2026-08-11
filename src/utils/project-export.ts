@@ -20,6 +20,7 @@ import {
   isPOV,
   isProblemStatement,
   isProject,
+  normalizeProject,
 } from '@/types'
 import {
   createEmptyCardSortState,
@@ -28,7 +29,7 @@ import {
   isSitemapNodeArray,
 } from '@/types/ideate'
 
-export const UX_FLOW_EXPORT_VERSION = 1 as const
+export const UX_FLOW_EXPORT_VERSION = 2 as const
 
 export interface UxFlowExport {
   version: typeof UX_FLOW_EXPORT_VERSION
@@ -53,6 +54,7 @@ export interface UxFlowExport {
     wcagChecked: string[]
     heuristicEval: HeuristicEvalMap
     aiPrefs: AiPrefs
+    usabilityReportSummary: string
   }
 }
 
@@ -132,11 +134,15 @@ function isString(value: unknown): value is string {
 
 export function isUxFlowExport(value: unknown): value is UxFlowExport {
   if (!isRecord(value)) return false
-  if (value.version !== UX_FLOW_EXPORT_VERSION) return false
+  if (value.version !== UX_FLOW_EXPORT_VERSION && value.version !== 1) return false
   if (typeof value.exportedAt !== 'string') return false
   if (!isRecord(value.data)) return false
   const d = value.data
+  const summaryOk =
+    value.version === 1 ||
+    typeof d.usabilityReportSummary === 'string'
   return (
+    summaryOk &&
     isProject(d.project) &&
     isPersonaArray(d.personas) &&
     isEmpathyMaps(d.empathyMaps) &&
@@ -164,7 +170,9 @@ export function buildUxFlowExport(): UxFlowExport {
     version: UX_FLOW_EXPORT_VERSION,
     exportedAt: new Date().toISOString(),
     data: {
-      project: readOr(STORAGE_KEYS.project, createDefaultProject(), isProject),
+      project: normalizeProject(
+        readOr(STORAGE_KEYS.project, createDefaultProject(), isProject),
+      ),
       personas: readOr(STORAGE_KEYS.personas, [], isPersonaArray),
       empathyMaps: readOr(STORAGE_KEYS.empathyMaps, {}, isEmpathyMaps),
       empathySelectedPersona: readOr(STORAGE_KEYS.empathySelectedPersona, 'general', isString),
@@ -184,9 +192,10 @@ export function buildUxFlowExport(): UxFlowExport {
       heuristicEval: readOr(STORAGE_KEYS.heuristicEval, {}, isHeuristicEvalMap),
       aiPrefs: readOr(
         STORAGE_KEYS.aiPrefs,
-        { selectedModelId: 'SmolLM2-360M-Instruct-q4f16_1-MLC' },
+        { selectedModelId: 'groq/compound-mini' },
         isAiPrefs,
       ),
+      usabilityReportSummary: readOr(STORAGE_KEYS.usabilityReportSummary, '', isString),
     },
   }
 }

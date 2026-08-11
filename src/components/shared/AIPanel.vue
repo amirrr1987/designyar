@@ -101,6 +101,7 @@ watch(lastResponse, (text) => {
 
 function groupLabel(phase: string): string {
   const labels: Record<string, string> = {
+    home: 'شروع پروژه',
     empathize: 'همدلی',
     define: 'تعریف',
     ideate: 'ایده‌پردازی',
@@ -161,7 +162,16 @@ function onApply(): void {
     message.warning('مورد معتبری برای افزودن نبود')
     return
   }
-  message.success(`${count} مورد به پروژه اضافه شد`)
+  message.success(
+    count === 1 && payload.type === 'testSummary'
+      ? 'خلاصه در گزارش usability ذخیره شد'
+      : count === 1 &&
+          (payload.type === 'problem' ||
+            payload.type === 'pov' ||
+            payload.type === 'projectBrief')
+        ? 'در فرم اعمال شد'
+        : `${count} مورد به پروژه اضافه شد`,
+  )
   applyPayloadResult.value = null
 }
 

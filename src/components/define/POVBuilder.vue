@@ -13,6 +13,7 @@ import {
 } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useDefineStore } from '@/stores/define'
 
 const Textarea = Input.TextArea
@@ -60,6 +61,9 @@ function onPersonaChange(value: unknown): void {
 
 <template>
   <Space direction="vertical" size="middle">
+    <Space wrap>
+      <AiAssistButton action="refine-pov" label="پیشنهاد POV با AI" />
+    </Space>
     <Card size="small" title="نقطه دید (POV)">
       <Form layout="vertical">
         <FormItem label="پرسونا (اختیاری)">

@@ -39,6 +39,10 @@ pnpm build
 2. بعد از `pnpm build`، محتویات `dist/` را به branch `gh-pages` بفرستید (یا از Action استفاده کنید).
 3. برای fallback، یک `404.html` کپی از `index.html` در `dist/` رایج است، یا از Actionهای SPA استفاده کنید.
 
+## شروع پروژه
+
+در صفحه **خانه** عنوان و **شرح پروژه** را بنویسید — AI در همه مراحل Design Thinking از این متن context می‌گیرد. دکمه «بهبود شرح با AI» پیشنهاد بازنویسی می‌دهد.
+
 ## یادداشت Groq AI
 
 کلید API از [Groq Console](https://console.groq.com/keys) در `.env.local` با نام `VITE_GROQ_API_KEY` قرار می‌گیرد. مدل پیش‌فرض `groq/compound-mini` است (جست‌وجوی وب و ابزارهای compound).

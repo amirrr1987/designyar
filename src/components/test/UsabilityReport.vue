@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import {
+  Button,
   Card,
   Descriptions,
   DescriptionsItem,
+  Empty,
   Progress,
   Result,
   Space,
@@ -16,6 +18,7 @@ import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { storeToRefs } from 'pinia'
 import { useContrast } from '@/composables/useContrast'
 import { useWCAG } from '@/composables/useWCAG'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { HEURISTIC_RULES, type HeuristicEvalMap } from '@/constants/heuristic-rules'
 import { useDesignSystemStore } from '@/stores/designSystem'
 import { evaluateContrast } from '@/utils/contrast'
@@ -26,6 +29,7 @@ const designStore = useDesignSystemStore()
 const { palette } = storeToRefs(designStore)
 
 const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
+const reportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
 
 const designContrast = computed(() => {
   const fg = palette.value.primary[7] ?? '#000000'
@@ -61,6 +65,10 @@ const overallTitle = computed(() => {
   if (overallStatus.value === 'warning') return 'نیاز به بهبود جدی'
   return 'ارزیابی در جریان است'
 })
+
+function clearSummary(): void {
+  reportSummary.value = ''
+}
 </script>
 
 <template>
@@ -72,6 +80,19 @@ const overallTitle = computed(() => {
         </Paragraph>
       </template>
     </Result>
+
+    <Card size="small" title="خلاصه AI (گزارش نهایی)">
+      <Space direction="vertical" size="middle">
+        <Space wrap>
+          <AiAssistButton action="summarize-test" label="تولید/به‌روزرسانی خلاصه با AI" />
+          <Button v-if="reportSummary.trim()" @click="clearSummary">پاک کردن خلاصه</Button>
+        </Space>
+        <Empty v-if="!reportSummary.trim()" description="هنوز خلاصه AI ذخیره نشده — از دکمه بالا استفاده کنید" />
+        <Paragraph v-else style="white-space: pre-wrap; margin-bottom: 0">
+          {{ reportSummary }}
+        </Paragraph>
+      </Space>
+    </Card>
 
     <Card size="small" title="کنتراست">
       <Descriptions :column="1" size="small" bordered>

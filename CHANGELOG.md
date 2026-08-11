@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-08-11
+
+### Added
+
+- **شرح پروژه** (عنوان + توضیح) در صفحه خانه — محور context برای AI و همه مراحل
+- اکشن `improve-project-brief` با اعمال مستقیم در پروژه
+- اعمال مستقیم **بیان مسئله** و **POV** از AI (`refine-problem`, `refine-pov`)
+- ذخیره **خلاصه تست** در گزارش usability (`summarize-test` → اعمال)
+- کلید `usabilityReportSummary` در export/import (نسخه export 2)
+
+### Removed
+
+- `useWebLLM` و وابستگی `@mlc-ai/web-llm` (جایگزین: Groq Cloud)
+
+### Changed
+
+- `Project` شامل `briefTitle` و `briefDescription` با migrate سازگار با داده قدیمی
+
 ## [0.11.0] - 2026-08-11
 
 ### Added

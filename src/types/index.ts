@@ -1,5 +1,5 @@
 export type { DesignStepKey, Project } from './project'
-export { createDefaultProject, isDesignStepKey, isProject } from './project'
+export { createDefaultProject, isDesignStepKey, isProject, normalizeProject } from './project'
 
 export type { Persona } from './persona'
 export { isPersona, isPersonaArray } from './persona'

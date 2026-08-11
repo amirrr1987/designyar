@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { normalizeProject } from '@/types/project'
 import type { UxFlowExport } from '@/utils/project-export'
 import { isUxFlowExport } from '@/utils/project-export'
 
@@ -11,7 +12,7 @@ function writeJson(key: string, value: unknown): void {
 /** Apply a validated export payload into LocalStorage keys. */
 export function hydrateFromExport(payload: UxFlowExport): void {
   const d = payload.data
-  writeJson(STORAGE_KEYS.project, d.project)
+  writeJson(STORAGE_KEYS.project, normalizeProject(d.project))
   writeJson(STORAGE_KEYS.personas, d.personas)
   writeJson(STORAGE_KEYS.empathyMaps, d.empathyMaps)
   writeJson(STORAGE_KEYS.empathySelectedPersona, d.empathySelectedPersona)
@@ -30,6 +31,12 @@ export function hydrateFromExport(payload: UxFlowExport): void {
   writeJson(STORAGE_KEYS.wcagChecked, d.wcagChecked)
   writeJson(STORAGE_KEYS.heuristicEval, d.heuristicEval)
   writeJson(STORAGE_KEYS.aiPrefs, d.aiPrefs)
+  writeJson(
+    STORAGE_KEYS.usabilityReportSummary,
+    'usabilityReportSummary' in d && typeof d.usabilityReportSummary === 'string'
+      ? d.usabilityReportSummary
+      : '',
+  )
 }
 
 export async function importUxFlowFromFile(file: File): Promise<ImportResult> {

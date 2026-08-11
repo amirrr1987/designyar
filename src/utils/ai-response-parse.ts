@@ -3,6 +3,8 @@ import {
   isAiFlowStepDraft,
   isAiIdeaDraft,
   isAiPersonaDraft,
+  isAiProjectBriefDraft,
+  isAiStatementDraft,
   isAiStructuredJson,
   type AiApplyPayload,
   type AiStructuredJson,
@@ -86,10 +88,50 @@ function parseFlowSteps(value: unknown): AiApplyPayload | null {
   return { type: 'flowSteps', items }
 }
 
+function parseProblem(value: unknown): AiApplyPayload | null {
+  if (!isAiStatementDraft(value)) return null
+  if (!value.user.trim() && !value.need.trim() && !value.insight.trim()) return null
+  return { type: 'problem', item: value }
+}
+
+function parsePov(value: unknown): AiApplyPayload | null {
+  if (!isAiStatementDraft(value)) return null
+  if (!value.user.trim() && !value.need.trim() && !value.insight.trim()) return null
+  return { type: 'pov', item: value }
+}
+
+function parseProjectBrief(root: AiStructuredJson): AiApplyPayload | null {
+  const title =
+    typeof root.briefTitle === 'string'
+      ? root.briefTitle
+      : typeof root.briefTitle === 'undefined'
+        ? ''
+        : null
+  const description =
+    typeof root.briefDescription === 'string'
+      ? root.briefDescription
+      : typeof root.briefDescription === 'undefined'
+        ? ''
+        : null
+  if (title === null || description === null) return null
+  if (!title.trim() && !description.trim()) return null
+  return { type: 'projectBrief', item: { briefTitle: title.trim(), briefDescription: description.trim() } }
+}
+
+function parseTestSummary(value: unknown): AiApplyPayload | null {
+  if (typeof value !== 'string' || !value.trim()) return null
+  return { type: 'testSummary', item: value.trim() }
+}
+
 export function parseApplyPayload(action: AiActionId, responseText: string): AiApplyPayload | null {
   const parsed = extractJsonCandidate(responseText)
   const root = normalizeStructuredRoot(parsed)
-  if (!root) return null
+  if (!root) {
+    if (action === 'summarize-test' && responseText.trim()) {
+      return { type: 'testSummary', item: responseText.trim() }
+    }
+    return null
+  }
 
   switch (action) {
     case 'persona-suggest':
@@ -100,6 +142,14 @@ export function parseApplyPayload(action: AiActionId, responseText: string): AiA
       return parseIdeas(root.ideas)
     case 'suggest-userflow':
       return parseFlowSteps(root.flowSteps)
+    case 'refine-problem':
+      return parseProblem(root.problem)
+    case 'refine-pov':
+      return parsePov(root.pov)
+    case 'improve-project-brief':
+      return parseProjectBrief(root)
+    case 'summarize-test':
+      return parseTestSummary(root.testSummary) ?? (responseText.trim() ? { type: 'testSummary', item: responseText.trim() } : null)
     default:
       return null
   }
@@ -110,6 +160,10 @@ export function supportsApply(action: AiActionId): boolean {
     action === 'persona-suggest' ||
     action === 'generate-hmw' ||
     action === 'brainstorm-ideas' ||
-    action === 'suggest-userflow'
+    action === 'suggest-userflow' ||
+    action === 'refine-problem' ||
+    action === 'refine-pov' ||
+    action === 'improve-project-brief' ||
+    action === 'summarize-test'
   )
 }

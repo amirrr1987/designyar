@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Alert, Card, Form, FormItem, Input, Space } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useDefineStore } from '@/stores/define'
 
 const Textarea = Input.TextArea
@@ -19,6 +20,7 @@ const previewReady = computed(() => {
 
 <template>
   <Space direction="vertical" size="middle">
+    <AiAssistButton action="refine-problem" label="پیشنهاد بیان مسئله با AI" />
     <Card size="small" title="بیان مسئله">
       <Form layout="vertical">
         <FormItem label="کاربر (چه کسی؟)">

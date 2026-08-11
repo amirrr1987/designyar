@@ -20,6 +20,7 @@ import { storeToRefs } from 'pinia'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { resolveStepIcon } from '@/constants/step-icons'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useWCAG } from '@/composables/useWCAG'
 import { useDefineStore } from '@/stores/define'
 import { useDesignSystemStore } from '@/stores/designSystem'
@@ -55,6 +56,24 @@ const projectName = computed({
   },
 })
 
+const briefTitle = computed({
+  get: () => projectStore.briefTitle,
+  set: (value: string) => {
+    projectStore.setBriefTitle(value)
+  },
+})
+
+const briefDescription = computed({
+  get: () => projectStore.briefDescription,
+  set: (value: string) => {
+    projectStore.setBriefDescription(value)
+  },
+})
+
+const hasProjectBrief = computed(
+  () => briefTitle.value.trim().length > 0 || briefDescription.value.trim().length > 0,
+)
+
 interface StepStat {
   key: DesignStepKey
   title: string
@@ -64,6 +83,7 @@ interface StepStat {
 
 const stepStats = computed((): StepStat[] => {
   const empathizeChecks = [
+    hasProjectBrief.value,
     personas.value.length > 0,
     researchNotes.value.trim().length > 0,
     competitors.value.length > 0,
@@ -147,6 +167,26 @@ function statFor(key: DesignStepKey): StepStat | undefined {
         <FormItem label="نام پروژه">
           <Input v-model:value="projectName" placeholder="مثلاً اپلیکیشن فروشگاهی" allow-clear />
         </FormItem>
+        <FormItem label="عنوان شرح پروژه">
+          <Input
+            v-model:value="briefTitle"
+            placeholder="مثلاً پلتفرم سفارش غذا برای دانشجویان"
+            allow-clear
+          />
+        </FormItem>
+        <FormItem label="توضیح پروژه">
+          <Input.TextArea
+            v-model:value="briefDescription"
+            :rows="5"
+            placeholder="محصول چیست؟ برای چه کسی؟ چه مشکلی حل می‌کند؟ محدودیت‌ها و اهداف کلیدی…"
+            allow-clear
+          />
+        </FormItem>
+        <FormItem>
+          <Space wrap>
+            <AiAssistButton action="improve-project-brief" label="بهبود شرح با AI" />
+          </Space>
+        </FormItem>
       </Form>
     </Card>
 
@@ -195,7 +235,12 @@ function statFor(key: DesignStepKey): StepStat | undefined {
       </Row>
     </Card>
 
-    <Card v-if="!projectName.trim()" size="small">
+    <Card v-if="!hasProjectBrief" size="small">
+      <Text type="secondary">
+        شرح پروژه را بنویسید — AI و فرم‌های همه مراحل از آن context می‌گیرند.
+      </Text>
+    </Card>
+    <Card v-else-if="!projectName.trim()" size="small">
       <Text type="secondary">نام پروژه را وارد کنید تا در خروجی JSON و گزارش‌ها استفاده شود.</Text>
     </Card>
   </Space>

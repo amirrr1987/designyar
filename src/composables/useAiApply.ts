@@ -1,6 +1,9 @@
+import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { useDefineStore } from '@/stores/define'
 import { useIdeateStore } from '@/stores/ideate'
 import { usePersonaStore } from '@/stores/persona'
+import { useProjectStore } from '@/stores/project'
 import type { AiApplyPayload } from '@/types/ai-response'
 
 const PERSONA_AVATAR_COLORS = ['#1677ff', '#eb2f96', '#52c41a', '#faad14', '#722ed1', '#13c2c2'] as const
@@ -21,6 +24,8 @@ export function useAiApply() {
   const personaStore = usePersonaStore()
   const defineStore = useDefineStore()
   const ideateStore = useIdeateStore()
+  const projectStore = useProjectStore()
+  const usabilityReportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
 
   function applyPayload(payload: AiApplyPayload): number {
     switch (payload.type) {
@@ -73,6 +78,38 @@ export function useAiApply() {
           added += 1
         }
         return added
+      }
+      case 'problem': {
+        defineStore.setProblem({
+          user: payload.item.user.trim(),
+          need: payload.item.need.trim(),
+          insight: payload.item.insight.trim(),
+        })
+        return 1
+      }
+      case 'pov': {
+        const currentPersonaId = defineStore.pov.personaId
+        defineStore.setPOV({
+          user: payload.item.user.trim(),
+          need: payload.item.need.trim(),
+          insight: payload.item.insight.trim(),
+          personaId: currentPersonaId,
+        })
+        return 1
+      }
+      case 'projectBrief': {
+        projectStore.patchBrief({
+          briefTitle: payload.item.briefTitle,
+          briefDescription: payload.item.briefDescription,
+        })
+        if (payload.item.briefTitle.trim() && !projectStore.name.trim()) {
+          projectStore.setName(payload.item.briefTitle.trim())
+        }
+        return 1
+      }
+      case 'testSummary': {
+        usabilityReportSummary.value = payload.item
+        return 1
       }
       default: {
         const _exhaustive: never = payload

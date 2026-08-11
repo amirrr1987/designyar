@@ -26,6 +26,7 @@ export const STORAGE_KEYS = {
   wcagChecked: 'ux-flow-wcag-checked',
   heuristicEval: 'ux-flow-heuristic-eval',
   aiPrefs: 'ux-flow-ai-prefs',
+  usabilityReportSummary: 'ux-flow-usability-report-summary',
 } as const
 
 export type StorageKeyId = keyof typeof STORAGE_KEYS

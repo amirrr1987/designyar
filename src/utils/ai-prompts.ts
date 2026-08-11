@@ -1,10 +1,16 @@
 import type { DesignStepKey } from '@/types/project'
 
+/** AI grouping includes home (project brief) before Design Thinking steps. */
+export type AiPhaseKey = DesignStepKey | 'home'
+
 export type AiActionId =
+  | 'improve-project-brief'
   | 'persona-suggest'
   | 'analyze-notes'
   | 'analyze-competitors'
   | 'generate-hmw'
+  | 'refine-problem'
+  | 'refine-pov'
   | 'ux-improve'
   | 'microcopy'
   | 'brainstorm-ideas'
@@ -17,13 +23,21 @@ export interface AiActionDef {
   id: AiActionId
   label: string
   description: string
-  phase: DesignStepKey
+  phase: AiPhaseKey
   /** When true, system prompt requests JSON block for apply-to-form. */
   structured: boolean
   applyLabel?: string
 }
 
 export const AI_ACTIONS: readonly AiActionDef[] = [
+  {
+    id: 'improve-project-brief',
+    label: 'بهبود شرح پروژه',
+    description: 'بازنویسی عنوان و توضیح پروژه — مبنای همه مراحل',
+    phase: 'home',
+    structured: true,
+    applyLabel: 'اعمال شرح بهبودیافته',
+  },
   {
     id: 'persona-suggest',
     label: 'پیشنهاد پرسونا',
@@ -53,6 +67,22 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     phase: 'define',
     structured: true,
     applyLabel: 'افزودن سوالات HMW',
+  },
+  {
+    id: 'refine-problem',
+    label: 'پیشنهاد بیان مسئله',
+    description: 'تکمیل user / need / insight از شرح پروژه',
+    phase: 'define',
+    structured: true,
+    applyLabel: 'اعمال در بیان مسئله',
+  },
+  {
+    id: 'refine-pov',
+    label: 'پیشنهاد POV',
+    description: 'تکمیل نقطه دید از مسئله و پرسونا',
+    phase: 'define',
+    structured: true,
+    applyLabel: 'اعمال در POV',
   },
   {
     id: 'ux-improve',
@@ -103,7 +133,8 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     label: 'خلاصه یافته‌های تست',
     description: 'جمع‌بندی WCAG، کنتراست و هیوریستیک',
     phase: 'test',
-    structured: false,
+    structured: true,
+    applyLabel: 'ذخیره در گزارش usability',
   },
 ] as const
 
@@ -119,6 +150,7 @@ export function getAiActionDef(action: AiActionId): AiActionDef {
 
 export interface AiPromptContext {
   projectName?: string
+  projectBrief?: string
   personasSummary?: string
   empathySummary?: string
   researchNotes?: string
@@ -145,10 +177,16 @@ function systemBase(): string {
     'تو دستیار تخصصی UX و Design Thinking برای محصول «دیزاین‌یار» هستی.',
     'همه پاسخ‌ها را به فارسی، کوتاه، ساخت‌یافته و قابل اجرا بنویس.',
     'از فهرست و بولت استفاده کن. حدس‌های غیرمعتبر نزن؛ اگر داده کم است بگو چه چیزی کم است.',
+    'اگر «شرح پروژه» داده شده، آن را محور اصلی پیشنهادها قرار بده.',
   ].join(' ')
 }
 
 const JSON_FOOTER: Record<AiActionId, string | undefined> = {
+  'improve-project-brief': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"briefTitle":"","briefDescription":""}',
+    'عنوان کوتاه و توضیح ۳–۶ جمله‌ای؛ فقط JSON معتبر.',
+  ].join('\n'),
   'persona-suggest': [
     'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
     '{"personas":[{"name":"","role":"","goals":"","pains":"","bio":"","age":null}]}',
@@ -169,22 +207,39 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
     '{"flowSteps":[{"kind":"start|action|decision|end","label":""}]}',
     '۶ تا ۱۰ مرحله منطقی؛ kind فقط یکی از start/action/decision/end؛ فقط JSON معتبر.',
   ].join('\n'),
+  'refine-problem': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"problem":{"user":"","need":"","insight":""}}',
+    'فقط JSON معتبر.',
+  ].join('\n'),
+  'refine-pov': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"pov":{"user":"","need":"","insight":""}}',
+    'فقط JSON معتبر.',
+  ].join('\n'),
+  'summarize-test': [
+    'ابتدا خلاصه فارسی بده. در انتها ```json:',
+    '{"testSummary":"خلاصه یکپارچه برای گزارش"}',
+  ].join('\n'),
   'analyze-notes': undefined,
   'analyze-competitors': undefined,
   'ux-improve': undefined,
   microcopy: undefined,
   'review-design-system': undefined,
   'wireframe-critique': undefined,
-  'summarize-test': undefined,
 }
 
 export function buildSystemPrompt(action: AiActionId): string {
   const extra: Record<AiActionId, string> = {
+    'improve-project-brief':
+      'ابتدا ۲ جمله توضیح بده چه بهبودی دادی. سپس JSON عنوان و شرح.',
     'persona-suggest':
       'ابتدا ۲–۳ جمله خلاصه بده. سپس JSON پرسوناها.',
     'analyze-notes': 'خروجی: تم‌های کلیدی، نقل‌قول‌ها، فرصت‌های طراحی، سوالات باز.',
     'analyze-competitors': 'خروجی: الگوهای مشترک، شکاف بازار، ۳ فرصت تمایز، ۲ تهدید.',
     'generate-hmw': 'ابتدا ۱ جمله چارچوب. سپس JSON سوالات HMW.',
+    'refine-problem': 'ابتدا یک جمله پیش‌نمایش مسئله. سپس JSON problem.',
+    'refine-pov': 'ابتدا یک جمله پیش‌نمایش POV. سپس JSON pov.',
     'ux-improve': 'خروجی: ۳–۵ پیشنهاد با اولویت (بالا/متوسط/پایین) و دلیل.',
     microcopy: 'خروجی: CTA، پیام خطا، empty state، راهنمای کوتاه — هر کدام یک خط.',
     'brainstorm-ideas': 'ابتدا ۱ جمله جهت‌گیری. سپس JSON ایده‌ها.',
@@ -194,7 +249,7 @@ export function buildSystemPrompt(action: AiActionId): string {
     'wireframe-critique':
       'خروجی: ارزیابی چیدمان، جاهای خالی/شلوغ، ۳ پیشنهاد بهبود ساختار صفحه.',
     'summarize-test':
-      'خروجی: وضعیت کنتراست/WCAG/هیوریستیک، ۳ ریسک، ۳ اقدام بعدی با اولویت.',
+      'خروجی: وضعیت کنتراست/WCAG/هیوریستیک، ۳ ریسک، ۳ اقدام بعدی؛ سپس JSON testSummary.',
   }
 
   const jsonPart = JSON_FOOTER[action]
@@ -206,9 +261,14 @@ export function buildSystemPrompt(action: AiActionId): string {
 export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): string {
   const parts: string[] = []
   if (ctx.projectName?.trim()) parts.push(`نام پروژه: ${ctx.projectName.trim()}`)
+  if (ctx.projectBrief?.trim()) parts.push(`شرح پروژه (محور اصلی):\n${ctx.projectBrief.trim()}`)
   if (ctx.userHint?.trim()) parts.push(`درخواست کاربر: ${ctx.userHint.trim()}`)
 
   switch (action) {
+    case 'improve-project-brief':
+      parts.push(`شرح فعلی:\n${ctx.projectBrief?.trim() || '(خالی — از صفر بنویس)'}`)
+      parts.push('عنوان و توضیح پروژه را واضح، مختصر و قابل استفاده در Design Thinking بازنویسی کن.')
+      break
     case 'persona-suggest':
       if (ctx.personasSummary?.trim()) parts.push(`پرسوناهای فعلی:\n${ctx.personasSummary}`)
       if (ctx.empathySummary?.trim()) parts.push(`نقشه همدلی:\n${ctx.empathySummary}`)
@@ -231,6 +291,17 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       if (ctx.personasSummary?.trim()) parts.push(`پرسوناها:\n${ctx.personasSummary}`)
       if (ctx.hmwSummary?.trim()) parts.push(`سوالات HMW فعلی:\n${ctx.hmwSummary}`)
       parts.push('سوالات HMW جدید و متنوع تولید کن.')
+      break
+    case 'refine-problem':
+      if (ctx.problemSentence?.trim()) parts.push(`بیان مسئله فعلی: ${ctx.problemSentence}`)
+      if (ctx.personasSummary?.trim()) parts.push(`پرسوناها:\n${ctx.personasSummary}`)
+      parts.push('بیان مسئله را در قالب user / need / insight تکمیل یا بهبود بده.')
+      break
+    case 'refine-pov':
+      if (ctx.problemSentence?.trim()) parts.push(`بیان مسئله: ${ctx.problemSentence}`)
+      if (ctx.povSentence?.trim()) parts.push(`POV فعلی: ${ctx.povSentence}`)
+      if (ctx.personasSummary?.trim()) parts.push(`پرسوناها:\n${ctx.personasSummary}`)
+      parts.push('POV را در قالب user / need / insight تکمیل یا بهبود بده.')
       break
     case 'ux-improve':
       if (ctx.problemSentence?.trim()) parts.push(`بیان مسئله: ${ctx.problemSentence}`)
@@ -292,10 +363,15 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
   const hints: string[] = []
 
   switch (action) {
+    case 'improve-project-brief':
+      if (!ctx.projectBrief?.trim()) {
+        hints.push('عنوان یا توضیح پروژه را در صفحه خانه بنویسید.')
+      }
+      break
     case 'persona-suggest':
     case 'analyze-notes':
-      if (!ctx.researchNotes?.trim() && !ctx.personasSummary?.trim()) {
-        hints.push('یادداشت تحقیق یا پرسونا را در تب همدلی پر کنید.')
+      if (!ctx.projectBrief?.trim() && !ctx.researchNotes?.trim() && !ctx.personasSummary?.trim()) {
+        hints.push('شرح پروژه یا یادداشت تحقیق را پر کنید.')
       }
       break
     case 'analyze-competitors':
@@ -304,9 +380,11 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
       }
       break
     case 'generate-hmw':
+    case 'refine-problem':
+    case 'refine-pov':
     case 'ux-improve':
-      if (!ctx.povSentence?.trim() && !ctx.problemSentence?.trim()) {
-        hints.push('بیان مسئله یا POV را در Define تکمیل کنید.')
+      if (!ctx.povSentence?.trim() && !ctx.problemSentence?.trim() && !ctx.projectBrief?.trim()) {
+        hints.push('شرح پروژه یا بیان مسئله/POV را در Define تکمیل کنید.')
       }
       break
     case 'brainstorm-ideas':
@@ -350,9 +428,9 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
   return hints
 }
 
-export const AI_ACTIONS_BY_PHASE = (['empathize', 'define', 'ideate', 'prototype', 'test'] as const).map(
-  (phase) => ({
-    phase,
-    actions: AI_ACTIONS.filter((a) => a.phase === phase),
-  }),
-)
+export const AI_ACTIONS_BY_PHASE = (
+  ['home', 'empathize', 'define', 'ideate', 'prototype', 'test'] as const
+).map((phase) => ({
+  phase,
+  actions: AI_ACTIONS.filter((a) => a.phase === phase),
+}))

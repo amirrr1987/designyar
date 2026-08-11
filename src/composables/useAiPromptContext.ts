@@ -15,6 +15,14 @@ import type { SitemapNode } from '@/types/ideate'
 import { evaluateContrast } from '@/utils/contrast'
 import type { AiPromptContext } from '@/utils/ai-prompts'
 
+function formatProjectBrief(title: string, description: string): string | undefined {
+  const t = title.trim()
+  const d = description.trim()
+  if (!t && !d) return undefined
+  if (t && d) return `عنوان: ${t}\n\n${d}`
+  return t || d
+}
+
 const WIREFRAME_LABELS: Record<string, string> = {
   header: 'هدر',
   nav: 'ناوبری جانبی',
@@ -164,6 +172,10 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
 
     return {
       projectName: projectStore.name,
+      projectBrief: formatProjectBrief(
+        projectStore.briefTitle,
+        projectStore.briefDescription,
+      ),
       personasSummary: personasSummary || undefined,
       empathySummary: summarizeEmpathyMaps(empathyMaps.value),
       researchNotes: researchNotes.value || undefined,

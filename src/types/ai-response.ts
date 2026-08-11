@@ -21,11 +21,26 @@ export interface AiFlowStepDraft {
   label: string
 }
 
+export interface AiStatementDraft {
+  user: string
+  need: string
+  insight: string
+}
+
+export interface AiProjectBriefDraft {
+  briefTitle: string
+  briefDescription: string
+}
+
 export type AiApplyPayload =
   | { type: 'personas'; items: AiPersonaDraft[] }
   | { type: 'hmw'; items: string[] }
   | { type: 'ideas'; items: AiIdeaDraft[] }
   | { type: 'flowSteps'; items: AiFlowStepDraft[] }
+  | { type: 'problem'; item: AiStatementDraft }
+  | { type: 'pov'; item: AiStatementDraft }
+  | { type: 'projectBrief'; item: AiProjectBriefDraft }
+  | { type: 'testSummary'; item: string }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -57,11 +72,30 @@ export function isAiFlowStepDraft(value: unknown): value is AiFlowStepDraft {
   return isFlowNodeKind(value.kind) && typeof value.label === 'string'
 }
 
+export function isAiStatementDraft(value: unknown): value is AiStatementDraft {
+  if (!isRecord(value)) return false
+  return (
+    typeof value.user === 'string' &&
+    typeof value.need === 'string' &&
+    typeof value.insight === 'string'
+  )
+}
+
+export function isAiProjectBriefDraft(value: unknown): value is AiProjectBriefDraft {
+  if (!isRecord(value)) return false
+  return typeof value.briefTitle === 'string' && typeof value.briefDescription === 'string'
+}
+
 export interface AiStructuredJson {
   personas?: unknown
   hmwQuestions?: unknown
   ideas?: unknown
   flowSteps?: unknown
+  problem?: unknown
+  pov?: unknown
+  briefTitle?: unknown
+  briefDescription?: unknown
+  testSummary?: unknown
 }
 
 export function isAiStructuredJson(value: unknown): value is AiStructuredJson {
