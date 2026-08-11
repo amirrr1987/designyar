@@ -1,0 +1,5 @@
+# Redirects for Netlify SPA (Vue Router history mode)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

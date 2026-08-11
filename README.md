@@ -1,50 +1,52 @@
-# دیزاین‌یار (UX Flow)
+# دیزاین‌یار (`ui-ux-ai`)
 
-اپلیکیشن کلاینت‌ساید برای کمک به فرآیند Design Thinking — Vue 3، Pinia، Ant Design Vue (RTL فارسی)، VueUse و Groq Cloud.
+اپلیکیشن **کلاینت‌ساید** فارسی RTL برای کمک به جونیور UI/UX در مسیر Design Thinking — یک کار در هر لحظه، AI اختیاری (Groq)، خروجی پروژهٔ منسجم.
+
+**Stack:** Vue 3.5 · Pinia 4 · Vue Router 5 · ant-design-vue 4 · VueUse · Vite 8 · TypeScript strict
 
 ## راه‌اندازی
 
 ```sh
+# pnpm (قفل پروژه)
 pnpm install
-cp .env.example .env.local   # سپس VITE_GROQ_API_KEY را از https://console.groq.com/keys پر کنید
+cp .env.example .env.local
 pnpm dev
+
+# یا npm
+npm install
+cp .env.example .env.local
+npm run dev
 ```
 
-## کیفیت
+در `.env.local` مقدار `VITE_GROQ_API_KEY` را از [Groq Console](https://console.groq.com/keys) بگذارید.
+
+## کیفیت (قبل از PR / استقرار)
 
 ```sh
-pnpm run type-check
+pnpm run type-check   # یا: npm run type-check
 pnpm run lint
 pnpm run format
-pnpm build
+pnpm build            # type-check موازی + vite build → dist/
 ```
-
-`pnpm build` خروجی استاتیک را در `dist/` می‌سازد (همراه type-check).
 
 ## استقرار استاتیک (SPA)
 
-اپ فقط فرانت است؛ backend ندارد. برای مسیرهای Vue Router باید همه درخواست‌ها به `index.html` برگردند.
+اپ backend ندارد. برای Vue Router باید همه مسیرها به `index.html` برگردند.
 
-### Vercel
+| میزبان | فایل |
+|--------|------|
+| Vercel | `vercel.json` (rewrite) |
+| Netlify | `netlify.toml` + `public/_redirects` |
+| GitHub Pages | بعد از build، `dist/`؛ برای ساب‌مسیر `base` در `vite.config.ts` را تنظیم کنید |
 
-فایل `vercel.json` در ریشه پروژه rewrite به `index.html` دارد. کافی است ریپو را به Vercel وصل کنید.
+## مسیر محصول
 
-### Netlify
+1. **خانه** — نام و شرح پروژه  
+2. **همدلی → تعریف → ایده‌پردازی → پروتوتایپ → تست** — با حالت ساده (جونیور) یا حرفه‌ای  
+3. **جمع‌بندی** — یادداشت / تحلیل AI + **خروجی / ورود JSON** (فرمت v6)
 
-فایل `public/_redirects` با قانون SPA در بیلد به `dist/` کپی می‌شود.
-
-### GitHub Pages
-
-1. اگر سایت روی ساب‌مسیر است (مثلاً `username.github.io/designyar/`) در `vite.config.ts` مقدار `base: '/designyar/'` را تنظیم کنید.
-2. بعد از `pnpm build`، محتویات `dist/` را به branch `gh-pages` بفرستید (یا از Action استفاده کنید).
-3. برای fallback، یک `404.html` کپی از `index.html` در `dist/` رایج است، یا از Actionهای SPA استفاده کنید.
-
-## شروع پروژه
-
-در صفحه **خانه** عنوان و **شرح پروژه** را بنویسید — AI در همه مراحل Design Thinking از این متن context می‌گیرد. دکمه «بهبود شرح با AI» پیشنهاد بازنویسی می‌دهد.
+داده در LocalStorage با سند واحد `ux-flow:v1` ذخیره می‌شود.
 
 ## یادداشت Groq AI
 
-کلید API از [Groq Console](https://console.groq.com/keys) در `.env.local` با نام `VITE_GROQ_API_KEY` قرار می‌گیرد. مدل پیش‌فرض `groq/compound-mini` است (جست‌وجوی وب و ابزارهای compound).
-
-**هشدار:** کلید در باندل فرانت قرار می‌گیرد — فقط برای ابزار داخلی/دمو مناسب است؛ برای پروداکشن عمومی بهتر است پروکسی سرور-side داشته باشید.
+مدل پیش‌فرض `groq/compound-mini` است. کلید در باندل فرانت دیده می‌شود — فقط برای ابزار داخلی/دمو؛ برای پروداکشن عمومی پروکسی سرور-side توصیه می‌شود.

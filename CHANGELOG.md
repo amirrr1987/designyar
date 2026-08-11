@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.30.0] - 2026-08-11
+
+### Added
+
+- **Release readiness (R9):** `netlify.toml` SPA fallback alongside `vercel.json` / `public/_redirects`
+- README refresh — product path, npm/pnpm commands, deploy table
+
+### Changed
+
+- Vite: Vue DevTools plugin only in `development` mode
+- Rebuild R0–R8 closed; this release is the ship-ready polish gate
+
 ## [0.29.0] - 2026-08-11
 
 ### Added
