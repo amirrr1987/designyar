@@ -27,6 +27,19 @@ const activeKey = ref<EmpathizeTabKey>(JUNIOR_DEFAULT_TAB.empathize)
 
 const isJunior = computed(() => projectStore.isJuniorMode)
 const essentials = JUNIOR_ESSENTIAL_TABS.empathize
+const labels = fa.empathizeTools.persona
+
+const focusJobId = computed(() => phaseProgress('empathize').nextJob?.id)
+
+const primaryAiLabel = computed(() => {
+  if (focusJobId.value === 'empathize.persona') return 'پیشنهاد پرسونا با AI'
+  return 'پیشنهاد اسکلت یادداشت'
+})
+
+const primaryAiAction = computed(() => {
+  if (focusJobId.value === 'empathize.persona') return 'persona-suggest' as const
+  return 'seed-research-notes' as const
+})
 
 function isEssential(key: EmpathizeTabKey): boolean {
   return (essentials as readonly string[]).includes(key)
@@ -38,21 +51,26 @@ function showTab(key: EmpathizeTabKey): boolean {
 }
 
 function tabFromJob(): EmpathizeTabKey {
-  const job = phaseProgress('empathize').nextJob
-  if (job?.id === 'empathize.persona') return 'personas'
+  if (focusJobId.value === 'empathize.persona') return 'personas'
   return 'notes'
 }
 
 watch(
-  isJunior,
-  (junior) => {
-    if (junior) {
-      activeKey.value = tabFromJob()
-      showAdvanced.value = false
-    }
+  focusJobId,
+  () => {
+    if (!isJunior.value) return
+    const next = tabFromJob()
+    if (showTab(next)) activeKey.value = next
   },
   { immediate: true },
 )
+
+watch(isJunior, (junior) => {
+  if (junior) {
+    activeKey.value = tabFromJob()
+    showAdvanced.value = false
+  }
+})
 
 watch(showAdvanced, (advanced) => {
   if (!advanced && !showTab(activeKey.value)) {
@@ -66,7 +84,13 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 <template>
   <PhaseShell phase="empathize">
     <template #ai>
-      <AiChainButton chain="empathize-starter" label="شروع با AI (یادداشت→پرسونا)" />
+      <AiAssistButton
+        v-if="isJunior"
+        :action="primaryAiAction"
+        :label="primaryAiLabel"
+        section="همدلی"
+      />
+      <AiChainButton v-else chain="empathize-starter" label="شروع با AI (یادداشت→پرسونا)" />
     </template>
     <template #ai-more>
       <AiAssistButton action="seed-research-notes" label="پیشنهاد یادداشت" section="همدلی" />
@@ -83,11 +107,11 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 
         <Tabs.TabPane v-if="showTab('personas')" key="personas" tab="۲. پرسوناها">
           <Space direction="vertical" size="large" style="width: 100%">
-            <Card size="small" title="افزودن پرسونا">
+            <Card size="small" :title="labels.formTitle">
               <PersonaBuilder />
             </Card>
-            <Card size="small" title="لیست پرسوناها">
-              <Empty v-if="personas.length === 0" description="هنوز پرسونایی ثبت نشده است" />
+            <Card size="small" :title="labels.listTitle">
+              <Empty v-if="personas.length === 0" :description="labels.emptyList" />
               <Row v-else :gutter="[16, 16]">
                 <Col v-for="persona in personas" :key="persona.id" :xs="24" :sm="12" :lg="8">
                   <PersonaCard :persona="persona" @remove="removePersona" />
@@ -97,7 +121,11 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
           </Space>
         </Tabs.TabPane>
 
-        <Tabs.TabPane v-if="showTab('empathy')" key="empathy" :tab="`${fa.optionalLabel}: نقشه همدلی`">
+        <Tabs.TabPane
+          v-if="showTab('empathy')"
+          key="empathy"
+          :tab="`${fa.optionalLabel}: نقشه همدلی`"
+        >
           <EmpathyMap />
         </Tabs.TabPane>
 

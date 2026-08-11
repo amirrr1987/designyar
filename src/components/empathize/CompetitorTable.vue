@@ -1,13 +1,25 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { Button, Form, FormItem, Input, Popconfirm, Space, Table, message } from 'ant-design-vue'
+import { reactive, ref, computed } from 'vue'
+import {
+  Alert,
+  Button,
+  Form,
+  FormItem,
+  Input,
+  Popconfirm,
+  Space,
+  Table,
+  message,
+} from 'ant-design-vue'
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 import type { TableColumnsType } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useEmpathizeStore } from '@/stores/empathize'
+import { useProjectStore } from '@/stores/project'
 import type { CompetitorRow } from '@/types/competitor'
+import { fa } from '@/content/fa'
 
 interface CompetitorForm {
   name: string
@@ -17,8 +29,11 @@ interface CompetitorForm {
 }
 
 const empathizeStore = useEmpathizeStore()
+const projectStore = useProjectStore()
 const { competitors } = storeToRefs(empathizeStore)
 const formRef = ref<FormInstance>()
+const copy = fa.empathizeTools.competitors
+const isJunior = computed(() => projectStore.isJuniorMode)
 
 const model = reactive<CompetitorForm>({
   name: '',
@@ -71,9 +86,22 @@ function onRemove(id: string): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
-    <AiAssistButton action="suggest-competitors" label="پیشنهاد رقبا با AI" section="جدول رقبا" />
-    <AiAssistButton action="analyze-competitors" label="تحلیل رقبا با AI" section="جدول رقبا" />
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="`${fa.optionalLabel}: ${copy.alertMessage}`"
+      :description="copy.alertDescription"
+    />
+    <Space wrap>
+      <AiAssistButton action="suggest-competitors" label="پیشنهاد رقبا با AI" section="جدول رقبا" />
+      <AiAssistButton
+        v-if="!isJunior"
+        action="analyze-competitors"
+        label="تحلیل رقبا با AI"
+        section="جدول رقبا"
+      />
+    </Space>
     <Form ref="formRef" layout="vertical" :model="model" :rules="rules" @finish="onAdd">
       <FormItem label="نام رقیب" name="name">
         <Input v-model:value="model.name" placeholder="نام محصول یا شرکت" />

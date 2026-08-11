@@ -223,6 +223,56 @@ const jobs: Record<string, JobCopy> = {
   },
 }
 
+const empathizeTools = {
+  notes: {
+    title: 'یادداشت تحقیق',
+    alertMessage: 'چه دیدی؟ چه شنیدی؟',
+    alertDescription:
+      'مصاحبه، مشاهده یا فرضیه‌ات را بنویس. بعداً از همین متن پرسونا می‌سازی.',
+    placeholder: `نمونه ساختار:
+• نقل‌قول کاربر: «…»
+• مشاهده رفتار: …
+• فرضیه / فرصت: …
+• سوال باز بعدی: …`,
+    analyzeLabel: 'تحلیل این یادداشت',
+  },
+  persona: {
+    title: 'پرسونا',
+    formTitle: 'ساخت پرسونا',
+    listTitle: 'پرسوناهای پروژه',
+    emptyList: 'هنوز پرسونایی نداری — از قالب یا فرم بساز.',
+    templateHint: 'از قالب شروع کن (سریع)، بعد جزئیات را عوض کن.',
+    quickAdd: 'افزودن سریع',
+    aiLabel: 'پیشنهاد پرسونا با AI',
+    name: 'نام',
+    role: 'نقش / شغل',
+    age: 'سن (اختیاری)',
+    goals: 'اهداف',
+    pains: 'دردها و موانع',
+    bio: 'بیوگرافی کوتاه (اختیاری)',
+    avatar: 'رنگ آواتار',
+    submit: 'افزودن پرسونا',
+    reset: 'پاک کردن فرم',
+  },
+  empathyMap: {
+    alertMessage: 'اختیاری — نقشه همدلی',
+    alertDescription:
+      'چهار خانه: می‌گوید، فکر می‌کند، انجام می‌دهد، احساس می‌کند. اول پرسونا داشته باش.',
+    linkPersona: 'مرتبط با پرسونا',
+    autoSave: 'تغییرات خودکار ذخیره می‌شوند.',
+    cells: {
+      says: { title: 'می‌گوید', placeholder: 'چیزی که با صدای بلند می‌گوید…' },
+      thinks: { title: 'فکر می‌کند', placeholder: 'چیزی که در ذهن دارد ولی نمی‌گوید…' },
+      does: { title: 'انجام می‌دهد', placeholder: 'رفتار و اقدامات واقعی…' },
+      feels: { title: 'احساس می‌کند', placeholder: 'احساسات و نگرانی‌ها…' },
+    },
+  },
+  competitors: {
+    alertMessage: 'اختیاری — جدول رقبا',
+    alertDescription: 'چند رقیب با نقطه قوت و ضعف کافی است؛ لازم نیست کامل باشد.',
+  },
+} as const
+
 export const fa = {
   brand: 'دیزاین‌یار',
   tagline: 'در هر لحظه فقط یک کار درست را می‌بینی؛ AI کمکت می‌کند؛ در پایان یک پروژهٔ منسجم داری.',
@@ -246,6 +296,7 @@ export const fa = {
   glossary,
   phases,
   jobs,
+  empathizeTools,
   getPhase(key: DesignStepKey, _mode: ExperienceMode): PhaseCopy {
     return phases[key]
   },

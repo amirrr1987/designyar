@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R2 — Empathize polish:** `fa.empathizeTools` copy for notes / persona / empathy / competitors
+- Persona quick-add from templates + avatar color presets (`@ant-design/colors`)
+- Contextual primary AI on Empathize (notes vs persona) driven by `nextJob`
+
+### Changed
+
+- Research notes: structured placeholder, quieter AI (analyze only when content exists in junior)
+- Empathy map & competitors: explicit اختیاری alerts; Persian-first quadrant labels
+- Persona form: junior hides jargon secondary AI and hex input
+
 ## [0.22.0] - 2026-08-11
 
 ### Added

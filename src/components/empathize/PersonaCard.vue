@@ -11,6 +11,7 @@ import {
 } from 'ant-design-vue'
 import { DeleteOutlined } from '@ant-design/icons-vue'
 import type { Persona } from '@/types/persona'
+import { fa } from '@/content/fa'
 
 interface PersonaCardProps {
   persona: Persona
@@ -18,18 +19,25 @@ interface PersonaCardProps {
 
 const props = defineProps<PersonaCardProps>()
 const emit = defineEmits<{ remove: [id: string] }>()
+const labels = fa.empathizeTools.persona
 
 function onConfirmRemove(): void {
   emit('remove', props.persona.id)
 }
+
+function initial(name: string): string {
+  const trimmed = name.trim()
+  if (!trimmed) return '?'
+  return trimmed.slice(0, 1)
+}
 </script>
 
 <template>
-  <Card size="small" hoverable>
+  <Card size="small">
     <template #title>
       <Space>
         <Avatar :style="{ backgroundColor: persona.avatarColor ?? '#1677ff' }">
-          {{ persona.name.slice(0, 1) }}
+          {{ initial(persona.name) }}
         </Avatar>
         <span>{{ persona.name }}</span>
       </Space>
@@ -48,14 +56,16 @@ function onConfirmRemove(): void {
     </template>
 
     <Descriptions :column="1" size="small">
-      <DescriptionsItem label="نقش">{{ persona.role }}</DescriptionsItem>
-      <DescriptionsItem label="سن">
+      <DescriptionsItem :label="labels.role">{{ persona.role }}</DescriptionsItem>
+      <DescriptionsItem :label="labels.age">
         <Tag v-if="persona.age !== null">{{ persona.age }}</Tag>
         <span v-else>—</span>
       </DescriptionsItem>
-      <DescriptionsItem label="اهداف">{{ persona.goals }}</DescriptionsItem>
-      <DescriptionsItem label="دردها">{{ persona.pains }}</DescriptionsItem>
-      <DescriptionsItem label="بیو">{{ persona.bio || '—' }}</DescriptionsItem>
+      <DescriptionsItem :label="labels.goals">{{ persona.goals }}</DescriptionsItem>
+      <DescriptionsItem :label="labels.pains">{{ persona.pains }}</DescriptionsItem>
+      <DescriptionsItem v-if="persona.bio.trim()" :label="labels.bio">
+        {{ persona.bio }}
+      </DescriptionsItem>
     </Descriptions>
   </Card>
 </template>

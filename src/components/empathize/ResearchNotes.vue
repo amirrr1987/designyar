@@ -1,32 +1,45 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { Alert, Card, Input, Space } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
-import AiAssistButton from '@/components/shared/AiAssistButton.vue'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useEmpathizeStore } from '@/stores/empathize'
+import { useProjectStore } from '@/stores/project'
+import { fa } from '@/content/fa'
 
 const Textarea = Input.TextArea
 const empathizeStore = useEmpathizeStore()
+const projectStore = useProjectStore()
 const { researchNotes: notes } = storeToRefs(empathizeStore)
+
+const copy = fa.empathizeTools.notes
+const job = fa.getJob('empathize.notes')
+const isJunior = computed(() => projectStore.isJuniorMode)
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Alert type="info" show-icon :message="copy.alertMessage" :description="copy.alertDescription" />
     <Alert
-      type="info"
+      v-if="job"
+      type="success"
       show-icon
-      message="یادداشت تحقیق"
-      description="متن را بنویسید؛ سپس با AI تحلیل کنید یا از آن برای پیشنهاد پرسونا استفاده کنید."
+      :message="fa.whyHeading"
+      :description="job.why"
     />
-    <Space wrap>
-      <AiAssistButton action="seed-research-notes" label="پیشنهاد اسکلت یادداشت" section="یادداشت تحقیق" />
-      <AiAssistButton action="analyze-notes" label="تحلیل این یادداشت" section="یادداشت تحقیق" />
-      <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا از یادداشت" section="یادداشت تحقیق" />
-    </Space>
-    <Card size="small" title="یادداشت‌ها">
+
+    <AiSectionAssist
+      v-if="!isJunior || notes.trim().length > 0"
+      action="analyze-notes"
+      :label="copy.analyzeLabel"
+      section="یادداشت تحقیق"
+    />
+
+    <Card size="small" :title="copy.title">
       <Textarea
         v-model:value="notes"
-        :rows="10"
-        placeholder="مشاهدات مصاحبه، نقل‌قول‌ها، بینش‌های اولیه…"
+        :rows="12"
+        :placeholder="copy.placeholder"
         allow-clear
       />
     </Card>

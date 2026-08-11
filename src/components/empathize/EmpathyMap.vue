@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import { Card, Col, Input, Row, Select, SelectOption, Space, Typography } from 'ant-design-vue'
+import { Alert, Card, Col, Input, Row, Select, SelectOption, Space, Typography } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useEmpathizeStore } from '@/stores/empathize'
 import { createEmptyQuadrants, type EmpathyQuadrants } from '@/types/empathy-map'
+import { fa } from '@/content/fa'
 
 const GENERAL_KEY = 'general'
 const Textarea = Input.TextArea
@@ -14,6 +15,9 @@ const { personas } = usePersona()
 const empathizeStore = useEmpathizeStore()
 const { empathyMaps: maps, empathySelectedPersona: selectedPersonaId } =
   storeToRefs(empathizeStore)
+
+const copy = fa.empathizeTools.empathyMap
+const glossary = fa.getGlossary('empathy-map')
 
 const personaOptions = computed(() => [
   { value: GENERAL_KEY, label: 'عمومی (بدون پرسونا)' },
@@ -44,28 +48,49 @@ watch(
   { deep: true },
 )
 
-const cells: { key: keyof EmpathyQuadrants; title: string; placeholder: string }[] = [
-  { key: 'says', title: 'می‌گوید (Says)', placeholder: 'چیزی که کاربر می‌گوید…' },
-  { key: 'thinks', title: 'فکر می‌کند (Thinks)', placeholder: 'چیزی که در ذهن دارد…' },
-  { key: 'does', title: 'انجام می‌دهد (Does)', placeholder: 'رفتار و اقدامات…' },
-  { key: 'feels', title: 'احساس می‌کند (Feels)', placeholder: 'احساسات و نگرانی‌ها…' },
+const cells: {
+  key: keyof EmpathyQuadrants
+  title: string
+  placeholder: string
+}[] = [
+  { key: 'says', title: copy.cells.says.title, placeholder: copy.cells.says.placeholder },
+  { key: 'thinks', title: copy.cells.thinks.title, placeholder: copy.cells.thinks.placeholder },
+  { key: 'does', title: copy.cells.does.title, placeholder: copy.cells.does.placeholder },
+  { key: 'feels', title: copy.cells.feels.title, placeholder: copy.cells.feels.placeholder },
 ]
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
-    <AiAssistButton action="synthesize-empathy" label="سنتز نقشه همدلی با AI" section="نقشه همدلی" />
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="`${fa.optionalLabel}: ${copy.alertMessage}`"
+      :description="copy.alertDescription"
+    />
+    <Paragraph v-if="glossary" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ glossary.labelFa }}</Text>
+      <template v-if="glossary.glossEn"> ({{ glossary.glossEn }})</template>
+      : {{ glossary.definition }}
+    </Paragraph>
+
+    <AiAssistButton
+      action="synthesize-empathy"
+      label="پر کردن نقشه با AI"
+      section="نقشه همدلی"
+    />
+
     <Row :gutter="[16, 8]">
       <Col :xs="24" :md="12" :lg="8">
-        <Text strong>مرتبط با پرسونا</Text>
-        <Select v-model:value="selectedPersonaId">
+        <Text strong>{{ copy.linkPersona }}</Text>
+        <Select v-model:value="selectedPersonaId" style="width: 100%">
           <SelectOption v-for="opt in personaOptions" :key="opt.value" :value="opt.value">
             {{ opt.label }}
           </SelectOption>
         </Select>
       </Col>
     </Row>
-    <Paragraph type="secondary">تغییرات به‌صورت خودکار ذخیره می‌شوند.</Paragraph>
+    <Paragraph type="secondary">{{ copy.autoSave }}</Paragraph>
 
     <Row :gutter="[16, 16]">
       <Col v-for="cell in cells" :key="cell.key" :xs="24" :md="12">
