@@ -47,8 +47,7 @@ const heuristicRatedCount = computed(
 )
 
 const overallStatus = computed((): 'success' | 'info' | 'warning' => {
-  const contrastOk =
-    designContrast.value !== null && designContrast.value.level !== 'fail'
+  const contrastOk = designContrast.value !== null && designContrast.value.level !== 'fail'
   const wcagOk = wcagProgress.value >= 50
   const heurOk = heuristicAverage.value >= 3
   if (contrastOk && wcagOk && heurOk) return 'success'

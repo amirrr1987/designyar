@@ -7,8 +7,8 @@ export function useWCAG() {
 
   const total = WCAG_CHECKLIST.length
 
-  const checkedCount = computed(() =>
-    checkedIds.value.filter((id) => WCAG_CHECKLIST.some((item) => item.id === id)).length,
+  const checkedCount = computed(
+    () => checkedIds.value.filter((id) => WCAG_CHECKLIST.some((item) => item.id === id)).length,
   )
 
   const progress = computed(() => {

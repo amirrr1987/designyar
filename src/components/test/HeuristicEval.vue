@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  Card,
-  Col,
-  Input,
-  Rate,
-  Row,
-  Space,
-  Statistic,
-  Typography,
-} from 'ant-design-vue'
+import { Card, Col, Input, Rate, Row, Space, Statistic, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
 import {
   HEURISTIC_RULES,
@@ -55,7 +46,9 @@ function setNotes(ruleId: string, notes: string): void {
   <Space direction="vertical" size="large">
     <Card size="small">
       <Statistic title="میانگین امتیاز (از ۵)" :value="average" :precision="1" suffix="/ ۵" />
-      <Paragraph type="secondary">۱۰ اصل نیلسن — امتیاز و یادداشت برای هر اصل ذخیره می‌شود.</Paragraph>
+      <Paragraph type="secondary"
+        >۱۰ اصل نیلسن — امتیاز و یادداشت برای هر اصل ذخیره می‌شود.</Paragraph
+      >
     </Card>
 
     <Row :gutter="[16, 16]">

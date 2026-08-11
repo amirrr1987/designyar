@@ -1,15 +1,5 @@
 <script setup lang="ts">
-import {
-  Button,
-  Card,
-  Col,
-  Input,
-  Row,
-  Space,
-  Statistic,
-  Tag,
-  Typography,
-} from 'ant-design-vue'
+import { Button, Card, Col, Input, Row, Space, Statistic, Tag, Typography } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { useContrast } from '@/composables/useContrast'
 import { useDesignSystemStore } from '@/stores/designSystem'
@@ -60,12 +50,7 @@ function levelColor(level: string): string {
       </Col>
       <Col :xs="24" :md="8">
         <Card size="small">
-          <Statistic
-            title="نسبت کنتراست"
-            :value="result?.ratio ?? 0"
-            :precision="2"
-            suffix=":1"
-          />
+          <Statistic title="نسبت کنتراست" :value="result?.ratio ?? 0" :precision="2" suffix=":1" />
         </Card>
       </Col>
       <Col :xs="24" :md="8">
