@@ -28,8 +28,7 @@ import {
 const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
 const aiStore = useAiStore()
-const { selectedModelId, isLoading, isReady, progress, lastResponse, error } =
-  storeToRefs(aiStore)
+const { selectedModelId, isLoading, isReady, progress, lastResponse, error } = storeToRefs(aiStore)
 const { models, initModel, chat } = useWebLLM()
 const { buildContext } = useAiPromptContext()
 
@@ -78,6 +77,12 @@ function onActionChange(value: unknown): void {
   }
 }
 
+function onModelChange(value: unknown): void {
+  if (typeof value === 'string') {
+    aiStore.setSelectedModelId(value)
+  }
+}
+
 async function onSend(): Promise<void> {
   const ctx = buildContext(prompt.value.trim() || undefined)
   const userPrompt = buildUserPrompt(actionId.value, ctx)
@@ -102,11 +107,7 @@ async function onSend(): Promise<void> {
       />
 
       <Space wrap>
-        <Select
-          :value="selectedModelId"
-          :options="modelOptions"
-          @update:value="(v: string) => aiStore.setSelectedModelId(v)"
-        />
+        <Select :value="selectedModelId" :options="modelOptions" @update:value="onModelChange" />
         <Button type="primary" :loading="isLoading" @click="onLoadModel">
           <template #icon><RobotOutlined /></template>
           بارگذاری مدل
@@ -115,7 +116,14 @@ async function onSend(): Promise<void> {
 
       <Progress v-if="isLoading || progress > 0" :percent="progress" status="active" />
 
-      <Alert v-if="error" type="error" show-icon :message="error" closable @close="aiStore.setError('')" />
+      <Alert
+        v-if="error"
+        type="error"
+        show-icon
+        :message="error"
+        closable
+        @close="aiStore.setError('')"
+      />
 
       <Alert
         v-if="isReady"
@@ -124,11 +132,7 @@ async function onSend(): Promise<void> {
         message="مدل آماده است — اکشن را انتخاب و اجرا کنید"
       />
 
-      <Select
-        :value="actionId"
-        :options="actionOptions"
-        @update:value="onActionChange"
-      />
+      <Select :value="actionId" :options="actionOptions" @update:value="onActionChange" />
       <Paragraph v-if="selectedAction" type="secondary">
         {{ selectedAction.description }}
       </Paragraph>

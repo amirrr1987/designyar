@@ -25,10 +25,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
 
   function buildContext(userHint?: string): AiPromptContext {
     const personasSummary = personas.value
-      .map(
-        (p) =>
-          `- ${p.name} (${p.role}): اهداف=${p.goals}; دردها=${p.pains}`,
-      )
+      .map((p) => `- ${p.name} (${p.role}): اهداف=${p.goals}; دردها=${p.pains}`)
       .join('\n')
 
     const ideasSummary = ideas.value
@@ -47,9 +44,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
     const fg = palette.value.primary[7] ?? '#000000'
     const bg = palette.value.primary[0] ?? '#ffffff'
     const contrast = evaluateContrast(fg, bg)
-    const contrastSummary = contrast
-      ? `${contrast.ratio}:1 (${contrast.level})`
-      : undefined
+    const contrastSummary = contrast ? `${contrast.ratio}:1 (${contrast.level})` : undefined
 
     return {
       projectName: projectStore.name,

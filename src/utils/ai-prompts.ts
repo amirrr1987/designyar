@@ -66,16 +66,11 @@ function systemBase(): string {
 
 export function buildSystemPrompt(action: AiActionId): string {
   const extra: Record<AiActionId, string> = {
-    'persona-suggest':
-      'خروجی: ۱ تا ۳ پرسونا با نام، نقش، اهداف، دردها و یک جمله بیو.',
-    'analyze-notes':
-      'خروجی: تم‌های کلیدی، نقل‌قول‌های مهم، فرصت‌های طراحی، و سوالات باز.',
-    'ux-improve':
-      'خروجی: ۳ تا ۵ پیشنهاد بهبود UX با اولویت و دلیل کوتاه.',
-    microcopy:
-      'خروجی: پیشنهاد میکروکپی برای CTA، پیام خطا، empty state و راهنمای کوتاه.',
-    'summarize-test':
-      'خروجی: خلاصه وضعیت کنتراست/WCAG/هیوریستیک، ریسک‌ها و ۳ اقدام بعدی.',
+    'persona-suggest': 'خروجی: ۱ تا ۳ پرسونا با نام، نقش، اهداف، دردها و یک جمله بیو.',
+    'analyze-notes': 'خروجی: تم‌های کلیدی، نقل‌قول‌های مهم، فرصت‌های طراحی، و سوالات باز.',
+    'ux-improve': 'خروجی: ۳ تا ۵ پیشنهاد بهبود UX با اولویت و دلیل کوتاه.',
+    microcopy: 'خروجی: پیشنهاد میکروکپی برای CTA، پیام خطا، empty state و راهنمای کوتاه.',
+    'summarize-test': 'خروجی: خلاصه وضعیت کنتراست/WCAG/هیوریستیک، ریسک‌ها و ۳ اقدام بعدی.',
   }
   return `${systemBase()} ${extra[action]}`
 }

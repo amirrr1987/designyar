@@ -63,9 +63,7 @@ export function useWebLLM() {
 
     try {
       const messages = [
-        ...(systemPrompt
-          ? [{ role: 'system' as const, content: systemPrompt }]
-          : []),
+        ...(systemPrompt ? [{ role: 'system' as const, content: systemPrompt }] : []),
         { role: 'user' as const, content: prompt },
       ]
 
