@@ -3,23 +3,34 @@ import { computed, watch } from 'vue'
 import {
   Alert,
   Button,
-  Card,
   Form,
   FormItem,
   Input,
   Select,
   SelectOption,
   Space,
+  Typography,
 } from 'ant-design-vue'
+import type { ButtonProps } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
-import AiAssistButton from '@/components/shared/AiAssistButton.vue'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDefineStore } from '@/stores/define'
+import { useProjectStore } from '@/stores/project'
+import { fa } from '@/content/fa'
 
 const Textarea = Input.TextArea
+const { Paragraph, Text } = Typography
 const defineStore = useDefineStore()
+const projectStore = useProjectStore()
 const { pov, povSentence, problem } = storeToRefs(defineStore)
 const { personas } = usePersona()
+const copy = fa.defineTools.pov
+const glossary = fa.getGlossary('pov')
+const job = fa.getJob('define.pov')
+const isJunior = computed(() => projectStore.isJuniorMode)
+
+const copyBtn: ButtonProps = { type: 'dashed' }
 
 const previewReady = computed(() => {
   return (
@@ -28,6 +39,13 @@ const previewReady = computed(() => {
     pov.value.insight.trim().length > 0
   )
 })
+
+const isComplete = computed(
+  () =>
+    Boolean(pov.value.user.trim()) &&
+    Boolean(pov.value.need.trim()) &&
+    Boolean(pov.value.insight.trim()),
+)
 
 const personaOptions = computed(() =>
   personas.value.map((p) => ({ value: p.id, label: `${p.name} — ${p.role}` })),
@@ -60,68 +78,69 @@ function onPersonaChange(value: unknown): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
-    <Space wrap>
-      <AiAssistButton action="refine-pov" label="پیشنهاد POV با AI" section="نقطه دید (POV)" />
-    </Space>
-    <Card size="small" title="نقطه دید (POV)">
-      <Form layout="vertical">
-        <FormItem label="پرسونا (اختیاری)">
-          <Select
-            :value="pov.personaId"
-            allow-clear
-            placeholder="اتصال به پرسونا"
-            @change="onPersonaChange"
-          >
-            <SelectOption v-for="opt in personaOptions" :key="opt.value" :value="opt.value">
-              {{ opt.label }}
-            </SelectOption>
-          </Select>
-        </FormItem>
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Paragraph v-if="glossary" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ glossary.labelFa }}</Text>
+      <template v-if="!isJunior && glossary.glossEn"> ({{ glossary.glossEn }})</template>
+      : {{ glossary.definition }}
+    </Paragraph>
+    <Paragraph v-if="job && isJunior" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ fa.whyHeading }}</Text>
+      {{ ' ' }}{{ job.why }}
+    </Paragraph>
 
-        <FormItem>
-          <Button @click="copyFromProblem">کپی از بیان مسئله</Button>
-        </FormItem>
+    <AiSectionAssist action="refine-pov" :label="copy.aiLabel" section="دیدگاه کاربر" />
 
-        <FormItem label="کاربر">
-          <Input
-            :value="pov.user"
-            placeholder="کاربر کیست؟"
-            @update:value="(v: string) => defineStore.patchPOV({ user: v })"
-          />
-        </FormItem>
-        <FormItem label="نیاز">
-          <Textarea
-            :value="pov.need"
-            :rows="2"
-            placeholder="چه نیازی دارد؟"
-            @update:value="(v: string) => defineStore.patchPOV({ need: v })"
-          />
-        </FormItem>
-        <FormItem label="بینش">
-          <Textarea
-            :value="pov.insight"
-            :rows="2"
-            placeholder="چرا این نیاز مهم است؟"
-            @update:value="(v: string) => defineStore.patchPOV({ insight: v })"
-          />
-        </FormItem>
-      </Form>
-    </Card>
+    <Form layout="vertical">
+      <FormItem :label="copy.persona">
+        <Select
+          :value="pov.personaId"
+          allow-clear
+          :placeholder="copy.personaPh"
+          @change="onPersonaChange"
+        >
+          <SelectOption v-for="opt in personaOptions" :key="opt.value" :value="opt.value">
+            {{ opt.label }}
+          </SelectOption>
+        </Select>
+      </FormItem>
+
+      <FormItem>
+        <Button v-bind="copyBtn" @click="copyFromProblem">{{ copy.copyFromProblem }}</Button>
+      </FormItem>
+
+      <FormItem :label="copy.user">
+        <Input
+          :value="pov.user"
+          :placeholder="copy.user"
+          @update:value="(v: string) => defineStore.patchPOV({ user: v })"
+        />
+      </FormItem>
+      <FormItem :label="copy.need">
+        <Textarea
+          :value="pov.need"
+          :rows="2"
+          :placeholder="copy.need"
+          @update:value="(v: string) => defineStore.patchPOV({ need: v })"
+        />
+      </FormItem>
+      <FormItem :label="copy.insight">
+        <Textarea
+          :value="pov.insight"
+          :rows="2"
+          :placeholder="copy.insight"
+          @update:value="(v: string) => defineStore.patchPOV({ insight: v })"
+        />
+      </FormItem>
+    </Form>
 
     <Alert
       v-if="previewReady"
-      type="success"
+      :type="isComplete ? 'success' : 'info'"
       show-icon
-      message="جمله POV"
+      :message="copy.previewReady"
       :description="povSentence"
     />
-    <Alert
-      v-else
-      type="info"
-      show-icon
-      message="پیش‌نمایش POV"
-      description="با پر کردن فیلدها یا انتخاب پرسونا، جمله POV ساخته می‌شود."
-    />
+    <Alert v-else type="info" show-icon :message="copy.previewEmpty" />
   </Space>
 </template>

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R3 — Define stack:** `fa.defineTools` for problem / POV / HMW
+- Numbered stack with «کار فعلی» / «انجام شد» tags from completion engine
+- Contextual primary AI + smooth scroll to active Define step (junior)
+
+### Changed
+
+- Problem / POV / HMW forms — Persian-first labels; HMW/POV jargon only in full mode gloss
+- Define view remains tab-free (Problem → POV → HMW stack)
+
 ## [0.23.0] - 2026-08-11
 
 ### Added
