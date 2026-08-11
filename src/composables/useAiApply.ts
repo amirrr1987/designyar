@@ -4,6 +4,7 @@ import { useDefineStore } from '@/stores/define'
 import { useIdeateStore } from '@/stores/ideate'
 import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
+import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { AiApplyPayload } from '@/types/ai-response'
 
 const PERSONA_AVATAR_COLORS = ['#1677ff', '#eb2f96', '#52c41a', '#faad14', '#722ed1', '#13c2c2'] as const
@@ -26,6 +27,9 @@ export function useAiApply() {
   const ideateStore = useIdeateStore()
   const projectStore = useProjectStore()
   const usabilityReportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
+  const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
+  const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
+  const empathySelectedPersona = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, 'general')
 
   function applyPayload(payload: AiApplyPayload): number {
     switch (payload.type) {
@@ -110,6 +114,35 @@ export function useAiApply() {
       case 'testSummary': {
         usabilityReportSummary.value = payload.item
         return 1
+      }
+      case 'researchNotes': {
+        researchNotes.value = payload.item
+        return 1
+      }
+      case 'empathyMaps': {
+        let applied = 0
+        for (const draft of payload.items) {
+          if (!draft.personaId.trim()) continue
+          empathyMaps.value = {
+            ...empathyMaps.value,
+            [draft.personaId]: {
+              personaId: draft.personaId,
+              quadrants: {
+                says: draft.quadrants.says.trim(),
+                thinks: draft.quadrants.thinks.trim(),
+                does: draft.quadrants.does.trim(),
+                feels: draft.quadrants.feels.trim(),
+              },
+              updatedAt: new Date().toISOString(),
+            },
+          }
+          applied += 1
+        }
+        const first = payload.items[0]
+        if (first?.personaId.trim()) {
+          empathySelectedPersona.value = first.personaId
+        }
+        return applied
       }
       default: {
         const _exhaustive: never = payload

@@ -7,6 +7,7 @@ import PersonaBuilder from '@/components/empathize/PersonaBuilder.vue'
 import PersonaCard from '@/components/empathize/PersonaCard.vue'
 import ResearchNotes from '@/components/empathize/ResearchNotes.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
+import AiChainButton from '@/components/shared/AiChainButton.vue'
 import { usePersona } from '@/composables/usePersona'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
@@ -24,6 +25,8 @@ const activeKey = ref<EmpathizeTabKey>('personas')
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
+        <AiChainButton chain="empathize-starter" label="زنجیره Empathize" />
+        <AiAssistButton action="seed-research-notes" label="پیشنهاد یادداشت" />
         <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا" />
         <AiAssistButton action="analyze-notes" label="تحلیل یادداشت" />
         <AiAssistButton action="analyze-competitors" label="تحلیل رقبا" />

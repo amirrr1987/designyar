@@ -2,7 +2,17 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { getAiChain, type AiChainId } from '@/constants/ai-chains'
 import type { AiActionId } from '@/utils/ai-prompts'
+
+function getChainStepCount(chainId: AiChainId): number {
+  return getAiChain(chainId).steps.length
+}
+
+function getChainStep(chainId: AiChainId, index: number): AiActionId | null {
+  const step = getAiChain(chainId).steps[index]
+  return step ?? null
+}
 
 export interface AiPrefs {
   /** Groq model id preference. */
@@ -28,6 +38,9 @@ export const useAiStore = defineStore('ai', () => {
   const error = ref('')
   const panelOpen = ref(false)
   const pendingAction = ref<AiActionId | null>(null)
+  const pendingChain = ref<AiChainId | null>(null)
+  const activeChainId = ref<AiChainId | null>(null)
+  const chainStepIndex = ref(0)
 
   const selectedModelId = computed(() => prefs.value.selectedModelId)
 
@@ -80,6 +93,50 @@ export const useAiStore = defineStore('ai', () => {
     error.value = ''
   }
 
+  function openChain(chainId: AiChainId): void {
+    pendingChain.value = chainId
+    panelOpen.value = true
+  }
+
+  function consumePendingChain(): AiChainId | null {
+    const chain = pendingChain.value
+    pendingChain.value = null
+    return chain
+  }
+
+  function startChain(chainId: AiChainId): AiActionId | null {
+    activeChainId.value = chainId
+    chainStepIndex.value = 0
+    return getChainStep(chainId, 0)
+  }
+
+  function advanceChain(): AiActionId | null {
+    if (!activeChainId.value) return null
+    const nextIndex = chainStepIndex.value + 1
+    const next = getChainStep(activeChainId.value, nextIndex)
+    if (!next) {
+      cancelChain()
+      return null
+    }
+    chainStepIndex.value = nextIndex
+    return next
+  }
+
+  function cancelChain(): void {
+    activeChainId.value = null
+    chainStepIndex.value = 0
+  }
+
+  function getChainProgress(): { chainId: AiChainId; current: number; total: number } | null {
+    if (!activeChainId.value) return null
+    const total = getChainStepCount(activeChainId.value)
+    return {
+      chainId: activeChainId.value,
+      current: chainStepIndex.value + 1,
+      total,
+    }
+  }
+
   function reset(): void {
     prefs.value = createDefaultAiPrefs()
     isLoading.value = false
@@ -89,6 +146,9 @@ export const useAiStore = defineStore('ai', () => {
     error.value = ''
     panelOpen.value = false
     pendingAction.value = null
+    pendingChain.value = null
+    activeChainId.value = null
+    chainStepIndex.value = 0
   }
 
   return {
@@ -101,6 +161,9 @@ export const useAiStore = defineStore('ai', () => {
     error,
     panelOpen,
     pendingAction,
+    pendingChain,
+    activeChainId,
+    chainStepIndex,
     setSelectedModelId,
     setLoading,
     setReady,
@@ -111,6 +174,12 @@ export const useAiStore = defineStore('ai', () => {
     closePanel,
     setPanelOpen,
     consumePendingAction,
+    openChain,
+    consumePendingChain,
+    startChain,
+    advanceChain,
+    cancelChain,
+    getChainProgress,
     clearSessionOutput,
     reset,
   }

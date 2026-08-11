@@ -4,6 +4,7 @@ import { Card, Col, Input, Row, Select, SelectOption, Space, Typography } from '
 import { useStorage } from '@vueuse/core'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { usePersona } from '@/composables/usePersona'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import {
   createEmptyQuadrants,
   type EmpathyMapsByPersona,
@@ -64,6 +65,7 @@ const cells: { key: keyof EmpathyQuadrants; title: string; placeholder: string }
 
 <template>
   <Space direction="vertical" size="middle">
+    <AiAssistButton action="synthesize-empathy" label="سنتز نقشه همدلی با AI" />
     <Row :gutter="[16, 8]">
       <Col :xs="24" :md="12" :lg="8">
         <Text strong>مرتبط با پرسونا</Text>

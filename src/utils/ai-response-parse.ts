@@ -1,5 +1,6 @@
 import type { AiActionId } from '@/utils/ai-prompts'
 import {
+  isAiEmpathyMapDraft,
   isAiFlowStepDraft,
   isAiIdeaDraft,
   isAiPersonaDraft,
@@ -123,6 +124,18 @@ function parseTestSummary(value: unknown): AiApplyPayload | null {
   return { type: 'testSummary', item: value.trim() }
 }
 
+function parseResearchNotes(value: unknown): AiApplyPayload | null {
+  if (typeof value !== 'string' || !value.trim()) return null
+  return { type: 'researchNotes', item: value.trim() }
+}
+
+function parseEmpathyMaps(value: unknown): AiApplyPayload | null {
+  if (!Array.isArray(value)) return null
+  const items = value.filter(isAiEmpathyMapDraft)
+  if (items.length === 0) return null
+  return { type: 'empathyMaps', items }
+}
+
 export function parseApplyPayload(action: AiActionId, responseText: string): AiApplyPayload | null {
   const parsed = extractJsonCandidate(responseText)
   const root = normalizeStructuredRoot(parsed)
@@ -148,6 +161,10 @@ export function parseApplyPayload(action: AiActionId, responseText: string): AiA
       return parsePov(root.pov)
     case 'improve-project-brief':
       return parseProjectBrief(root)
+    case 'seed-research-notes':
+      return parseResearchNotes(root.researchNotes)
+    case 'synthesize-empathy':
+      return parseEmpathyMaps(root.empathyMaps)
     case 'summarize-test':
       return parseTestSummary(root.testSummary) ?? (responseText.trim() ? { type: 'testSummary', item: responseText.trim() } : null)
     default:
@@ -164,6 +181,8 @@ export function supportsApply(action: AiActionId): boolean {
     action === 'refine-problem' ||
     action === 'refine-pov' ||
     action === 'improve-project-brief' ||
+    action === 'seed-research-notes' ||
+    action === 'synthesize-empathy' ||
     action === 'summarize-test'
   )
 }

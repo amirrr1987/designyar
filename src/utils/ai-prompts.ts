@@ -5,7 +5,9 @@ export type AiPhaseKey = DesignStepKey | 'home'
 
 export type AiActionId =
   | 'improve-project-brief'
+  | 'seed-research-notes'
   | 'persona-suggest'
+  | 'synthesize-empathy'
   | 'analyze-notes'
   | 'analyze-competitors'
   | 'generate-hmw'
@@ -39,12 +41,28 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     applyLabel: 'اعمال شرح بهبودیافته',
   },
   {
+    id: 'seed-research-notes',
+    label: 'پیشنهاد یادداشت تحقیق',
+    description: 'اسکلت یادداشت از شرح پروژه — سوالات مصاحبه و تم‌ها',
+    phase: 'empathize',
+    structured: true,
+    applyLabel: 'اعمال در یادداشت تحقیق',
+  },
+  {
     id: 'persona-suggest',
     label: 'پیشنهاد پرسونا',
     description: 'ساخت ۱–۳ پرسونا از یادداشت تحقیق و داده موجود',
     phase: 'empathize',
     structured: true,
     applyLabel: 'افزودن پرسوناها به لیست',
+  },
+  {
+    id: 'synthesize-empathy',
+    label: 'سنتز نقشه همدلی',
+    description: 'پر کردن Says/Thinks/Does/Feels از پرسونا و تحقیق',
+    phase: 'empathize',
+    structured: true,
+    applyLabel: 'اعمال نقشه همدلی',
   },
   {
     id: 'analyze-notes',
@@ -187,6 +205,16 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
     '{"briefTitle":"","briefDescription":""}',
     'عنوان کوتاه و توضیح ۳–۶ جمله‌ای؛ فقط JSON معتبر.',
   ].join('\n'),
+  'seed-research-notes': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"researchNotes":"متن کامل یادداشت تحقیق"}',
+    'شامل: اهداف تحقیق، سوالات مصاحبه، فرضیه‌ها؛ فقط JSON معتبر.',
+  ].join('\n'),
+  'synthesize-empathy': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"empathyMaps":[{"personaId":"general","quadrants":{"says":"","thinks":"","does":"","feels":""}}]}',
+    'برای هر پرسونای مرتبط یک entry؛ personaId = id پرسونا یا "general"؛ فقط JSON معتبر.',
+  ].join('\n'),
   'persona-suggest': [
     'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
     '{"personas":[{"name":"","role":"","goals":"","pains":"","bio":"","age":null}]}',
@@ -233,9 +261,12 @@ export function buildSystemPrompt(action: AiActionId): string {
   const extra: Record<AiActionId, string> = {
     'improve-project-brief':
       'ابتدا ۲ جمله توضیح بده چه بهبودی دادی. سپس JSON عنوان و شرح.',
+    'seed-research-notes':
+      'ابتدا ۱ جمله خلاصه. سپس JSON یادداشت تحقیق کامل.',
     'persona-suggest':
       'ابتدا ۲–۳ جمله خلاصه بده. سپس JSON پرسوناها.',
     'analyze-notes': 'خروجی: تم‌های کلیدی، نقل‌قول‌ها، فرصت‌های طراحی، سوالات باز.',
+    'synthesize-empathy': 'ابتدا ۱ جمله خلاصه. سپس JSON empathyMaps.',
     'analyze-competitors': 'خروجی: الگوهای مشترک، شکاف بازار، ۳ فرصت تمایز، ۲ تهدید.',
     'generate-hmw': 'ابتدا ۱ جمله چارچوب. سپس JSON سوالات HMW.',
     'refine-problem': 'ابتدا یک جمله پیش‌نمایش مسئله. سپس JSON problem.',
@@ -269,11 +300,21 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       parts.push(`شرح فعلی:\n${ctx.projectBrief?.trim() || '(خالی — از صفر بنویس)'}`)
       parts.push('عنوان و توضیح پروژه را واضح، مختصر و قابل استفاده در Design Thinking بازنویسی کن.')
       break
+    case 'seed-research-notes':
+      if (ctx.researchNotes?.trim()) parts.push(`یادداشت فعلی:\n${ctx.researchNotes}`)
+      parts.push('یادداشت تحقیق ساخت‌یافته برای فاز Empathize بنویس.')
+      break
     case 'persona-suggest':
       if (ctx.personasSummary?.trim()) parts.push(`پرسوناهای فعلی:\n${ctx.personasSummary}`)
       if (ctx.empathySummary?.trim()) parts.push(`نقشه همدلی:\n${ctx.empathySummary}`)
       if (ctx.researchNotes?.trim()) parts.push(`یادداشت تحقیق:\n${ctx.researchNotes}`)
       parts.push('پرسونای جدید پیشنهاد بده (تکمیل‌کننده، نه تکراری).')
+      break
+    case 'synthesize-empathy':
+      if (ctx.personasSummary?.trim()) parts.push(`پرسوناها:\n${ctx.personasSummary}`)
+      if (ctx.researchNotes?.trim()) parts.push(`یادداشت تحقیق:\n${ctx.researchNotes}`)
+      if (ctx.empathySummary?.trim()) parts.push(`نقشه فعلی:\n${ctx.empathySummary}`)
+      parts.push('نقشه همدلی را برای پرسوناهای مرتبط تکمیل کن.')
       break
     case 'analyze-notes':
       parts.push(`یادداشت تحقیق:\n${ctx.researchNotes?.trim() || '(خالی)'}`)
@@ -364,8 +405,14 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
 
   switch (action) {
     case 'improve-project-brief':
+    case 'seed-research-notes':
       if (!ctx.projectBrief?.trim()) {
         hints.push('عنوان یا توضیح پروژه را در صفحه خانه بنویسید.')
+      }
+      break
+    case 'synthesize-empathy':
+      if (!ctx.personasSummary?.trim()) {
+        hints.push('حداقل یک پرسونا بسازید یا از AI پیشنهاد بگیرید.')
       }
       break
     case 'persona-suggest':

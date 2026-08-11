@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-08-11
+
+### Added
+
+- **آمادگی context** در پنل AI (درصد + checklist ✓/○)
+- **زنجیره‌های AI**: Define کامل (مسئله→POV→HMW) و Empathize (یادداشت→پرسونا→empathy)
+- اکشن `seed-research-notes` با اعمال در یادداشت تحقیق
+- اکشن `synthesize-empathy` با اعمال در نقشه همدلی
+- `AiChainButton` و اجرای خودکار زنجیره با apply بین مراحل
+
 ## [0.12.0] - 2026-08-11
 
 ### Added

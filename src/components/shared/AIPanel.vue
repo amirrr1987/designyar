@@ -5,8 +5,10 @@ import {
   Button,
   Card,
   Input,
+  Progress,
   Select,
   Space,
+  Tag,
   Typography,
   message,
 } from 'ant-design-vue'
@@ -18,12 +20,15 @@ import {
   ReloadOutlined,
   RobotOutlined,
   SendOutlined,
+  StopOutlined,
 } from '@ant-design/icons-vue'
+import { AI_CHAINS } from '@/constants/ai-chains'
 import { useAiApply } from '@/composables/useAiApply'
 import { useAiPromptContext } from '@/composables/useAiPromptContext'
 import { useGroq } from '@/composables/useGroq'
 import { useAiStore } from '@/stores/ai'
 import type { AiApplyPayload } from '@/types/ai-response'
+import { getContextReadiness } from '@/utils/ai-context-readiness'
 import { parseApplyPayload, supportsApply } from '@/utils/ai-response-parse'
 import {
   AI_ACTIONS_BY_PHASE,
@@ -38,7 +43,8 @@ import {
 const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
 const aiStore = useAiStore()
-const { selectedModelId, isLoading, isReady, lastResponse, error } = storeToRefs(aiStore)
+const { selectedModelId, isLoading, isReady, lastResponse, error, activeChainId } =
+  storeToRefs(aiStore)
 const { models, validateApiKey, chat } = useGroq()
 const { buildContext } = useAiPromptContext()
 const { applyPayload } = useAiApply()
@@ -46,6 +52,7 @@ const { applyPayload } = useAiApply()
 const actionId = ref<AiActionId>('persona-suggest')
 const prompt = ref('')
 const applyPayloadResult = ref<AiApplyPayload | null>(null)
+const chainRunning = ref(false)
 
 const modelOptions = computed(() =>
   models.map((id) => ({
@@ -70,6 +77,10 @@ const contextPreview = computed(() => buildContext(prompt.value.trim() || undefi
 
 const contextHints = computed(() => getContextHints(actionId.value, contextPreview.value))
 
+const readiness = computed(() => getContextReadiness(actionId.value, contextPreview.value))
+
+const chainProgress = computed(() => aiStore.getChainProgress())
+
 const canApply = computed(
   () => applyPayloadResult.value !== null && supportsApply(actionId.value),
 )
@@ -81,6 +92,11 @@ watch(
   (open) => {
     if (!open) return
     validateApiKey()
+    const pendingChain = aiStore.consumePendingChain()
+    if (pendingChain) {
+      void startChainRun(pendingChain)
+      return
+    }
     const pending = aiStore.consumePendingAction()
     if (pending) actionId.value = pending
   },
@@ -119,6 +135,7 @@ function onCheckConnection(): void {
 
 function onActionChange(value: unknown): void {
   if (typeof value === 'string' && isAiActionId(value)) {
+    aiStore.cancelChain()
     actionId.value = value
     aiStore.clearSessionOutput()
     applyPayloadResult.value = null
@@ -131,10 +148,27 @@ function onModelChange(value: unknown): void {
   }
 }
 
-async function onSend(): Promise<void> {
-  if (!validateApiKey()) return
+function applySuccessMessage(payload: AiApplyPayload, count: number): void {
+  if (count === 1 && payload.type === 'testSummary') {
+    message.success('خلاصه در گزارش usability ذخیره شد')
+    return
+  }
+  if (
+    count === 1 &&
+    (payload.type === 'problem' ||
+      payload.type === 'pov' ||
+      payload.type === 'projectBrief' ||
+      payload.type === 'researchNotes')
+  ) {
+    message.success('در فرم اعمال شد')
+    return
+  }
+  message.success(`${count} مورد به پروژه اضافه شد`)
+}
 
-  applyPayloadResult.value = null
+async function runSend(): Promise<AiApplyPayload | null> {
+  if (!validateApiKey()) return null
+
   const ctx = buildContext(prompt.value.trim() || undefined)
   const userPrompt = buildUserPrompt(actionId.value, ctx)
   const systemPrompt = buildSystemPrompt(actionId.value)
@@ -143,12 +177,76 @@ async function onSend(): Promise<void> {
     await chat(userPrompt, systemPrompt)
     const parsed = parseApplyPayload(actionId.value, aiStore.lastResponse)
     applyPayloadResult.value = parsed
-    if (parsed) {
+    if (parsed && !activeChainId.value) {
       message.info('داده ساخت‌یافته شناسایی شد — می‌توانید اعمال کنید')
     }
+    return parsed
   } catch {
-    // error in store
+    return null
   }
+}
+
+async function onSend(): Promise<void> {
+  applyPayloadResult.value = null
+  await runSend()
+}
+
+async function continueChainAfterApply(parsed: AiApplyPayload): Promise<void> {
+  const count = applyPayload(parsed)
+  if (count === 0) {
+    aiStore.cancelChain()
+    chainRunning.value = false
+    message.warning('زنجیره متوقف شد — داده قابل اعمال نبود')
+    return
+  }
+
+  applySuccessMessage(parsed, count)
+  applyPayloadResult.value = null
+  aiStore.clearSessionOutput()
+
+  const nextAction = aiStore.advanceChain()
+  if (!nextAction) {
+    chainRunning.value = false
+    message.success('زنجیره AI با موفقیت کامل شد')
+    return
+  }
+
+  actionId.value = nextAction
+  const parsedNext = await runSend()
+  if (!parsedNext) {
+    aiStore.cancelChain()
+    chainRunning.value = false
+    message.warning('زنجیره متوقف شد — خطا در مرحله بعد')
+    return
+  }
+
+  await continueChainAfterApply(parsedNext)
+}
+
+async function startChainRun(chainId: typeof AI_CHAINS[number]['id']): Promise<void> {
+  if (!validateApiKey()) return
+
+  const first = aiStore.startChain(chainId)
+  if (!first) return
+
+  chainRunning.value = true
+  actionId.value = first
+  applyPayloadResult.value = null
+  aiStore.clearSessionOutput()
+
+  message.loading({ content: 'اجرای زنجیره AI…', key: 'chain', duration: 0 })
+
+  const parsed = await runSend()
+  message.destroy('chain')
+
+  if (!parsed) {
+    aiStore.cancelChain()
+    chainRunning.value = false
+    message.error('شروع زنجیره ناموفق بود')
+    return
+  }
+
+  await continueChainAfterApply(parsed)
 }
 
 function onApply(): void {
@@ -162,17 +260,14 @@ function onApply(): void {
     message.warning('مورد معتبری برای افزودن نبود')
     return
   }
-  message.success(
-    count === 1 && payload.type === 'testSummary'
-      ? 'خلاصه در گزارش usability ذخیره شد'
-      : count === 1 &&
-          (payload.type === 'problem' ||
-            payload.type === 'pov' ||
-            payload.type === 'projectBrief')
-        ? 'در فرم اعمال شد'
-        : `${count} مورد به پروژه اضافه شد`,
-  )
+  applySuccessMessage(payload, count)
   applyPayloadResult.value = null
+}
+
+function onStopChain(): void {
+  aiStore.cancelChain()
+  chainRunning.value = false
+  message.info('زنجیره متوقف شد')
 }
 
 async function onCopyResponse(): Promise<void> {
@@ -198,7 +293,7 @@ function onClearResponse(): void {
       type="info"
       show-icon
       message="دستیار Design Thinking (Groq)"
-      description="اکشن را انتخاب کنید؛ AI از داده‌های ذخیره‌شده پروژه context می‌گیرد. برخی اکشن‌ها قابل «اعمال مستقیم» در فرم هستند."
+      description="اکشن یا زنجیره را انتخاب کنید؛ AI از داده پروژه context می‌گیرد."
     />
 
     <Alert
@@ -206,7 +301,7 @@ function onClearResponse(): void {
       type="warning"
       show-icon
       message="کلید API یافت نشد"
-      description="فایل .env.local را با VITE_GROQ_API_KEY=... بسازید (از console.groq.com/keys)."
+      description="فایل .env.local را با VITE_GROQ_API_KEY=... بسازید."
     >
       <template #action>
         <Button size="small" type="link" href="https://console.groq.com/keys" target="_blank">
@@ -216,11 +311,44 @@ function onClearResponse(): void {
       </template>
     </Alert>
 
+    <Card v-if="chainProgress" size="small" title="زنجیره در حال اجرا">
+      <Space direction="vertical">
+        <Progress
+          :percent="Math.round((chainProgress.current / chainProgress.total) * 100)"
+          status="active"
+        />
+        <Text type="secondary">
+          مرحله {{ chainProgress.current }} از {{ chainProgress.total }}
+        </Text>
+        <Button v-if="chainRunning" danger size="small" @click="onStopChain">
+          <template #icon><StopOutlined /></template>
+          توقف زنجیره
+        </Button>
+      </Space>
+    </Card>
+
+    <Card size="small" title="زنجیره‌های پیشنهادی">
+      <Space wrap>
+        <Button
+          v-for="chain in AI_CHAINS"
+          :key="chain.id"
+          :loading="chainRunning"
+          :disabled="!isReady || isLoading"
+          @click="startChainRun(chain.id)"
+        >
+          {{ chain.label }}
+        </Button>
+      </Space>
+      <Paragraph type="secondary">
+        {{ AI_CHAINS.map((c) => c.description).join(' · ') }}
+      </Paragraph>
+    </Card>
+
     <Space wrap>
       <Select
         :value="selectedModelId"
         :options="modelOptions"
-        :disabled="isLoading"
+        :disabled="isLoading || chainRunning"
         @update:value="onModelChange"
       />
       <Button :loading="isLoading" @click="onCheckConnection">
@@ -241,12 +369,24 @@ function onClearResponse(): void {
     <Select
       :value="actionId"
       :options="actionOptions"
-      :disabled="isLoading"
+      :disabled="isLoading || chainRunning"
       @update:value="onActionChange"
     />
     <Paragraph v-if="selectedAction" type="secondary">
       {{ selectedAction.description }}
     </Paragraph>
+
+    <Card size="small" title="آمادگی context">
+      <Progress
+        :percent="readiness.percent"
+        :status="readiness.readyEnough ? 'success' : 'active'"
+      />
+      <Space wrap>
+        <Tag v-for="item in readiness.items" :key="item.id" :color="item.met ? 'success' : 'default'">
+          {{ item.met ? '✓' : '○' }} {{ item.label }}
+        </Tag>
+      </Space>
+    </Card>
 
     <Alert
       v-for="(hint, index) in contextHints"
@@ -260,16 +400,21 @@ function onClearResponse(): void {
     <Textarea
       v-model:value="prompt"
       :rows="3"
-      :disabled="!isReady || isLoading"
+      :disabled="!isReady || isLoading || chainRunning"
       placeholder="مثلاً تمرکز روی کاربران موبایل…"
     />
 
     <Space wrap>
-      <Button type="primary" :disabled="!isReady" :loading="isLoading" @click="onSend">
+      <Button
+        type="primary"
+        :disabled="!isReady || chainRunning"
+        :loading="isLoading"
+        @click="onSend"
+      >
         <template #icon><SendOutlined /></template>
         اجرای اکشن AI
       </Button>
-      <Button :disabled="!lastResponse || isLoading" @click="onSend">
+      <Button :disabled="!lastResponse || isLoading || chainRunning" @click="onSend">
         <template #icon><ReloadOutlined /></template>
         تکرار
       </Button>
@@ -284,7 +429,12 @@ function onClearResponse(): void {
       </template>
       <template #extra>
         <Space>
-          <Button v-if="canApply" type="primary" size="small" @click="onApply">
+          <Button
+            v-if="canApply && !chainRunning"
+            type="primary"
+            size="small"
+            @click="onApply"
+          >
             <template #icon><CheckOutlined /></template>
             {{ applyLabel }}
           </Button>

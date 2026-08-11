@@ -1,3 +1,5 @@
+import type { EmpathyQuadrants } from '@/types/empathy-map'
+import { isEmpathyQuadrants } from '@/types/empathy-map'
 import type { FlowNodeKind } from '@/types/ideate'
 import { isFlowNodeKind } from '@/types/ideate'
 
@@ -32,6 +34,11 @@ export interface AiProjectBriefDraft {
   briefDescription: string
 }
 
+export interface AiEmpathyMapDraft {
+  personaId: string
+  quadrants: EmpathyQuadrants
+}
+
 export type AiApplyPayload =
   | { type: 'personas'; items: AiPersonaDraft[] }
   | { type: 'hmw'; items: string[] }
@@ -41,6 +48,8 @@ export type AiApplyPayload =
   | { type: 'pov'; item: AiStatementDraft }
   | { type: 'projectBrief'; item: AiProjectBriefDraft }
   | { type: 'testSummary'; item: string }
+  | { type: 'researchNotes'; item: string }
+  | { type: 'empathyMaps'; items: AiEmpathyMapDraft[] }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -86,6 +95,11 @@ export function isAiProjectBriefDraft(value: unknown): value is AiProjectBriefDr
   return typeof value.briefTitle === 'string' && typeof value.briefDescription === 'string'
 }
 
+export function isAiEmpathyMapDraft(value: unknown): value is AiEmpathyMapDraft {
+  if (!isRecord(value)) return false
+  return typeof value.personaId === 'string' && isEmpathyQuadrants(value.quadrants)
+}
+
 export interface AiStructuredJson {
   personas?: unknown
   hmwQuestions?: unknown
@@ -96,6 +110,8 @@ export interface AiStructuredJson {
   briefTitle?: unknown
   briefDescription?: unknown
   testSummary?: unknown
+  researchNotes?: unknown
+  empathyMaps?: unknown
 }
 
 export function isAiStructuredJson(value: unknown): value is AiStructuredJson {
