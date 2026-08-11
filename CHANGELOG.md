@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.28.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R7 — AI polish:** `fa.ai` copy; junior drawer is one-assist (locked action, no chains/coverage cockpit)
+- Streaming via `AiProvider` / `completeAssist`; apply CTA elevated when structured payload ready
+- History collapsed for junior (`AiHistoryList` embedded mode)
+
+### Changed
+
+- `useGroq` thin facade over ai store; Groq provider streams deltas
+- `AiSectionAssist` quieter in junior (no secondary + jargon caption)
+
 ## [0.27.0] - 2026-08-11
 
 ### Added

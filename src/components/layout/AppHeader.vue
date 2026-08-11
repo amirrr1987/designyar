@@ -22,6 +22,7 @@ import { useAiStore } from '@/stores/ai'
 import { useProjectStore } from '@/stores/project'
 import { downloadUxFlowExport } from '@/utils/project-export'
 import { importUxFlowFromFile } from '@/utils/project-import'
+import { fa } from '@/content/fa'
 
 const Header = Layout.Header
 const { Text, Title } = Typography
@@ -118,7 +119,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
           </Button>
           <Button v-bind="aiButton" @click="aiStore.openPanel()">
             <template #icon><RobotOutlined /></template>
-            دستیار AI
+            {{ fa.ai.headerButton }}
           </Button>
         </Space>
       </Col>
@@ -126,7 +127,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
 
     <Drawer
       v-model:open="drawerOpen"
-      title="دستیار هوش مصنوعی"
+      :title="fa.ai.drawerTitle"
       placement="left"
       :width="440"
       destroy-on-close

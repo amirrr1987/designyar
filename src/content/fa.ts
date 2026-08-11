@@ -486,6 +486,38 @@ export const fa = {
   getGlossary(id: string): GlossaryTerm | undefined {
     return glossary.find((g) => g.id === id)
   },
+  ai: {
+    drawerTitle: 'دستیار AI',
+    headerButton: 'کمک AI',
+    juniorAlertTitle: 'کمک برای کار فعلی',
+    juniorAlertDesc:
+      'همان اکشنی که از صفحه باز کردی را اجرا کن. اگر جواب ساخت‌یافته بود، با «اعمال» در پروژه ذخیره می‌شود.',
+    fullAlertTitle: 'دستیار Design Thinking (Groq)',
+    fullAlertDesc:
+      'هر اکشن از کل داده‌های پروژه context می‌گیرد — نه فقط همین صفحه.',
+    noKeyTitle: 'کلید API یافت نشد',
+    noKeyDesc: 'فایل .env.local را با VITE_GROQ_API_KEY=... بسازید.',
+    getKey: 'دریافت کلید',
+    coverageTitle: 'پوشش داده پروژه',
+    chainsTitle: 'زنجیره‌های پیشنهادی',
+    chainRunning: 'زنجیره در حال اجرا',
+    stopChain: 'توقف زنجیره',
+    checkConnection: 'بررسی اتصال',
+    readinessTitle: 'آمادگی context',
+    hintLabel: 'نکته اختیاری برای مدل',
+    hintPh: 'مثلاً تمرکز روی کاربران موبایل…',
+    run: 'اجرا',
+    retry: 'تکرار',
+    apply: 'اعمال در پروژه',
+    copy: 'کپی',
+    clear: 'پاک',
+    responseTitle: 'پاسخ',
+    structuredReady: 'داده ساخت‌یافته آماده است — اعمال کن تا در پروژه ذخیره شود.',
+    showSettings: 'تنظیمات مدل',
+    hideSettings: 'بستن تنظیمات',
+    historyCollapse: 'تاریخچه اعمال',
+    sectionHint: 'AI از داده پروژه کمک می‌گیرد',
+  } as const,
 } as const
 
 export type FaContent = typeof fa

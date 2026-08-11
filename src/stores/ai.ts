@@ -184,6 +184,9 @@ export const useAiStore = defineStore('ai', () => {
       const result = await provider.value.complete({
         messages,
         modelId: selectedModelId.value,
+        onDelta: (_chunk, full) => {
+          setLastResponse(full)
+        },
       })
       setLastResponse(result.text)
       return result.text

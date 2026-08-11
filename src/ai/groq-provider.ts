@@ -76,6 +76,9 @@ export function createGroqProvider(options: GroqProviderOptions): AiProvider {
           content: m.content,
         })),
         temperature: request.temperature ?? 0.6,
+        max_completion_tokens: 2048,
+        top_p: 1,
+        stream: true,
       }
 
       if (isCompoundModel(modelId)) {
@@ -85,8 +88,15 @@ export function createGroqProvider(options: GroqProviderOptions): AiProvider {
       }
 
       try {
-        const completion = await client.chat.completions.create(params)
-        const text = completion.choices[0]?.message?.content?.trim() ?? ''
+        const stream = await client.chat.completions.create(params)
+        let full = ''
+        for await (const chunk of stream) {
+          const delta = chunk.choices[0]?.delta?.content ?? ''
+          if (!delta) continue
+          full += delta
+          request.onDelta?.(delta, full)
+        }
+        const text = full.trim()
         if (!text) {
           throw new AiProviderError('empty_response', 'پاسخ خالی از Groq دریافت شد')
         }

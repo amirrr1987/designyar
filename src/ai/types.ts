@@ -14,6 +14,8 @@ export interface AiCompleteRequest {
   /** Optional model override; provider may ignore. */
   modelId?: string
   temperature?: number
+  /** Streaming chunks — `full` is cumulative text so far. */
+  onDelta?: (chunk: string, full: string) => void
 }
 
 export interface AiCompleteResult {

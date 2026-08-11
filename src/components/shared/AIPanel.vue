@@ -4,6 +4,8 @@ import {
   Alert,
   Button,
   Card,
+  Collapse,
+  CollapsePanel,
   Input,
   Progress,
   Select,
@@ -12,6 +14,7 @@ import {
   Typography,
   message,
 } from 'ant-design-vue'
+import type { ButtonProps } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import {
   CheckOutlined,
@@ -22,11 +25,11 @@ import {
   SendOutlined,
   StopOutlined,
 } from '@ant-design/icons-vue'
+import { GROQ_MODELS } from '@/ai/groq-provider'
 import { AI_CHAINS } from '@/constants/ai-chains'
 import AiHistoryList from '@/components/shared/AiHistoryList.vue'
 import { useAiApply, type AiApplyAudit } from '@/composables/useAiApply'
 import { useAiPromptContext } from '@/composables/useAiPromptContext'
-import { useGroq } from '@/composables/useGroq'
 import { useAiStore } from '@/stores/ai'
 import { useProjectStore } from '@/stores/project'
 import type { AiApplyPayload } from '@/types/ai-response'
@@ -42,6 +45,7 @@ import {
   isAiActionId,
   type AiActionId,
 } from '@/utils/ai-prompts'
+import { fa } from '@/content/fa'
 
 const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
@@ -49,31 +53,43 @@ const aiStore = useAiStore()
 const projectStore = useProjectStore()
 const { selectedModelId, isLoading, isReady, lastResponse, error, activeChainId } =
   storeToRefs(aiStore)
-const { models, validateApiKey, chat } = useGroq()
 const { buildContext } = useAiPromptContext()
 const { applyPayload } = useAiApply()
+
+const copy = fa.ai
+const isJunior = computed(() => projectStore.isJuniorMode)
 
 const actionId = ref<AiActionId>('persona-suggest')
 const prompt = ref('')
 const applyPayloadResult = ref<AiApplyPayload | null>(null)
 const chainRunning = ref(false)
+const showSettings = ref(false)
 
 const modelOptions = computed(() =>
-  models.map((id) => ({
+  GROQ_MODELS.map((id) => ({
     value: id,
     label: id.replace(/^groq\//, ''),
   })),
 )
 
-const actionOptions = computed(() =>
-  AI_ACTIONS_BY_PHASE.map((group) => ({
+const actionOptions = computed(() => {
+  if (isJunior.value) {
+    const def = getAiActionDef(actionId.value)
+    return [
+      {
+        value: actionId.value,
+        label: def?.label ?? actionId.value,
+      },
+    ]
+  }
+  return AI_ACTIONS_BY_PHASE.map((group) => ({
     label: groupLabel(group.phase),
     options: group.actions.map((a) => ({
       value: a.id,
       label: a.label,
     })),
-  })),
-)
+  }))
+})
 
 const selectedAction = computed(() => getAiActionDef(actionId.value))
 
@@ -91,13 +107,18 @@ const canApply = computed(
   () => applyPayloadResult.value !== null && supportsApply(actionId.value),
 )
 
-const applyLabel = computed(() => selectedAction.value.applyLabel ?? 'اعمال در پروژه')
+const applyLabel = computed(
+  () => selectedAction.value.applyLabel ?? copy.apply,
+)
+
+const primaryRunBtn: ButtonProps = { type: 'primary' }
+const applyBtn: ButtonProps = { type: 'primary' }
 
 watch(
   () => aiStore.panelOpen,
   (open) => {
     if (!open) return
-    validateApiKey()
+    aiStore.validateProvider()
     const pendingChain = aiStore.consumePendingChain()
     if (pendingChain) {
       void startChainRun(pendingChain)
@@ -109,6 +130,7 @@ watch(
     if (sectionHint) {
       prompt.value = `بخش فعلی: ${sectionHint}`
     }
+    if (isJunior.value) showSettings.value = false
   },
   { immediate: true },
 )
@@ -138,12 +160,13 @@ function groupLabel(phase: string): string {
 }
 
 function onCheckConnection(): void {
-  if (validateApiKey()) {
+  if (aiStore.validateProvider()) {
     message.success('کلید API یافت شد — آماده اجرا')
   }
 }
 
 function onActionChange(value: unknown): void {
+  if (isJunior.value) return
   if (typeof value === 'string' && isAiActionId(value)) {
     aiStore.cancelChain()
     actionId.value = value
@@ -160,7 +183,7 @@ function onModelChange(value: unknown): void {
 
 function applySuccessMessage(payload: AiApplyPayload, count: number): void {
   if (count === 1 && payload.type === 'testSummary') {
-    message.success('خلاصه در گزارش usability ذخیره شد')
+    message.success('خلاصه در گزارش ذخیره شد')
     return
   }
   if (count === 1 && payload.type === 'projectSynthesis') {
@@ -181,18 +204,18 @@ function applySuccessMessage(payload: AiApplyPayload, count: number): void {
 }
 
 async function runSend(): Promise<AiApplyPayload | null> {
-  if (!validateApiKey()) return null
+  if (!aiStore.validateProvider()) return null
 
   const ctx = buildContext(prompt.value.trim() || undefined)
   const userPrompt = buildUserPrompt(actionId.value, ctx)
   const systemPrompt = buildSystemPrompt(actionId.value)
 
   try {
-    await chat(userPrompt, systemPrompt)
+    await aiStore.completeAssist(userPrompt, systemPrompt)
     const parsed = parseApplyPayload(actionId.value, aiStore.lastResponse)
     applyPayloadResult.value = parsed
     if (parsed && !activeChainId.value) {
-      message.info('داده ساخت‌یافته شناسایی شد — می‌توانید اعمال کنید')
+      message.info(copy.structuredReady)
     }
     return parsed
   } catch {
@@ -244,8 +267,8 @@ async function continueChainAfterApply(parsed: AiApplyPayload): Promise<void> {
   await continueChainAfterApply(parsedNext)
 }
 
-async function startChainRun(chainId: typeof AI_CHAINS[number]['id']): Promise<void> {
-  if (!validateApiKey()) return
+async function startChainRun(chainId: (typeof AI_CHAINS)[number]['id']): Promise<void> {
+  if (!aiStore.validateProvider()) return
 
   const first = aiStore.startChain(chainId)
   if (!first) return
@@ -309,19 +332,15 @@ function onClearResponse(): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
+  <Space direction="vertical" size="middle" style="width: 100%">
     <Alert
       type="info"
       show-icon
-      :message="projectStore.isJuniorMode ? 'دستیار AI' : 'دستیار Design Thinking (Groq)'"
-      :description="
-        projectStore.isJuniorMode
-          ? 'یک اکشن انتخاب کن و بفرست. اگر مطمئن نیستی، همان پیشنهادی که در صفحه باز شده را نگه دار.'
-          : 'هر اکشن از کل artifactهای پروژه (شرح، Empathize، Define، Ideate، Prototype، Test) context می‌گیرد — نه فقط همین صفحه.'
-      "
+      :message="isJunior ? copy.juniorAlertTitle : copy.fullAlertTitle"
+      :description="isJunior ? copy.juniorAlertDesc : copy.fullAlertDesc"
     />
 
-    <Card size="small" title="پوشش داده پروژه در AI">
+    <Card v-if="!isJunior" size="small" :title="copy.coverageTitle">
       <Progress :percent="projectCoverage.percent" status="active" />
       <Space wrap>
         <Tag
@@ -338,18 +357,18 @@ function onClearResponse(): void {
       v-if="!isReady"
       type="warning"
       show-icon
-      message="کلید API یافت نشد"
-      description="فایل .env.local را با VITE_GROQ_API_KEY=... بسازید."
+      :message="copy.noKeyTitle"
+      :description="copy.noKeyDesc"
     >
       <template #action>
         <Button size="small" type="link" href="https://console.groq.com/keys" target="_blank">
           <template #icon><LinkOutlined /></template>
-          دریافت کلید
+          {{ copy.getKey }}
         </Button>
       </template>
     </Alert>
 
-    <Card v-if="chainProgress" size="small" title="زنجیره در حال اجرا">
+    <Card v-if="chainProgress" size="small" :title="copy.chainRunning">
       <Space direction="vertical">
         <Progress
           :percent="Math.round((chainProgress.current / chainProgress.total) * 100)"
@@ -360,12 +379,12 @@ function onClearResponse(): void {
         </Text>
         <Button v-if="chainRunning" danger size="small" @click="onStopChain">
           <template #icon><StopOutlined /></template>
-          توقف زنجیره
+          {{ copy.stopChain }}
         </Button>
       </Space>
     </Card>
 
-    <Card size="small" title="زنجیره‌های پیشنهادی">
+    <Card v-if="!isJunior" size="small" :title="copy.chainsTitle">
       <Space wrap>
         <Button
           v-for="chain in AI_CHAINS"
@@ -382,18 +401,23 @@ function onClearResponse(): void {
       </Paragraph>
     </Card>
 
-    <Space wrap>
-      <Select
-        :value="selectedModelId"
-        :options="modelOptions"
-        :disabled="isLoading || chainRunning"
-        @update:value="onModelChange"
-      />
-      <Button :loading="isLoading" @click="onCheckConnection">
-        <template #icon><RobotOutlined /></template>
-        بررسی اتصال
-      </Button>
-    </Space>
+    <template v-if="!isJunior || showSettings">
+      <Space wrap>
+        <Select
+          :value="selectedModelId"
+          :options="modelOptions"
+          :disabled="isLoading || chainRunning"
+          @update:value="onModelChange"
+        />
+        <Button :loading="isLoading" @click="onCheckConnection">
+          <template #icon><RobotOutlined /></template>
+          {{ copy.checkConnection }}
+        </Button>
+      </Space>
+    </template>
+    <Button v-else type="link" size="small" @click="showSettings = true">
+      {{ copy.showSettings }}
+    </Button>
 
     <Alert
       v-if="error"
@@ -407,14 +431,14 @@ function onClearResponse(): void {
     <Select
       :value="actionId"
       :options="actionOptions"
-      :disabled="isLoading || chainRunning"
+      :disabled="isLoading || chainRunning || isJunior"
       @update:value="onActionChange"
     />
     <Paragraph v-if="selectedAction" type="secondary">
       {{ selectedAction.description }}
     </Paragraph>
 
-    <Card size="small" title="آمادگی context">
+    <Card v-if="!isJunior" size="small" :title="copy.readinessTitle">
       <Progress
         :percent="readiness.percent"
         :status="readiness.readyEnough ? 'success' : 'active'"
@@ -425,43 +449,65 @@ function onClearResponse(): void {
         </Tag>
       </Space>
     </Card>
+    <Alert
+      v-else-if="!readiness.readyEnough"
+      type="warning"
+      show-icon
+      :message="copy.readinessTitle"
+      :description="contextHints[0] ?? 'برای نتیجه بهتر، دادهٔ کار فعلی را کامل‌تر کن.'"
+    />
 
     <Alert
-      v-for="(hint, index) in contextHints"
+      v-for="(hint, index) in isJunior ? [] : contextHints"
       :key="index"
       type="warning"
       show-icon
       :message="hint"
     />
 
-    <Text strong>نکته اختیاری برای مدل</Text>
+    <Text strong>{{ copy.hintLabel }}</Text>
     <Textarea
       v-model:value="prompt"
-      :rows="3"
+      :rows="isJunior ? 2 : 3"
       :disabled="!isReady || isLoading || chainRunning"
-      placeholder="مثلاً تمرکز روی کاربران موبایل…"
+      :placeholder="copy.hintPh"
     />
 
     <Space wrap>
       <Button
-        type="primary"
+        v-bind="primaryRunBtn"
         :disabled="!isReady || chainRunning"
         :loading="isLoading"
         @click="onSend"
       >
         <template #icon><SendOutlined /></template>
-        اجرای اکشن AI
+        {{ copy.run }}
       </Button>
       <Button :disabled="!lastResponse || isLoading || chainRunning" @click="onSend">
         <template #icon><ReloadOutlined /></template>
-        تکرار
+        {{ copy.retry }}
+      </Button>
+      <Button
+        v-if="canApply && !chainRunning"
+        v-bind="applyBtn"
+        @click="onApply"
+      >
+        <template #icon><CheckOutlined /></template>
+        {{ applyLabel }}
       </Button>
     </Space>
+
+    <Alert
+      v-if="canApply && !chainRunning"
+      type="success"
+      show-icon
+      :message="copy.structuredReady"
+    />
 
     <Card v-if="lastResponse" size="small">
       <template #title>
         <Space>
-          <span>پاسخ</span>
+          <span>{{ copy.responseTitle }}</span>
           <Text v-if="isLoading" type="secondary">در حال دریافت…</Text>
         </Space>
       </template>
@@ -478,9 +524,9 @@ function onClearResponse(): void {
           </Button>
           <Button size="small" @click="onCopyResponse">
             <template #icon><CopyOutlined /></template>
-            کپی
+            {{ copy.copy }}
           </Button>
-          <Button size="small" @click="onClearResponse">پاک</Button>
+          <Button size="small" @click="onClearResponse">{{ copy.clear }}</Button>
         </Space>
       </template>
       <Paragraph style="white-space: pre-wrap; margin-bottom: 0">
@@ -488,6 +534,11 @@ function onClearResponse(): void {
       </Paragraph>
     </Card>
 
-    <AiHistoryList />
+    <Collapse v-if="isJunior" accordion>
+      <CollapsePanel key="history" :header="copy.historyCollapse">
+        <AiHistoryList embedded />
+      </CollapsePanel>
+    </Collapse>
+    <AiHistoryList v-else />
   </Space>
 </template>
