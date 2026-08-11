@@ -37,11 +37,5 @@ function onChange(next: number): void {
 </script>
 
 <template>
-  <Steps
-    type="navigation"
-    size="small"
-    :current="current"
-    :items="items"
-    @change="onChange"
-  />
+  <Steps type="navigation" size="small" :current="current" :items="items" @change="onChange" />
 </template>

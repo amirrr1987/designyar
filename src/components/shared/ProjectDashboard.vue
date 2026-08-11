@@ -1,17 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  Card,
-  Button,
-  Input,
-  Form,
-  FormItem,
-  Row,
-  Col,
-  Space,
-  Typography,
-} from 'ant-design-vue'
+import { Card, Button, Input, Form, FormItem, Row, Col, Space, Typography } from 'ant-design-vue'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { resolveStepIcon } from '@/constants/step-icons'
 import { useProjectStore } from '@/stores/project'
