@@ -1,0 +1,34 @@
+/**
+ * Canonical LocalStorage keys for UX Flow (`useStorage` only).
+ * Keep in sync when adding persistence.
+ */
+export const STORAGE_KEYS = {
+  project: 'ux-flow-project',
+  personas: 'ux-flow-personas',
+  empathyMaps: 'ux-flow-empathy-maps',
+  empathySelectedPersona: 'ux-flow-empathy-selected-persona',
+  researchNotes: 'ux-flow-research-notes',
+  competitors: 'ux-flow-competitors',
+  problem: 'ux-flow-problem',
+  pov: 'ux-flow-pov',
+  hmw: 'ux-flow-hmw',
+  ideas: 'ux-flow-ideas',
+  userflow: 'ux-flow-userflow',
+  sitemap: 'ux-flow-sitemap',
+  cardSort: 'ux-flow-card-sort',
+  designSystem: 'ux-flow-design-system',
+  wireframeBlocks: 'ux-flow-wireframe-blocks',
+  componentChecklist: 'ux-flow-component-checklist',
+  wcagChecked: 'ux-flow-wcag-checked',
+  heuristicEval: 'ux-flow-heuristic-eval',
+  aiPrefs: 'ux-flow-ai-prefs',
+} as const
+
+export type StorageKeyId = keyof typeof STORAGE_KEYS
+export type StorageKeyValue = (typeof STORAGE_KEYS)[StorageKeyId]
+
+export const STORAGE_KEY_LIST = Object.values(STORAGE_KEYS) as readonly StorageKeyValue[]
+
+export function isStorageKeyValue(value: string): value is StorageKeyValue {
+  return (STORAGE_KEY_LIST as readonly string[]).includes(value)
+}

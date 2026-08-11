@@ -8,15 +8,13 @@ const { Content } = Layout
 </script>
 
 <template>
-  <Layout>
+  <Layout style="height: 100vh">
     <AppSider />
-    <Layout>
+    <Layout >
       <AppHeader />
-      <Content>
-        <Space direction="vertical" size="middle">
-          <StepProgress />
-          <RouterView />
-        </Space>
+      <Content style="overflow: auto; padding: 16px">
+        <StepProgress />
+        <RouterView />
       </Content>
     </Layout>
   </Layout>
