@@ -1,4 +1,3 @@
-import { UX_FLOW_DOCUMENT_KEY } from '@/constants/storage-keys'
 import { normalizeProject } from '@/types/project'
 import { createDefaultAiPrefs } from '@/types/ai-prefs'
 import { isContrastCheckRecord } from '@/types/test-state'
@@ -7,10 +6,12 @@ import {
   isUxFlowExport,
   type UxFlowExport,
 } from '@/utils/project-export'
+import { usePersistenceStore } from '@/stores/persistence'
+import { fa } from '@/content/fa'
 
 export type ImportResult = { ok: true; exportedAt: string } | { ok: false; error: string }
 
-/** Apply a validated export payload into the single `ux-flow:v1` document. */
+/** Apply a validated export payload into the single `ux-flow:v1` document (Pinia + LocalStorage). */
 export function hydrateFromExport(payload: UxFlowExport): void {
   const d = payload.data
   const data: UxFlowExport['data'] = {
@@ -52,7 +53,7 @@ export function hydrateFromExport(payload: UxFlowExport): void {
   }
 
   const document = exportDataToDocument(data)
-  localStorage.setItem(UX_FLOW_DOCUMENT_KEY, JSON.stringify(document))
+  usePersistenceStore().replaceDocument(document)
 }
 
 export async function importUxFlowFromFile(file: File): Promise<ImportResult> {
@@ -70,13 +71,13 @@ export async function importUxFlowFromFile(file: File): Promise<ImportResult> {
   try {
     parsed = JSON.parse(text)
   } catch {
-    return { ok: false, error: 'فایل JSON معتبر نیست' }
+    return { ok: false, error: fa.exportIo.importBadJson }
   }
 
   if (!isUxFlowExport(parsed)) {
     return {
       ok: false,
-      error: 'ساختار فایل با نسخه خروجی دیزاین‌یار سازگار نیست',
+      error: fa.exportIo.importBadSchema,
     }
   }
 

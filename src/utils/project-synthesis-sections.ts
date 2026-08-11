@@ -62,9 +62,9 @@ export function buildSynthesisSections(ctx: AiPromptContext): SynthesisSection[]
       phaseTitle: 'تعریف مسئله',
       items: [
         item('problemSentence', 'بیان مسئله', ctx.problemSentence),
-        item('povSentence', 'نقطه دید (POV)', ctx.povSentence),
-        item('hmwSummary', 'سوالات HMW', ctx.hmwSummary),
-        item('hmwTopSummary', 'HMW برتر (با رأی)', ctx.hmwTopSummary),
+        item('povSentence', 'دیدگاه کاربر', ctx.povSentence),
+        item('hmwSummary', 'سوالات چگونه می‌توانیم', ctx.hmwSummary),
+        item('hmwTopSummary', 'سوالات برتر (با رأی)', ctx.hmwTopSummary),
       ],
     },
     {
@@ -74,7 +74,7 @@ export function buildSynthesisSections(ctx: AiPromptContext): SynthesisSection[]
       items: [
         item('ideasSummary', 'ایده‌ها', ctx.ideasSummary),
         item('userflowSummary', 'جریان کاربر', ctx.userflowSummary),
-        item('sitemapSummary', 'نقشه سایت (IA)', ctx.sitemapSummary),
+        item('sitemapSummary', 'نقشه سایت', ctx.sitemapSummary),
         item('cardSortSummary', 'مرتب‌سازی کارت', ctx.cardSortSummary),
       ],
     },
@@ -83,10 +83,10 @@ export function buildSynthesisSections(ctx: AiPromptContext): SynthesisSection[]
       phase: 'prototype',
       phaseTitle: 'پروتوتایپ',
       items: [
-        item('designSystemSummary', 'Design System', ctx.designSystemSummary),
+        item('designSystemSummary', 'دیزاین‌سیستم', ctx.designSystemSummary),
         item('wireframeSummary', 'وایرفریم', ctx.wireframeSummary),
         item('componentChecklistSummary', 'چک‌لیست کامپوننت', ctx.componentChecklistSummary),
-        item('microcopySummary', 'بانک میکروکپی', ctx.microcopySummary),
+        item('microcopySummary', 'متن‌های UI', ctx.microcopySummary),
       ],
     },
     {
@@ -95,8 +95,8 @@ export function buildSynthesisSections(ctx: AiPromptContext): SynthesisSection[]
       phaseTitle: 'تست',
       items: [
         item('contrastSummary', '\u06A9\u0646\u062A\u0631\u0627\u0633\u062A', ctx.contrastSummary),
-        item('wcag', 'WCAG', wcagText),
-        item('heuristic', 'ارزیابی اکتشافی', heuristicText),
+        item('wcag', 'دسترسی‌پذیری', wcagText),
+        item('heuristic', 'قوانین کاربردپذیری', heuristicText),
         item('testSummary', 'خلاصه تست', ctx.testSummary),
       ],
     },

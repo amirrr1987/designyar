@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.29.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R8 — Persistence & synthesis:** export format **v6** with required `contrastCheck`; `roundTripDocument` helper
+- `ExportImportCard` shared header + synthesis I/O; import hydrates Pinia without full page reload
+- Junior synthesis: manual notes, coverage soft, Persian section labels, copy full context
+
+### Changed
+
+- `fa.synthesis` / `fa.exportIo`; synthesis page DoD + export card
+- Rebuild track R0–R8 complete for junior-first Design Thinking coach
+
 ## [0.28.0] - 2026-08-11
 
 ### Added

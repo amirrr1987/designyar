@@ -41,10 +41,10 @@ import { createDefaultDocument, normalizeDocument, isUxFlowDocument } from '@/ty
 import { migrateToDocumentV1 } from '@/domain/migrate'
 
 /** Export file format version (flat payload for round-trip + legacy imports). */
-export const UX_FLOW_EXPORT_VERSION = 5 as const
+export const UX_FLOW_EXPORT_VERSION = 6 as const
 
 export interface UxFlowExport {
-  version: typeof UX_FLOW_EXPORT_VERSION | 4 | 3 | 2 | 1
+  version: typeof UX_FLOW_EXPORT_VERSION | 5 | 4 | 3 | 2 | 1
   exportedAt: string
   data: {
     project: Project
@@ -67,8 +67,8 @@ export interface UxFlowExport {
     heuristicEval: HeuristicEvalMap
     aiPrefs: AiPrefs
     usabilityReportSummary: string
-    /** Optional — older exports omit this; import normalizes to null. */
-    contrastCheck?: ContrastCheckRecord | null
+    /** Always written on v6+; optional on older imports. */
+    contrastCheck: ContrastCheckRecord | null
     microcopyBank: MicrocopyEntry[]
     aiHistory: AiHistoryEntry[]
     projectSynthesis: string
@@ -211,6 +211,7 @@ export function isUxFlowExport(value: unknown): value is UxFlowExport {
   if (!isRecord(value)) return false
   if (
     value.version !== UX_FLOW_EXPORT_VERSION &&
+    value.version !== 5 &&
     value.version !== 4 &&
     value.version !== 3 &&
     value.version !== 2 &&
@@ -230,11 +231,17 @@ export function isUxFlowExport(value: unknown): value is UxFlowExport {
     value.version <= 3 ||
     typeof d.projectSynthesis === 'string' ||
     d.projectSynthesis === undefined
+  const contrastOk =
+    value.version < 6 ||
+    d.contrastCheck === null ||
+    isContrastCheckRecord(d.contrastCheck) ||
+    d.contrastCheck === undefined
   return (
     summaryOk &&
     microcopyOk &&
     historyOk &&
     synthesisOk &&
+    contrastOk &&
     isProject(d.project) &&
     isPersonaArray(d.personas) &&
     isEmpathyMaps(d.empathyMaps) &&
@@ -255,6 +262,11 @@ export function isUxFlowExport(value: unknown): value is UxFlowExport {
     isHeuristicEvalMap(d.heuristicEval) &&
     isAiPrefs(d.aiPrefs)
   )
+}
+
+/** Pure round-trip: document → export data → document (for sanity / tests). */
+export function roundTripDocument(doc: UxFlowDocument): UxFlowDocument {
+  return exportDataToDocument(documentToExportData(doc))
 }
 
 export function buildUxFlowExport(): UxFlowExport {

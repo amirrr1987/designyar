@@ -1,21 +1,35 @@
 <script setup lang="ts">
-import { Space } from 'ant-design-vue'
+import { computed } from 'vue'
+import { Space, Typography } from 'ant-design-vue'
 import ProjectSynthesisPanel from '@/components/synthesis/ProjectSynthesisPanel.vue'
 import PhaseFlowNav from '@/components/shared/PhaseFlowNav.vue'
 import PhaseHero from '@/components/shared/PhaseHero.vue'
+import { useProjectStore } from '@/stores/project'
+import { fa } from '@/content/fa'
 
-const description =
-  'نمای یکپارچه از تمام داده‌های Design Thinking — با تحلیل AI از کل context پروژه.'
+const { Paragraph, Text } = Typography
+const projectStore = useProjectStore()
+const copy = fa.synthesis
+
+const isJunior = computed(() => projectStore.isJuniorMode)
+const description = computed(() =>
+  isJunior.value ? copy.descriptionJunior : copy.descriptionFull,
+)
 </script>
 
 <template>
   <Space direction="vertical" size="large" style="width: 100%">
     <PhaseHero
-      title="جمع‌بندی پروژه"
+      :title="copy.title"
       :description="description"
       color="#722ed1"
-      badge="پایان مسیر"
+      :badge="copy.badge"
     />
+
+    <Paragraph v-if="isJunior" type="secondary">
+      <Text strong>{{ fa.dodHeading }}</Text>
+      {{ ' ' }}یک یادداشت جمع‌بندی یا تحلیل AI ذخیره شده باشد.
+    </Paragraph>
 
     <ProjectSynthesisPanel />
 

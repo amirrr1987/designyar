@@ -486,6 +486,40 @@ export const fa = {
   getGlossary(id: string): GlossaryTerm | undefined {
     return glossary.find((g) => g.id === id)
   },
+  synthesis: {
+    badge: 'پایان مسیر',
+    title: 'جمع‌بندی پروژه',
+    descriptionJunior:
+      'یک نگاه به کل مسیر — یادداشت کوتاه بنویس، در صورت نیاز از AI کمک بگیر، بعد خروجی بگیر.',
+    descriptionFull:
+      'نمای یکپارچه از تمام داده‌های Design Thinking — با تحلیل AI از کل context پروژه.',
+    coverageTitle: 'پوشش داده پروژه',
+    coverageHint: (filled: number, total: number) =>
+      `${filled} از ${total} بخش برای مرور آماده است`,
+    notesTitle: 'یادداشت جمع‌بندی',
+    notesPh: 'چه یاد گرفتی؟ چه چیزی را در نسخه بعد اصلاح می‌کنی؟',
+    notesEmpty: 'هنوز یادداشتی نیست — خودت بنویس یا از AI کمک بگیر.',
+    aiLabel: 'تحلیل جامع با AI',
+    clear: 'پاک کردن یادداشت',
+    sectionsTitle: 'مرور مراحل',
+    sectionsHint: 'خلاصه ساخت‌یافته از مسیر — قبل از خروجی یا ارائه.',
+    filled: 'تکمیل‌شده',
+    empty: 'خالی',
+    emptyItem: 'هنوز داده‌ای ثبت نشده است.',
+    copyContext: 'کپی خلاصه متنی',
+    copyDone: 'خلاصه کپی شد',
+  } as const,
+  exportIo: {
+    exportBtn: 'خروجی',
+    importBtn: 'ورود',
+    exportDone: 'خروجی JSON دانلود شد',
+    importDone: 'ورود موفق — پروژه به‌روز شد',
+    importBadJson: 'فایل JSON معتبر نیست',
+    importBadSchema: 'ساختار فایل با نسخه خروجی دیزاین‌یار سازگار نیست',
+    cardTitle: 'خروجی و ورود پروژه',
+    cardDesc:
+      'کل پروژه در یک فایل JSON ذخیره می‌شود. می‌توانی بعداً دوباره وارد کنی یا به همکار بدهی.',
+  } as const,
   ai: {
     drawerTitle: 'دستیار AI',
     headerButton: 'کمک AI',
