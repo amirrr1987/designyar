@@ -1,6 +1,7 @@
 import { UX_FLOW_DOCUMENT_KEY } from '@/constants/storage-keys'
 import { normalizeProject } from '@/types/project'
 import { createDefaultAiPrefs } from '@/types/ai-prefs'
+import { isContrastCheckRecord } from '@/types/test-state'
 import {
   exportDataToDocument,
   isUxFlowExport,
@@ -36,6 +37,11 @@ export function hydrateFromExport(payload: UxFlowExport): void {
       'usabilityReportSummary' in d && typeof d.usabilityReportSummary === 'string'
         ? d.usabilityReportSummary
         : '',
+    contrastCheck:
+      'contrastCheck' in d &&
+      (d.contrastCheck === null || isContrastCheckRecord(d.contrastCheck))
+        ? d.contrastCheck
+        : null,
     microcopyBank:
       'microcopyBank' in d && Array.isArray(d.microcopyBank) ? d.microcopyBank : [],
     aiHistory: 'aiHistory' in d && Array.isArray(d.aiHistory) ? d.aiHistory : [],

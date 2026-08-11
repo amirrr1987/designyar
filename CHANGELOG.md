@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R6 — Test:** `fa.testTools` for contrast / WCAG / report + optional heuristics
+- Persisted `contrastCheck` on test slice; completion `test.contrast` requires a saved check
+- Manual usability report notes (TextArea) + contextual tab tags / AI
+
+### Changed
+
+- Junior WCAG labels hide raw criterion IDs; heuristics behind «ابزارهای بیشتر» with info alert
+- Export/import carries optional `contrastCheck`
+
 ## [0.26.0] - 2026-08-11
 
 ### Added

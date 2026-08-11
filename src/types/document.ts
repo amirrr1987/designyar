@@ -14,7 +14,12 @@ import {
   isPrototypeState,
   type PrototypeState,
 } from './prototype-state'
-import { createDefaultTestState, isTestState, type TestState } from './test-state'
+import {
+  createDefaultTestState,
+  isTestState,
+  normalizeTestState,
+  type TestState,
+} from './test-state'
 
 /** Current on-disk / export document schema. */
 export const UX_FLOW_SCHEMA_VERSION = 1 as const
@@ -87,7 +92,7 @@ export function normalizeDocument(value: unknown): UxFlowDocument {
     define: isDefineState(value.define) ? value.define : defaults.define,
     ideate: isIdeateState(value.ideate) ? value.ideate : defaults.ideate,
     prototype: isPrototypeState(value.prototype) ? value.prototype : defaults.prototype,
-    test: isTestState(value.test) ? value.test : defaults.test,
+    test: normalizeTestState(value.test),
     meta: isMetaState(value.meta) ? value.meta : defaults.meta,
     aiPrefs: isAiPrefs(value.aiPrefs) ? value.aiPrefs : defaults.aiPrefs,
   }

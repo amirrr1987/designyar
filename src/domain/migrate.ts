@@ -177,6 +177,7 @@ export function assembleDocumentFromLegacyKeys(): UxFlowDocument {
       wcagChecked: isStringArray(wcagRaw) ? wcagRaw : [],
       heuristicEval: isHeuristicEvalMap(heuristicRaw) ? heuristicRaw : {},
       usabilityReportSummary: isString(summaryRaw) ? summaryRaw : '',
+      contrastCheck: null,
     },
     meta: {
       projectSynthesis: isString(synthesisRaw) ? synthesisRaw : '',

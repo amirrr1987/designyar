@@ -16,6 +16,7 @@ app.use(pinia)
 app.use(router)
 
 /** Eager migrate legacy keys → `ux-flow:v1` before first view render. */
-usePersistenceStore(pinia)
+const persistence = usePersistenceStore(pinia)
+persistence.ensureNormalized()
 
 app.mount('#app')

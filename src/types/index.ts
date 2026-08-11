@@ -65,8 +65,13 @@ export { createDefaultIdeateState, isIdeateState } from './ideate-state'
 export type { PrototypeState } from './prototype-state'
 export { createDefaultPrototypeState, isPrototypeState } from './prototype-state'
 
-export type { TestState } from './test-state'
-export { createDefaultTestState, isTestState } from './test-state'
+export type { TestState, ContrastCheckRecord } from './test-state'
+export {
+  createDefaultTestState,
+  isTestState,
+  isContrastCheckRecord,
+  normalizeTestState,
+} from './test-state'
 
 export type { MetaState } from './meta-state'
 export { createDefaultMetaState, isMetaState } from './meta-state'

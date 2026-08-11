@@ -1,5 +1,6 @@
 import type { DesignStepKey } from '@/types/project'
 import type { UxFlowDocument } from '@/types/document'
+import { isContrastCheckRecord } from '@/types/test-state'
 
 /** Flat facts used by completion + coach + soft gates. */
 export interface CompletionSnapshot {
@@ -20,6 +21,7 @@ export interface CompletionSnapshot {
   hasTypography: boolean
   microcopyCount: number
   checklistCount: number
+  hasContrastCheck: boolean
   wcagCheckedCount: number
   hasTestSummary: boolean
   hasSynthesis: boolean
@@ -106,6 +108,7 @@ export function buildCompletionSnapshot(doc: UxFlowDocument): CompletionSnapshot
     hasTypography: prototype.designSystem.typography.baseSize > 0,
     microcopyCount: prototype.microcopyBank.length,
     checklistCount: prototype.componentChecklist.length,
+    hasContrastCheck: isContrastCheckRecord(test.contrastCheck),
     wcagCheckedCount: test.wcagChecked.length,
     hasTestSummary: Boolean(test.usabilityReportSummary.trim()),
     hasSynthesis: Boolean(meta.projectSynthesis.trim()),
@@ -153,9 +156,7 @@ function isJobDone(id: JobId, s: CompletionSnapshot): boolean {
     case 'prototype.type':
       return s.hasTypography
     case 'test.contrast':
-      // Contrast is a tool session — treat report or any WCAG as soft progress proxy when empty.
-      // Primary: user opened checker; we use report OR wcag as evidence of test work until dedicated flag.
-      return s.hasTestSummary || s.wcagCheckedCount > 0
+      return s.hasContrastCheck
     case 'test.wcag':
       return s.wcagCheckedCount >= 3
     case 'test.report':

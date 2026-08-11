@@ -5,6 +5,8 @@ import type { AiHistoryEntry } from '@/types/ai-history'
 import { isAiHistoryEntryArray } from '@/types/ai-history'
 import type { HeuristicEvalMap } from '@/types/heuristic-eval'
 import { isHeuristicEvalMap } from '@/types/heuristic-eval'
+import type { ContrastCheckRecord } from '@/types/test-state'
+import { isContrastCheckRecord } from '@/types/test-state'
 import type { CompetitorRow } from '@/types/competitor'
 import type { HMWItem, POV, ProblemStatement } from '@/types/define'
 import type { DesignSystem } from '@/types/design-system'
@@ -65,6 +67,8 @@ export interface UxFlowExport {
     heuristicEval: HeuristicEvalMap
     aiPrefs: AiPrefs
     usabilityReportSummary: string
+    /** Optional — older exports omit this; import normalizes to null. */
+    contrastCheck?: ContrastCheckRecord | null
     microcopyBank: MicrocopyEntry[]
     aiHistory: AiHistoryEntry[]
     projectSynthesis: string
@@ -149,6 +153,7 @@ export function documentToExportData(doc: UxFlowDocument): UxFlowExport['data'] 
     heuristicEval: doc.test.heuristicEval,
     aiPrefs: doc.aiPrefs,
     usabilityReportSummary: doc.test.usabilityReportSummary,
+    contrastCheck: doc.test.contrastCheck,
     microcopyBank: doc.prototype.microcopyBank,
     aiHistory: doc.meta.aiHistory,
     projectSynthesis: doc.meta.projectSynthesis,
@@ -187,6 +192,12 @@ export function exportDataToDocument(data: UxFlowExport['data']): UxFlowDocument
       wcagChecked: data.wcagChecked,
       heuristicEval: data.heuristicEval,
       usabilityReportSummary: data.usabilityReportSummary,
+      contrastCheck:
+        data.contrastCheck === undefined
+          ? null
+          : data.contrastCheck === null || isContrastCheckRecord(data.contrastCheck)
+            ? data.contrastCheck
+            : null,
     },
     meta: {
       projectSynthesis: data.projectSynthesis,
