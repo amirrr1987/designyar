@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - تکمیل دیزاین‌سیستم با رمپ پیش‌فرض `@ant-design/colors` و `generatePrimaryFromSeed`
 - پیش‌نمایش و ذخیره پالت رنگ در `ColorPalette.vue`
+- مقیاس تایپوگرافی با Slider/InputNumber در `TypographyScale.vue`
 
 ## [0.5.0] - 2026-08-11
 
