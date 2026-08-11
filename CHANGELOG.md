@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - موتور کنتراست WCAG (`utils/contrast.ts`)، `useContrast` و `ContrastChecker.vue`
 - چک‌لیست WCAG با persistence در `WCAGChecklist.vue` / `useWCAG`
+- ارزیابی ۱۰ اصل نیلسن با Rate/یادداشت در `HeuristicEval.vue`
 
 ## [0.6.0] - 2026-08-11
 
