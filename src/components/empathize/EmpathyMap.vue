@@ -2,6 +2,7 @@
 import { computed, watch } from 'vue'
 import { Card, Col, Input, Row, Select, SelectOption, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { usePersona } from '@/composables/usePersona'
 import {
   createEmptyQuadrants,
@@ -14,8 +15,11 @@ const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
 const { personas } = usePersona()
 
-const maps = useStorage<EmpathyMapsByPersona>('ux-flow-empathy-maps', {})
-const selectedPersonaId = useStorage<string>('ux-flow-empathy-selected-persona', GENERAL_KEY)
+const maps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
+const selectedPersonaId = useStorage<string>(
+  STORAGE_KEYS.empathySelectedPersona,
+  GENERAL_KEY,
+)
 
 const personaOptions = computed(() => [
   { value: GENERAL_KEY, label: 'عمومی (بدون پرسونا)' },

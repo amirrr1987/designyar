@@ -12,6 +12,7 @@ import {
   Typography,
 } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { storeToRefs } from 'pinia'
 import { useContrast } from '@/composables/useContrast'
 import { useWCAG } from '@/composables/useWCAG'
@@ -24,7 +25,7 @@ const { progress: wcagProgress, checkedCount, total: wcagTotal } = useWCAG()
 const designStore = useDesignSystemStore()
 const { palette } = storeToRefs(designStore)
 
-const evaluations = useStorage<HeuristicEvalMap>('ux-flow-heuristic-eval', {})
+const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
 
 const designContrast = computed(() => {
   const fg = palette.value.primary[7] ?? '#000000'

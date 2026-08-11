@@ -1,4 +1,5 @@
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
 import { useWCAG } from '@/composables/useWCAG'
@@ -20,8 +21,8 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
   const { problemSentence, povSentence } = storeToRefs(defineStore)
   const { ideas } = storeToRefs(ideateStore)
   const { palette } = storeToRefs(designStore)
-  const researchNotes = useStorage<string>('ux-flow-research-notes', '')
-  const evaluations = useStorage<HeuristicEvalMap>('ux-flow-heuristic-eval', {})
+  const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
+  const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
 
   function buildContext(userHint?: string): AiPromptContext {
     const personasSummary = personas.value

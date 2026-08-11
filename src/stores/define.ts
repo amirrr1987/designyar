@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   assemblePOVSentence,
   assembleProblemSentence,
@@ -12,9 +13,12 @@ import {
 } from '@/types/define'
 
 export const useDefineStore = defineStore('define', () => {
-  const problem = useStorage<ProblemStatement>('ux-flow-problem', createEmptyProblemStatement())
-  const pov = useStorage<POV>('ux-flow-pov', createEmptyPOV())
-  const hmw = useStorage<HMWItem[]>('ux-flow-hmw', [])
+  const problem = useStorage<ProblemStatement>(
+    STORAGE_KEYS.problem,
+    createEmptyProblemStatement(),
+  )
+  const pov = useStorage<POV>(STORAGE_KEYS.pov, createEmptyPOV())
+  const hmw = useStorage<HMWItem[]>(STORAGE_KEYS.hmw, [])
 
   const problemSentence = computed(() => assembleProblemSentence(problem.value))
   const povSentence = computed(() => assemblePOVSentence(pov.value))

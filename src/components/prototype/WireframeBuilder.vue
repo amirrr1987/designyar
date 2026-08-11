@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, Checkbox, Col, Row, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 const { Text, Paragraph } = Typography
 
@@ -21,7 +22,11 @@ const BLOCKS: readonly WireframeBlock[] = [
   { id: 'footer', label: 'فوتر', description: 'لینک‌ها و اطلاعات تماس' },
 ] as const
 
-const selected = useStorage<string[]>('ux-flow-wireframe-blocks', ['header', 'content', 'footer'])
+const selected = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
+  'header',
+  'content',
+  'footer',
+])
 
 const selectedSet = computed(() => new Set(selected.value))
 

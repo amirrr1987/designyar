@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, Col, Input, Rate, Row, Space, Statistic, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   HEURISTIC_RULES,
   type HeuristicEvalMap,
@@ -11,7 +12,7 @@ import {
 const Textarea = Input.TextArea
 const { Paragraph, Text } = Typography
 
-const evaluations = useStorage<HeuristicEvalMap>('ux-flow-heuristic-eval', {})
+const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
 
 const average = computed(() => {
   const ratings = HEURISTIC_RULES.map((rule) => evaluations.value[rule.id]?.rating ?? 0)

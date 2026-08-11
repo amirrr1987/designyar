@@ -1,6 +1,10 @@
 /**
- * Canonical LocalStorage keys for UX Flow (`useStorage` only).
- * Keep in sync when adding persistence.
+ * Canonical LocalStorage keys for UX Flow.
+ *
+ * Persistence rules (Phase 8.4 audit):
+ * - Runtime app state uses VueUse `useStorage` only (via these keys).
+ * - Direct `localStorage` is allowed only in import/export hydrate helpers.
+ * - Debounce is not required; module payloads stay small enough for sync writes.
  */
 export const STORAGE_KEYS = {
   project: 'ux-flow-project',

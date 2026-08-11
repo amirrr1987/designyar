@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   createDefaultDesignSystem,
   rampFromSeed,
@@ -13,7 +14,7 @@ import {
 
 export const useDesignSystemStore = defineStore('designSystem', () => {
   const designSystem = useStorage<DesignSystem>(
-    'ux-flow-design-system',
+    STORAGE_KEYS.designSystem,
     createDefaultDesignSystem(),
   )
 

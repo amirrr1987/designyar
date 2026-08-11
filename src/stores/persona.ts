@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { Persona } from '@/types/persona'
 
 export type PersonaDraft = Omit<Persona, 'id' | 'createdAt'> & {
@@ -13,7 +14,7 @@ function createId(): string {
 }
 
 export const usePersonaStore = defineStore('persona', () => {
-  const personas = useStorage<Persona[]>('ux-flow-personas', [])
+  const personas = useStorage<Persona[]>(STORAGE_KEYS.personas, [])
 
   const count = computed(() => personas.value.length)
 

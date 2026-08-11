@@ -1,11 +1,12 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { createDefaultProject, type Project } from '@/types/project'
 import { getStepByNumber } from '@/constants/design-thinking-steps'
 
 export const useProjectStore = defineStore('project', () => {
-  const project = useStorage<Project>('ux-flow-project', createDefaultProject())
+  const project = useStorage<Project>(STORAGE_KEYS.project, createDefaultProject())
 
   const name = computed(() => project.value.name)
   const currentStep = computed(() => project.value.currentStep)

@@ -5,6 +5,7 @@ import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 import type { TableColumnsType } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { CompetitorRow } from '@/types/competitor'
 
 interface CompetitorForm {
@@ -14,7 +15,7 @@ interface CompetitorForm {
   url: string
 }
 
-const competitors = useStorage<CompetitorRow[]>('ux-flow-competitors', [])
+const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
 const formRef = ref<FormInstance>()
 
 const model = reactive<CompetitorForm>({

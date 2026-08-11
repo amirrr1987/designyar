@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Alert, Card, Input, Space } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 const Textarea = Input.TextArea
-const notes = useStorage<string>('ux-flow-research-notes', '')
+const notes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
 </script>
 
 <template>

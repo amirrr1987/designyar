@@ -1,9 +1,10 @@
 import { computed } from 'vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { WCAG_CHECKLIST } from '@/constants/wcag-checklist'
 
 export function useWCAG() {
-  const checkedIds = useStorage<string[]>('ux-flow-wcag-checked', [])
+  const checkedIds = useStorage<string[]>(STORAGE_KEYS.wcagChecked, [])
 
   const total = WCAG_CHECKLIST.length
 

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   createEmptyCardSortState,
   type CardSortState,
@@ -15,12 +16,15 @@ function createId(): string {
 }
 
 export const useIdeateStore = defineStore('ideate', () => {
-  const ideas = useStorage<IdeaCard[]>('ux-flow-ideas', [])
-  const flowNodes = useStorage<FlowNode[]>('ux-flow-userflow', [])
-  const sitemap = useStorage<SitemapNode[]>('ux-flow-sitemap', [
+  const ideas = useStorage<IdeaCard[]>(STORAGE_KEYS.ideas, [])
+  const flowNodes = useStorage<FlowNode[]>(STORAGE_KEYS.userflow, [])
+  const sitemap = useStorage<SitemapNode[]>(STORAGE_KEYS.sitemap, [
     { key: 'home', title: 'خانه', children: [] },
   ])
-  const cardSort = useStorage<CardSortState>('ux-flow-card-sort', createEmptyCardSortState())
+  const cardSort = useStorage<CardSortState>(
+    STORAGE_KEYS.cardSort,
+    createEmptyCardSortState(),
+  )
 
   function addIdea(input: { title: string; detail: string; tags?: string[] }): IdeaCard {
     const idea: IdeaCard = {

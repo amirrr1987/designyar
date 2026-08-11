@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { Card, CheckboxGroup, Progress, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 
 const { Paragraph } = Typography
 
@@ -20,7 +21,7 @@ const COMPONENT_OPTIONS: { label: string; value: string }[] = [
   { label: 'Alert / message', value: 'Alert' },
 ]
 
-const checked = useStorage<string[]>('ux-flow-component-checklist', [
+const checked = useStorage<string[]>(STORAGE_KEYS.componentChecklist, [
   'Button',
   'Form',
   'Input',

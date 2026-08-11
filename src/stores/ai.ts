@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { AiActionId } from '@/utils/ai-prompts'
 
 export interface AiPrefs {
@@ -17,7 +18,7 @@ function createDefaultAiPrefs(): AiPrefs {
 }
 
 export const useAiStore = defineStore('ai', () => {
-  const prefs = useStorage<AiPrefs>('ux-flow-ai-prefs', createDefaultAiPrefs())
+  const prefs = useStorage<AiPrefs>(STORAGE_KEYS.aiPrefs, createDefaultAiPrefs())
 
   /** Runtime only — not persisted. */
   const isLoading = ref(false)
