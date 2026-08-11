@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Layout, Menu } from 'ant-design-vue'
+import { Layout, Menu, Space, Typography } from 'ant-design-vue'
 import type { ItemType, MenuProps } from 'ant-design-vue/es/menu'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { resolveStepIcon } from '@/constants/step-icons'
 import { useProjectStore } from '@/stores/project'
-import { HomeOutlined, AuditOutlined } from '@ant-design/icons-vue'
+import { AuditOutlined, HomeOutlined } from '@ant-design/icons-vue'
 
 const Sider = Layout.Sider
+const { Text, Title } = Typography
 const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
@@ -56,7 +57,11 @@ const onSelect: MenuProps['onSelect'] = (info) => {
 </script>
 
 <template>
-  <Sider breakpoint="lg" collapsed-width="0" :width="220">
+  <Sider breakpoint="lg" collapsed-width="0" :width="232" theme="dark">
+    <Space direction="vertical" size="small" style="width: 100%; padding: 16px 16px 8px">
+      <Title :level="4" style="margin: 0; color: #fff">دیزاین‌یار</Title>
+      <Text style="color: rgba(255, 255, 255, 0.65)">Design Thinking</Text>
+    </Space>
     <Menu
       mode="inline"
       theme="dark"

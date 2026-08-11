@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Alert, Button, Space, Steps } from 'ant-design-vue'
-import type { StepProps } from 'ant-design-vue'
+import { Alert, Button, Card, Space, Steps } from 'ant-design-vue'
+import type { ButtonProps, StepProps } from 'ant-design-vue'
 import { RobotOutlined } from '@ant-design/icons-vue'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { resolveStepIcon } from '@/constants/step-icons'
@@ -31,6 +31,8 @@ const items = computed((): StepProps[] =>
   })),
 )
 
+const coachBtn: ButtonProps = { type: 'link', size: 'small' }
+
 function onChange(next: number): void {
   const step = DESIGN_THINKING_STEPS[next]
   if (!step) return
@@ -40,24 +42,28 @@ function onChange(next: number): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="middle" style="width: 100%; margin-bottom: 16px">
-    <Steps type="navigation" size="small" :current="current" :items="items" @change="onChange" />
+  <Card size="small">
+    <Space direction="vertical" size="middle" style="width: 100%">
+      <Steps
+        type="navigation"
+        size="small"
+        responsive
+        :current="current"
+        :items="items"
+        @change="onChange"
+      />
 
-    <Alert v-if="coach" type="info" show-icon>
-      <template #message>
-        <Space wrap>
-          <span>{{ coach.hint }}</span>
-          <Button
-            v-if="coach.actionId"
-            type="link"
-            size="small"
-            @click="runCoachAction"
-          >
-            <template #icon><RobotOutlined /></template>
-            {{ coach.actionLabel ?? 'باز کردن AI' }}
-          </Button>
-        </Space>
-      </template>
-    </Alert>
-  </Space>
+      <Alert v-if="coach" type="info" show-icon banner>
+        <template #message>
+          <Space wrap>
+            <span>{{ coach.hint }}</span>
+            <Button v-if="coach.actionId" v-bind="coachBtn" @click="runCoachAction">
+              <template #icon><RobotOutlined /></template>
+              {{ coach.actionLabel ?? 'باز کردن AI' }}
+            </Button>
+          </Space>
+        </template>
+      </Alert>
+    </Space>
+  </Card>
 </template>

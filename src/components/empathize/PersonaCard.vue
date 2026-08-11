@@ -25,7 +25,7 @@ function onConfirmRemove(): void {
 </script>
 
 <template>
-  <Card size="small">
+  <Card size="small" hoverable>
     <template #title>
       <Space>
         <Avatar :style="{ backgroundColor: persona.avatarColor ?? '#1677ff' }">

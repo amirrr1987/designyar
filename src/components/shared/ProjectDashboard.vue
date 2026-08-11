@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, h } from 'vue'
 import { useRouter } from 'vue-router'
 import {
+  Alert,
   Button,
   Card,
   Col,
@@ -15,6 +16,8 @@ import {
   Tag,
   Typography,
 } from 'ant-design-vue'
+import type { ButtonProps } from 'ant-design-vue'
+import { ArrowLeftOutlined, RocketOutlined } from '@ant-design/icons-vue'
 import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
@@ -31,7 +34,7 @@ import type { CompetitorRow } from '@/types/competitor'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { DesignStepKey } from '@/types/project'
 
-const { Paragraph, Text } = Typography
+const { Paragraph, Text, Title } = Typography
 const router = useRouter()
 const projectStore = useProjectStore()
 const personaStore = usePersonaStore()
@@ -150,19 +153,90 @@ const overallPercent = computed(() => {
   return Math.round(sum / stepStats.value.length)
 })
 
+/** First incomplete step — primary CTA for flow. */
+const nextStep = computed(() => {
+  for (const step of DESIGN_THINKING_STEPS) {
+    const stat = stepStats.value.find((s) => s.key === step.key)
+    if (!stat || stat.percent < 100) return step
+  }
+  return undefined
+})
+
+const ctaBtn: ButtonProps = { type: 'primary', size: 'large' }
+const stepBtn: ButtonProps = { type: 'primary', block: true }
+
 function goToStep(route: (typeof DESIGN_THINKING_STEPS)[number]['route'], step: number): void {
   projectStore.setStep(step)
   void router.push(route)
 }
 
+function goNextRecommended(): void {
+  const step = nextStep.value
+  if (!step) {
+    void router.push({ name: 'synthesis' })
+    return
+  }
+  goToStep(step.route, step.step)
+}
+
+function goSynthesis(): void {
+  void router.push({ name: 'synthesis' })
+}
+
 function statFor(key: DesignStepKey): StepStat | undefined {
   return stepStats.value.find((s) => s.key === key)
+}
+
+function statusColor(percent: number): string {
+  if (percent >= 100) return 'success'
+  if (percent >= 40) return 'processing'
+  return 'default'
 }
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
-    <Card title="پروژه">
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Card>
+      <Space direction="vertical" size="middle">
+        <Space wrap align="center">
+          <Tag color="geekblue">شروع پروژه</Tag>
+          <Title :level="3" style="margin: 0">خوش آمدید به دیزاین‌یار</Title>
+        </Space>
+        <Paragraph type="secondary" style="margin-bottom: 0">
+          مسیر پنج‌مرحله‌ای Design Thinking را با AI طی کنید — از همدلی تا تست و جمع‌بندی.
+        </Paragraph>
+        <Alert
+          v-if="nextStep"
+          type="info"
+          show-icon
+          :message="`گام پیشنهادی: ${nextStep.title}`"
+          :description="nextStep.description"
+        >
+          <template #action>
+            <Button v-bind="ctaBtn" @click="goNextRecommended">
+              <template #icon><RocketOutlined /></template>
+              ادامه {{ nextStep.title }}
+            </Button>
+          </template>
+        </Alert>
+        <Alert
+          v-else
+          type="success"
+          show-icon
+          message="همه مراحل تکمیل شده‌اند"
+          description="می‌توانید جمع‌بندی نهایی پروژه را ببینید."
+        >
+          <template #action>
+            <Button v-bind="ctaBtn" @click="goSynthesis">
+              رفتن به جمع‌بندی
+              <template #icon><ArrowLeftOutlined /></template>
+            </Button>
+          </template>
+        </Alert>
+      </Space>
+    </Card>
+
+    <Card title="شرح پروژه">
       <Form layout="vertical">
         <FormItem label="نام پروژه">
           <Input v-model:value="projectName" placeholder="مثلاً اپلیکیشن فروشگاهی" allow-clear />
@@ -184,28 +258,48 @@ function statFor(key: DesignStepKey): StepStat | undefined {
         </FormItem>
         <FormItem>
           <Space wrap>
-            <AiAssistButton action="improve-project-brief" label="بهبود شرح با AI" section="شرح پروژه" />
+            <AiAssistButton
+              action="improve-project-brief"
+              label="بهبود شرح با AI"
+              section="شرح پروژه"
+            />
           </Space>
         </FormItem>
       </Form>
+      <Alert
+        v-if="!hasProjectBrief"
+        type="warning"
+        show-icon
+        message="شرح پروژه را بنویسید"
+        description="AI و فرم‌های همه مراحل از این context استفاده می‌کنند."
+      />
+      <Alert
+        v-else-if="!projectName.trim()"
+        type="warning"
+        show-icon
+        message="نام پروژه را وارد کنید"
+        description="در خروجی JSON و گزارش‌ها استفاده می‌شود."
+      />
     </Card>
 
     <Card title="پیشرفت کلی">
-      <Progress :percent="overallPercent" status="active" />
-      <Row :gutter="[16, 16]">
-        <Col :xs="12" :sm="8" :md="6">
-          <Statistic title="پرسوناها" :value="personas.length" />
-        </Col>
-        <Col :xs="12" :sm="8" :md="6">
-          <Statistic title="ایده‌ها" :value="ideas.length" />
-        </Col>
-        <Col :xs="12" :sm="8" :md="6">
-          <Statistic title="HMW" :value="hmw.length" />
-        </Col>
-        <Col :xs="12" :sm="8" :md="6">
-          <Statistic title="رقبا" :value="competitors.length" />
-        </Col>
-      </Row>
+      <Space direction="vertical" size="large" style="width: 100%">
+        <Progress :percent="overallPercent" status="active" />
+        <Row :gutter="[16, 16]">
+          <Col :xs="12" :sm="8" :md="6">
+            <Statistic title="پرسوناها" :value="personas.length" />
+          </Col>
+          <Col :xs="12" :sm="8" :md="6">
+            <Statistic title="ایده‌ها" :value="ideas.length" />
+          </Col>
+          <Col :xs="12" :sm="8" :md="6">
+            <Statistic title="HMW" :value="hmw.length" />
+          </Col>
+          <Col :xs="12" :sm="8" :md="6">
+            <Statistic title="رقبا" :value="competitors.length" />
+          </Col>
+        </Row>
+      </Space>
     </Card>
 
     <Card title="مراحل دیزاین تینکینگ">
@@ -218,30 +312,35 @@ function statFor(key: DesignStepKey): StepStat | undefined {
           :md="8"
           :lg="8"
         >
-          <Card size="small" :title="step.title">
-            <Paragraph>{{ step.description }}</Paragraph>
-            <Space direction="vertical">
-              <Progress :percent="statFor(step.key)?.percent ?? 0" size="small" status="active" />
-              <Tag>{{ statFor(step.key)?.detail ?? '—' }}</Tag>
-              <Button type="primary" @click="goToStep(step.route, step.step)">
+          <Card size="small" hoverable>
+            <template #title>
+              <Space>
+                <Tag :color="step.color" :icon="h(resolveStepIcon(step.icon))">
+                  {{ step.step }}
+                </Tag>
+                <Text strong>{{ step.title }}</Text>
+              </Space>
+            </template>
+            <Space direction="vertical" style="width: 100%">
+              <Paragraph type="secondary">{{ step.description }}</Paragraph>
+              <Progress
+                :percent="statFor(step.key)?.percent ?? 0"
+                size="small"
+                status="active"
+              />
+              <Tag :color="statusColor(statFor(step.key)?.percent ?? 0)">
+                {{ statFor(step.key)?.detail ?? '—' }}
+              </Tag>
+              <Button v-bind="stepBtn" @click="goToStep(step.route, step.step)">
                 <template #icon>
                   <component :is="resolveStepIcon(step.icon)" />
                 </template>
-                ادامه {{ step.title }}
+                ورود به {{ step.title }}
               </Button>
             </Space>
           </Card>
         </Col>
       </Row>
-    </Card>
-
-    <Card v-if="!hasProjectBrief" size="small">
-      <Text type="secondary">
-        شرح پروژه را بنویسید — AI و فرم‌های همه مراحل از آن context می‌گیرند.
-      </Text>
-    </Card>
-    <Card v-else-if="!projectName.trim()" size="small">
-      <Text type="secondary">نام پروژه را وارد کنید تا در خروجی JSON و گزارش‌ها استفاده شود.</Text>
     </Card>
   </Space>
 </template>

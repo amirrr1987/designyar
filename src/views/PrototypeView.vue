@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Card, Space, Tabs, Typography } from 'ant-design-vue'
+import { Card, Space, Tabs } from 'ant-design-vue'
 import ColorPalette from '@/components/prototype/ColorPalette.vue'
 import ComponentLibrary from '@/components/prototype/ComponentLibrary.vue'
 import MicrocopyBank from '@/components/prototype/MicrocopyBank.vue'
@@ -10,30 +10,39 @@ import TypographyScale from '@/components/prototype/TypographyScale.vue'
 import WireframeBuilder from '@/components/prototype/WireframeBuilder.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import AiChainButton from '@/components/shared/AiChainButton.vue'
+import PhaseFlowNav from '@/components/shared/PhaseFlowNav.vue'
+import PhaseHero from '@/components/shared/PhaseHero.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
 type PrototypeTabKey = 'color' | 'type' | 'grid' | 'spacing' | 'wireframe' | 'checklist' | 'microcopy'
 
-const { Title, Paragraph } = Typography
 const step = getStepByKey('prototype')
 const activeKey = ref<PrototypeTabKey>('color')
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
-    <Card>
-      <Title :level="3">{{ step.title }}</Title>
-      <Paragraph>{{ step.description }}</Paragraph>
-      <Space wrap>
+  <Space direction="vertical" size="large" style="width: 100%">
+    <PhaseHero
+      :title="step.title"
+      :description="step.description"
+      :color="step.color"
+      :icon="step.icon"
+      badge="مرحله ۴ از ۵"
+    >
+      <template #actions>
         <AiChainButton chain="prototype-starter" label="زنجیره Prototype (wireframe→microcopy)" />
-        <AiAssistButton action="review-design-system" label="بازبینی Design System" section="Prototype" />
+        <AiAssistButton
+          action="review-design-system"
+          label="بازبینی Design System"
+          section="Prototype"
+        />
         <AiAssistButton action="wireframe-critique" label="نقد وایرفریم" section="Prototype" />
         <AiAssistButton action="microcopy" label="تولید میکروکپی" section="Prototype" />
-      </Space>
-    </Card>
+      </template>
+    </PhaseHero>
 
     <Card>
-      <Tabs v-model:activeKey="activeKey">
+      <Tabs v-model:activeKey="activeKey" type="card">
         <Tabs.TabPane key="color" tab="رنگ">
           <ColorPalette />
         </Tabs.TabPane>
@@ -57,5 +66,7 @@ const activeKey = ref<PrototypeTabKey>('color')
         </Tabs.TabPane>
       </Tabs>
     </Card>
+
+    <PhaseFlowNav current-key="prototype" />
   </Space>
 </template>

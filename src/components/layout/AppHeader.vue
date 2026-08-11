@@ -10,9 +10,10 @@ import {
   Drawer,
   Space,
   Upload,
+  Divider,
   message,
 } from 'ant-design-vue'
-import type { UploadProps } from 'ant-design-vue'
+import type { ButtonProps, UploadProps } from 'ant-design-vue'
 import { DownloadOutlined, RobotOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
 import AIPanel from '@/components/shared/AIPanel.vue'
@@ -22,7 +23,7 @@ import { downloadUxFlowExport } from '@/utils/project-export'
 import { importUxFlowFromFile } from '@/utils/project-import'
 
 const Header = Layout.Header
-const { Text } = Typography
+const { Text, Title } = Typography
 const projectStore = useProjectStore()
 const aiStore = useAiStore()
 const { panelOpen } = storeToRefs(aiStore)
@@ -40,6 +41,9 @@ const drawerOpen = computed({
     aiStore.setPanelOpen(value)
   },
 })
+
+const aiButton: ButtonProps = { type: 'primary' }
+const exportButton: ButtonProps = { type: 'default' }
 
 function onExport(): void {
   const safeName = projectStore.project.name.trim().replace(/\s+/g, '-') || 'designyar'
@@ -64,35 +68,40 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
 </script>
 
 <template>
-  <Header>
-    <Row :gutter="16" align="middle" justify="space-between">
-      <Col>
-        <Row :gutter="16" align="middle">
-          <Col>
-            <Text strong>دیزاین‌یار</Text>
-          </Col>
-          <Col :xs="24" :sm="14" :md="10" :lg="8">
-            <Input v-model:value="projectName" placeholder="نام پروژه" allow-clear />
-          </Col>
-        </Row>
+  <Header style="padding-inline: 24px; line-height: normal; display: flex; align-items: center">
+    <Row :gutter="[16, 8]" align="middle" justify="space-between" style="width: 100%">
+      <Col :xs="24" :md="12" :lg="14">
+        <Space wrap align="center" size="middle">
+          <Space direction="vertical" :size="0">
+            <Title :level="5" style="margin: 0">دیزاین‌یار</Title>
+            <Text type="secondary">همراه Design Thinking</Text>
+          </Space>
+          <Divider type="vertical" />
+          <Input
+            v-model:value="projectName"
+            placeholder="نام پروژه"
+            allow-clear
+            style="min-width: 180px; max-width: 280px"
+          />
+        </Space>
       </Col>
-      <Col>
-        <Space wrap>
+      <Col :xs="24" :md="12" :lg="10">
+        <Space wrap style="width: 100%; justify-content: flex-end">
           <Upload
             :before-upload="beforeUpload"
             :show-upload-list="false"
             accept=".json,application/json"
           >
-            <Button>
+            <Button v-bind="exportButton">
               <template #icon><UploadOutlined /></template>
-              ورود JSON
+              ورود
             </Button>
           </Upload>
-          <Button @click="onExport">
+          <Button v-bind="exportButton" @click="onExport">
             <template #icon><DownloadOutlined /></template>
-            خروجی JSON
+            خروجی
           </Button>
-          <Button type="default" @click="aiStore.openPanel()">
+          <Button v-bind="aiButton" @click="aiStore.openPanel()">
             <template #icon><RobotOutlined /></template>
             دستیار AI
           </Button>
@@ -104,7 +113,7 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
       v-model:open="drawerOpen"
       title="دستیار هوش مصنوعی"
       placement="left"
-      :width="420"
+      :width="440"
       destroy-on-close
     >
       <AIPanel />
