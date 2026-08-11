@@ -12,11 +12,9 @@ export function isGroqModelId(value: string): value is GroqModelId {
 
 const COMPOUND_ENABLED_TOOLS = ['web_search', 'code_interpreter', 'visit_website'] as const
 
-type CompoundEnabledTool = (typeof COMPOUND_ENABLED_TOOLS)[number]
-
 interface CompoundCustomConfig {
   tools: {
-    enabled_tools: readonly CompoundEnabledTool[]
+    enabled_tools: string[]
   }
 }
 
@@ -94,7 +92,7 @@ export function useGroq() {
       if (isCompoundModel(modelId)) {
         params.compound_custom = {
           tools: {
-            enabled_tools: COMPOUND_ENABLED_TOOLS,
+            enabled_tools: [...COMPOUND_ENABLED_TOOLS],
           },
         }
       }
