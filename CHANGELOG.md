@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.25.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R4 — Ideate:** `fa.ideateTools` for brainstorm / userflow / optional IA tools
+- Junior progress toward 3 ideas and 2 flow steps with Progress bars
+- Contextual primary AI + tab tags (کار فعلی / انجام شد) from completion
+
+### Changed
+
+- Brainstorm: quieter form (tags hidden in junior); Userflow: Persian glossary + goal hints
+- Sitemap & card sort marked اختیاری with info alerts
+
 ## [0.24.0] - 2026-08-11
 
 ### Added

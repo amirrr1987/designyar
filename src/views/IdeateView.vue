@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Button, Card, Space, Tabs } from 'ant-design-vue'
+import { Button, Card, Space, Tabs, Tag } from 'ant-design-vue'
 import type { ButtonProps } from 'ant-design-vue'
 import { AppstoreOutlined } from '@ant-design/icons-vue'
 import BrainstormBoard from '@/components/ideate/BrainstormBoard.vue'
@@ -14,6 +14,7 @@ import { useCompletion } from '@/composables/useCompletion'
 import { JUNIOR_DEFAULT_TAB, JUNIOR_ESSENTIAL_TABS } from '@/constants/junior-guide'
 import { fa } from '@/content/fa'
 import { useProjectStore } from '@/stores/project'
+import type { JobId } from '@/domain/completion'
 
 type IdeateTabKey = 'brainstorm' | 'userflow' | 'sitemap' | 'cardsort'
 
@@ -24,6 +25,10 @@ const activeKey = ref<IdeateTabKey>(JUNIOR_DEFAULT_TAB.ideate)
 
 const isJunior = computed(() => projectStore.isJuniorMode)
 const essentials = JUNIOR_ESSENTIAL_TABS.ideate
+const tools = fa.ideateTools
+
+const focusJobId = computed(() => phaseProgress('ideate').nextJob?.id)
+const progress = computed(() => phaseProgress('ideate'))
 
 function showTab(key: IdeateTabKey): boolean {
   if (!isJunior.value || showAdvanced.value) return true
@@ -31,21 +36,46 @@ function showTab(key: IdeateTabKey): boolean {
 }
 
 function tabFromJob(): IdeateTabKey {
-  const job = phaseProgress('ideate').nextJob
-  if (job?.id === 'ideate.userflow') return 'userflow'
+  if (focusJobId.value === 'ideate.userflow') return 'userflow'
   return 'brainstorm'
 }
 
+function isDone(jobId: JobId): boolean {
+  return !progress.value.missing.includes(jobId)
+}
+
+const primaryAiAction = computed(() => {
+  if (focusJobId.value === 'ideate.userflow') return 'suggest-userflow' as const
+  return 'brainstorm-ideas' as const
+})
+
+const primaryAiLabel = computed(() => {
+  if (focusJobId.value === 'ideate.userflow') return tools.userflow.aiLabel
+  return tools.brainstorm.aiLabel
+})
+
 watch(
-  isJunior,
-  (junior) => {
-    if (junior) {
-      activeKey.value = tabFromJob()
-      showAdvanced.value = false
-    }
+  focusJobId,
+  () => {
+    if (!isJunior.value) return
+    const next = tabFromJob()
+    if (showTab(next)) activeKey.value = next
   },
   { immediate: true },
 )
+
+watch(isJunior, (junior) => {
+  if (junior) {
+    activeKey.value = tabFromJob()
+    showAdvanced.value = false
+  }
+})
+
+watch(showAdvanced, (advanced) => {
+  if (!advanced && !showTab(activeKey.value)) {
+    activeKey.value = tabFromJob()
+  }
+})
 
 const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 </script>
@@ -53,19 +83,56 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 <template>
   <PhaseShell phase="ideate">
     <template #ai>
-      <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" section="ایده‌پردازی" />
+      <AiAssistButton
+        v-if="isJunior"
+        :action="primaryAiAction"
+        :label="primaryAiLabel"
+        section="ایده‌پردازی"
+      />
+      <AiAssistButton
+        v-else
+        action="brainstorm-ideas"
+        :label="tools.brainstorm.aiLabel"
+        section="ایده‌پردازی"
+      />
     </template>
     <template #ai-more>
       <AiChainButton chain="ideate-complete" label="زنجیره کامل ایده‌پردازی" />
-      <AiAssistButton action="suggest-userflow" label="پیشنهاد مسیر کاربر" section="ایده‌پردازی" />
+      <AiAssistButton
+        action="suggest-userflow"
+        :label="tools.userflow.aiLabel"
+        section="ایده‌پردازی"
+      />
     </template>
 
     <Card>
       <Tabs v-model:activeKey="activeKey" type="card">
-        <Tabs.TabPane v-if="showTab('brainstorm')" key="brainstorm" tab="۱. طوفان فکری">
+        <Tabs.TabPane v-if="showTab('brainstorm')" key="brainstorm">
+          <template #tab>
+            <Space>
+              <span>{{ tools.brainstorm.tab }}</span>
+              <Tag v-if="focusJobId === 'ideate.brainstorm'" color="processing" >
+                {{ fa.defineTools.currentJob }}
+              </Tag>
+              <Tag v-else-if="isDone('ideate.brainstorm')" color="success">
+                {{ fa.defineTools.doneStep }}
+              </Tag>
+            </Space>
+          </template>
           <BrainstormBoard />
         </Tabs.TabPane>
-        <Tabs.TabPane v-if="showTab('userflow')" key="userflow" tab="۲. مسیر کاربر">
+        <Tabs.TabPane v-if="showTab('userflow')" key="userflow">
+          <template #tab>
+            <Space>
+              <span>{{ tools.userflow.tab }}</span>
+              <Tag v-if="focusJobId === 'ideate.userflow'" color="processing">
+                {{ fa.defineTools.currentJob }}
+              </Tag>
+              <Tag v-else-if="isDone('ideate.userflow')" color="success">
+                {{ fa.defineTools.doneStep }}
+              </Tag>
+            </Space>
+          </template>
           <UserflowCanvas />
         </Tabs.TabPane>
         <Tabs.TabPane

@@ -1,22 +1,27 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import {
+  Alert,
   Button,
   Card,
   Empty,
   Input,
   Popconfirm,
+  Progress,
   Select,
   SelectOption,
   Space,
   Tag,
+  Typography,
   message,
 } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
-import AiAssistButton from '@/components/shared/AiAssistButton.vue'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { storeToRefs } from 'pinia'
 import { useIdeateStore } from '@/stores/ideate'
+import { useProjectStore } from '@/stores/project'
 import type { FlowNodeKind } from '@/types/ideate'
+import { fa } from '@/content/fa'
 
 const KIND_OPTIONS: { value: FlowNodeKind; label: string; color: string }[] = [
   { value: 'start', label: 'شروع', color: 'green' },
@@ -31,7 +36,17 @@ function kindMeta(kind: FlowNodeKind): { label: string; color: string } {
 }
 
 const ideateStore = useIdeateStore()
+const projectStore = useProjectStore()
 const { flowNodes } = storeToRefs(ideateStore)
+const copy = fa.ideateTools.userflow
+const glossary = fa.getGlossary('userflow')
+const job = fa.getJob('ideate.userflow')
+const isJunior = computed(() => projectStore.isJuniorMode)
+
+const GOAL = 2
+const progressPercent = computed(() =>
+  Math.min(100, Math.round((flowNodes.value.length / GOAL) * 100)),
+)
 
 const draftKind = ref<FlowNodeKind>('action')
 const draftLabel = ref('')
@@ -39,7 +54,7 @@ const draftLabel = ref('')
 function onAdd(): void {
   const label = draftLabel.value.trim()
   if (!label) {
-    message.warning('برچسب گره را وارد کنید')
+    message.warning('برچسب گام را وارد کنید')
     return
   }
   ideateStore.addFlowNode(draftKind.value, label)
@@ -52,21 +67,48 @@ function onKindChange(id: string, value: unknown): void {
     ideateStore.updateFlowNode(id, { kind: value })
   }
 }
+
+const { Paragraph, Text } = Typography
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
-    <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان با AI" section="جریان کاربر" />
-    <Card size="small" title="افزودن گام">
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Paragraph v-if="glossary" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ glossary.labelFa }}:</Text>
+      {{ ' ' }}{{ glossary.definition }}
+    </Paragraph>
+    <Paragraph v-if="job && isJunior" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ fa.whyHeading }}</Text>
+      {{ ' ' }}{{ job.why }}
+    </Paragraph>
+
+    <Alert
+      v-if="isJunior"
+      :type="flowNodes.length >= GOAL ? 'success' : 'info'"
+      show-icon
+      :message="copy.goalHint"
+      :description="`${flowNodes.length} از ${GOAL} گام`"
+    />
+    <Progress
+      v-if="isJunior"
+      :percent="progressPercent"
+      :status="flowNodes.length >= GOAL ? 'success' : 'active'"
+      size="small"
+    />
+
+    <AiSectionAssist action="suggest-userflow" :label="copy.aiLabel" section="مسیر کاربر" />
+
+    <Card size="small" :title="copy.addStep">
       <Space wrap>
-        <Select v-model:value="draftKind">
+        <Select v-model:value="draftKind" style="min-width: 120px">
           <SelectOption v-for="opt in KIND_OPTIONS" :key="opt.value" :value="opt.value">
             {{ opt.label }}
           </SelectOption>
         </Select>
         <Input
           v-model:value="draftLabel"
-          placeholder="مثلاً ورود به صفحه محصول"
+          :placeholder="copy.labelPh"
+          style="min-width: 200px"
           @press-enter="onAdd"
         />
         <Button type="primary" @click="onAdd">
@@ -76,9 +118,9 @@ function onKindChange(id: string, value: unknown): void {
       </Space>
     </Card>
 
-    <Empty v-if="flowNodes.length === 0" description="هنوز جریانی تعریف نشده است" />
+    <Empty v-if="flowNodes.length === 0" :description="copy.empty" />
 
-    <Space v-else direction="vertical" size="small">
+    <Space v-else direction="vertical" size="small" style="width: 100%">
       <Card v-for="(node, index) in flowNodes" :key="node.id" size="small">
         <template #title>
           <Space>
@@ -99,8 +141,12 @@ function onKindChange(id: string, value: unknown): void {
           </Popconfirm>
         </template>
 
-        <Space direction="vertical">
-          <Select :value="node.kind" @change="(v: unknown) => onKindChange(node.id, v)">
+        <Space direction="vertical" style="width: 100%">
+          <Select
+            :value="node.kind"
+            style="width: 100%"
+            @change="(v: unknown) => onKindChange(node.id, v)"
+          >
             <SelectOption v-for="opt in KIND_OPTIONS" :key="opt.value" :value="opt.value">
               {{ opt.label }}
             </SelectOption>
@@ -110,7 +156,7 @@ function onKindChange(id: string, value: unknown): void {
             placeholder="برچسب گام"
             @update:value="(v: string) => ideateStore.updateFlowNode(node.id, { label: v })"
           />
-          <Tag v-if="node.nextId" color="default">→ گره بعدی متصل است</Tag>
+          <Tag v-if="node.nextId" color="default">{{ copy.nextConnected }}</Tag>
         </Space>
       </Card>
     </Space>

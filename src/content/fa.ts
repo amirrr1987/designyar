@@ -338,6 +338,40 @@ export const fa = {
     currentJob: 'کار فعلی',
     doneStep: 'انجام شد',
   } as const,
+  ideateTools: {
+    brainstorm: {
+      tab: '۱. طوفان فکری',
+      why: 'اول کمیت، بعد کیفیت — حداقل ۳ ایده از سوالات «چگونه می‌توانیم».',
+      newIdea: 'ایده جدید',
+      empty: 'هنوز ایده‌ای نداری — یکی بنویس یا از AI کمک بگیر.',
+      aiLabel: 'پیشنهاد ایده با AI',
+      modalTitle: 'افزودن ایده',
+      title: 'عنوان',
+      detail: 'جزئیات',
+      tags: 'برچسب‌ها (با ویرگول)',
+      tagsPh: 'مثلاً موبایل، سرعت، اعتماد',
+      vote: 'رأی',
+      goalHint: 'هدف جونیور: حداقل ۳ ایده',
+    },
+    userflow: {
+      tab: '۲. مسیر کاربر',
+      why: 'گام‌به‌گام کاری که کاربر برای رسیدن به هدف انجام می‌دهد.',
+      aiLabel: 'پیشنهاد مسیر با AI',
+      addStep: 'افزودن گام',
+      empty: 'هنوز مسیری نداری — از شروع تا پایان چند گام بساز.',
+      labelPh: 'مثلاً ورود به صفحه محصول',
+      goalHint: 'هدف جونیور: حداقل ۲ گام (مثلاً شروع + اقدام)',
+      nextConnected: '→ گام بعدی متصل است',
+    },
+    sitemap: {
+      alertMessage: 'اختیاری — نقشه سایت',
+      alertDescription: 'ساختار صفحات محصول؛ بعد از مسیر کاربر مفید است.',
+    },
+    cardsort: {
+      alertMessage: 'اختیاری — مرتب‌سازی کارت',
+      alertDescription: 'کارت‌ها را در دسته‌ها بچین تا اولویت محتوا روشن شود.',
+    },
+  } as const,
   getPhase(key: DesignStepKey, _mode: ExperienceMode): PhaseCopy {
     return phases[key]
   },

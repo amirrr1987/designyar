@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button, Card, Empty, Input, Popconfirm, Space, Tree, message } from 'ant-design-vue'
+import { Alert, Button, Card, Empty, Input, Popconfirm, Space, Tree, message } from 'ant-design-vue'
 import type { TreeProps } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useIdeateStore } from '@/stores/ideate'
 import type { SitemapNode } from '@/types/ideate'
+import { fa } from '@/content/fa'
 
 const ideateStore = useIdeateStore()
 const { sitemap } = storeToRefs(ideateStore)
@@ -84,8 +85,14 @@ function onDeleteSelected(): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
-    <AiAssistButton action="suggest-sitemap" label="پیشنهاد IA با AI" section="نقشه سایت" />
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="`${fa.optionalLabel}: ${fa.ideateTools.sitemap.alertMessage}`"
+      :description="fa.ideateTools.sitemap.alertDescription"
+    />
+    <AiAssistButton action="suggest-sitemap" label="پیشنهاد نقشه سایت با AI" section="نقشه سایت" />
 
     <Card size="small" title="افزودن صفحه ریشه">
       <Space wrap>
