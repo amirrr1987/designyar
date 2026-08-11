@@ -19,3 +19,15 @@ export { createEmptyQuadrants, isEmpathyQuadrants, isEmpathyMapEntry } from './e
 
 export type { CompetitorRow } from './competitor'
 export { isCompetitorRow, isCompetitorRowArray } from './competitor'
+
+export type { ProblemStatement, POV, HMWItem } from './define'
+export {
+  createEmptyProblemStatement,
+  createEmptyPOV,
+  assembleProblemSentence,
+  assemblePOVSentence,
+  isProblemStatement,
+  isPOV,
+  isHMWItem,
+  isHMWItemArray,
+} from './define'
