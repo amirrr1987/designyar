@@ -13,7 +13,7 @@ const { Content } = Layout
     <Layout>
       <AppHeader />
       <Content style="overflow: auto; padding: 16px">
-        <Space direction="vertical" size="middle">
+        <Space direction="vertical" size="middle" style="width: 100%">
           <StepProgress />
           <RouterView />
         </Space>
