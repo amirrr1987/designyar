@@ -64,16 +64,51 @@ import { Card, Space, Tag } from 'ant-design-vue'
 </template>
 ```
 
+## Package interfaces (mandatory)
+
+Use `@ant-design/colors` return shapes and pair with antdv theme types. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+| Need | Type / API |
+|------|------------|
+| Named ramp | `readonly string[]` (10 steps) from exports like `blue` |
+| Generator | `generate(hex: string): string[]` |
+| Theme binding | antdv `ThemeConfig` when feeding primary into ConfigProvider |
+| Style preview | Vue `CSSProperties` for the rare `:style` binding |
+
+```ts
+import { blue, generate } from '@ant-design/colors'
+import type { ThemeConfig } from 'ant-design-vue'
+import type { CSSProperties } from 'vue'
+
+const primaryRamp: readonly string[] = blue
+const customRamp: string[] = generate('#52c41a')
+const primary = primaryRamp[5]
+if (primary === undefined) throw new Error('ramp index missing')
+
+const theme: ThemeConfig = {
+  token: { colorPrimary: primary },
+}
+
+function swatchStyle(color: string, darkText: boolean): CSSProperties {
+  return { backgroundColor: color, color: darkText ? '#fff' : undefined, border: 'none' }
+}
+```
+
+Do not invent a parallel `interface ColorScale { 0: string; … }` — use the package arrays/`generate` result.
+
 ## Rules
 
 1. Prefer named ramps (`blue`, `red`, …) or `generate(hex)` — not hand-picked one-off hex sprawl.
 2. Feed ramps into Pinia / `useStorage` design-system state; UI shows them via antdv (`Tag`, `Card`, color inputs).
 3. For contrast checks, pass ramp hex strings into utils — do not style with custom CSS classes.
 4. Align semantic steps with Design Thinking colors in `constants/design-thinking-steps.ts` when needed.
+5. When applying a primary to the app, type the object as `ThemeConfig`.
+6. Honor `noUncheckedIndexedAccess` on ramp indices.
 
 ## Checklist
 
 - [ ] Import from `@ant-design/colors`
-- [ ] Use 10-step ramps or `generate`
+- [ ] Use 10-step ramps or `generate` (typed as `string[]` / `readonly string[]`)
+- [ ] Theme via `ThemeConfig` when wiring ConfigProvider
 - [ ] No custom CSS palette files
-- [ ] Dynamic color via `:style` binding only when previewing
+- [ ] Dynamic color via `:style` binding only when previewing (`CSSProperties`)

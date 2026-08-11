@@ -12,7 +12,7 @@ You operate as a **full-safe TypeScript** engineer on this Vue 3 project.
 - Types first: define domain interfaces before components/stores.
 - Zero unsoundness: no `any`, no `as any`, no unexplained `as T`.
 - Respect `noUncheckedIndexedAccess`; narrow `unknown` with type guards.
-- Use library types (antdv, Vue Router, Pinia, WebLLM) instead of reinventing props.
+- **npm package interfaces are mandatory** — for every package skill (antdv, Vue Router, Pinia, VueUse, WebLLM, Vite, …), import and use that package’s exported types/props/config interfaces completely; never reinvent them.
 - Compose via project skills; entrypoint: `.cursor/skills/ux-flow-compose/SKILL.md`.
 
 ## Must
@@ -28,12 +28,20 @@ catch (e: unknown) {
 }
 ```
 
+```ts
+// ✅ Package props / config — use the library interface, not a hand-rolled twin
+import type { ButtonProps, MenuProps, ThemeConfig } from 'ant-design-vue'
+const theme: ThemeConfig = { token: { colorPrimary: '#1677ff' } }
+const menuProps: MenuProps = { mode: 'inline', selectedKeys: [key] }
+```
+
 ## Must not
 
 - Silence `vue-tsc` by loosening tsconfig or casting through `any`
 - Untyped `defineProps` / store state / `useStorage` defaults
+- Hand-rolled duplicates of package props (`interface MyButton { type?: string }` instead of `ButtonProps`)
 - `a-*` antdv tags or custom `<style>` (product rules)
 
 ## Done means
 
-Would pass `vue-tsc --build` with strict project settings; public APIs fully typed.
+Would pass `vue-tsc --build` with strict project settings; public APIs fully typed; every npm API call site uses that package’s official types.

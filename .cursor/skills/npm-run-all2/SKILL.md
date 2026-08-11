@@ -21,6 +21,10 @@ From [`package.json`](../../../package.json):
 - **build**: runs `type-check` (`vue-tsc --build`) and `build-only` (`vite build`) **in parallel**.
 - **lint**: runs `lint:oxlint` then `lint:eslint` **in sequence**.
 
+## Package interfaces (mandatory)
+
+`npm-run-all2` is CLI-only (`run-p` / `run-s`) — use those binaries in `package.json` scripts; do not reimplement parallel/sequential runners. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
 ## Rules
 
 1. Use `run-p` when tasks are independent (type-check ∥ vite build).

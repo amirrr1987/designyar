@@ -15,6 +15,10 @@ Pulled in transitively via `@vue/eslint-config-typescript` / `eslint-plugin-vue`
 
 Do **not** hand-set `parser: 'vue-eslint-parser'` unless leaving `defineConfigWithVueTs` — the Vue TS helper configures this.
 
+## Package interfaces (mandatory)
+
+Parser package is consumed via `@vue/eslint-config-typescript` — prefer that helper’s wiring over a local `parserOptions` twin. If you must set parser explicitly, use the package string/import the package documents. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
 ## Rules
 
 1. Align major with `eslint-plugin-vue` (both ~10.x here).

@@ -25,6 +25,17 @@ export default defineConfigWithVueTs(
 
 Place **last** (or after style-related configs) so it wins.
 
+## Package interfaces (mandatory)
+
+Use the official flat export `eslint-config-prettier/flat` as `skipFormatting` — do not hand-disable the same formatting rules one-by-one. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+```ts
+import skipFormatting from 'eslint-config-prettier/flat'
+import type { Linter } from 'eslint'
+
+const prettierSkip: Linter.Config = skipFormatting
+```
+
 ## Rules
 
 1. This project formats with **oxfmt** (`npm run format`) — ESLint must not enforce formatting.
@@ -37,3 +48,4 @@ Place **last** (or after style-related configs) so it wins.
 - [ ] `skipFormatting` imported from `/flat`
 - [ ] Applied after Vue/TS rule sets
 - [ ] Format via oxfmt, not ESLint
+- [ ] No hand-rolled prettier-disable twin

@@ -17,6 +17,10 @@ Package: `oxfmt` ^0.59. Project formatter (Prettier-class workflow via Oxc).
 
 Show the command and wait for user confirmation before running (UX Flow rule).
 
+## Package interfaces (mandatory)
+
+Use oxfmt’s CLI / official config surface for this repo — do not add a second formatter with a parallel config twin. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
 ## Rules
 
 1. Format **`src/`** with oxfmt — do not add Prettier as a second formatter.

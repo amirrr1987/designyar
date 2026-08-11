@@ -11,18 +11,42 @@ description: >
 
 Package: `@vueuse/core` ^14. **All persistence** goes through VueUse — especially `useStorage`. See [ux-flow](../ux-flow/SKILL.md) and [pinia](../pinia/SKILL.md).
 
+## Package interfaces (mandatory)
+
+Use `@vueuse/core` exported types and generics — never untyped storage or reinvented “maybe ref” helpers. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+| Need | Package type / API |
+|------|---------------------|
+| Persistence | `useStorage<T>`, return `RemovableRef<T>` |
+| Debounce | `useDebounceFn`, `MaybeRefOrGetter` inputs where applicable |
+| Clipboard | `useClipboard` return fields as inferred / documented |
+| Shared refs | `RemovableRef<T>`, `StorageLike` when customizing storage |
+
+```ts
+import { useStorage, type RemovableRef } from '@vueuse/core'
+
+const personas: RemovableRef<Persona[]> = useStorage<Persona[]>('ux-flow-personas', [])
+const project = useStorage<Project>('ux-flow-project', {
+  name: '',
+  currentStep: 1,
+  createdAt: new Date().toISOString(),
+})
+```
+
+Always pass the generic `useStorage<T>(key, defaultValue)` — do not rely on `as T` on the default alone without `T`.
+
 ## Persistence (required pattern)
 
 ```ts
 import { useStorage } from '@vueuse/core'
 
-const personas = useStorage('ux-flow-personas', [] as Persona[])
-const project = useStorage('ux-flow-project', {
+const personas = useStorage<Persona[]>('ux-flow-personas', [])
+const project = useStorage<Project>('ux-flow-project', {
   name: '',
   currentStep: 1,
   createdAt: new Date().toISOString(),
 })
-const designSystem = useStorage('ux-flow-design-system', defaultDesignSystem)
+const designSystem = useStorage<DesignSystem>('ux-flow-design-system', defaultDesignSystem)
 ```
 
 ### Keys convention
@@ -77,7 +101,8 @@ File download can use a temporary `<a download>` without custom CSS.
 
 ## Checklist
 
-- [ ] Persistence via `useStorage`
+- [ ] Persistence via `useStorage<T>`
+- [ ] VueUse types (`RemovableRef`, generics) — no hand-rolled storage types
 - [ ] Keys prefixed `ux-flow-`
 - [ ] Prefer VueUse over custom composables for common browser APIs
 - [ ] Works with Pinia stores

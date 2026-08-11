@@ -24,6 +24,17 @@ export default defineConfigWithVueTs(
 
 Uses **flat/essential** — keep unless user requests `flat/recommended` or `flat/strongly-recommended`.
 
+## Package interfaces (mandatory)
+
+Use the plugin’s flat config exports (`pluginVue.configs['flat/essential']`) — do not reinvent Vue rule sets. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+```ts
+import pluginVue from 'eslint-plugin-vue'
+import type { Linter } from 'eslint'
+
+const vueEssential: Linter.Config[] = pluginVue.configs['flat/essential']
+```
+
 ## Rules
 
 1. Respect Vue 3 + `<script setup>` patterns; do not suggest Options-API-only fixes.
@@ -34,5 +45,6 @@ Uses **flat/essential** — keep unless user requests `flat/recommended` or `fla
 ## Checklist
 
 - [ ] `flat/essential` spread into flat config
+- [ ] Official plugin configs used (no hand-rolled Vue rule twin)
 - [ ] `.vue` files in ESLint `files` glob
 - [ ] Compatible with TS script setup

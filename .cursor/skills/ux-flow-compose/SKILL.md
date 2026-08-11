@@ -3,8 +3,9 @@ name: ux-flow-compose
 description: >
   Orchestrates all UX Flow project skills in the correct order with extreme full-safe
   TypeScript — when to load which skill, typed boundaries across Vue/Pinia/antdv/VueUse/
-  WebLLM/Vite tooling, and a no-any checklist. Use when starting features, combining
-  stack skills, full safe type, type-safe architecture, or composing ux-flow modules.
+  WebLLM/Vite tooling, mandatory use of each npm package’s official interfaces (e.g.
+  ButtonProps), and a no-any checklist. Use when starting features, combining stack skills,
+  full safe type, type-safe architecture, package interfaces, or composing ux-flow modules.
 ---
 
 # UX Flow — compose all skills (full-safe TS)
@@ -22,6 +23,48 @@ You are a **full-safe TypeScript** Vue engineer for UX Flow:
 5. Before coding UI, read [ant-design-vue](../ant-design-vue/SKILL.md) (named imports + `<Button>`).
 
 Also obey project rule `.cursor/rules/full-safe-type-ts.mdc`.
+
+## Package interfaces mandate (every npm skill)
+
+Each skill under `.cursor/skills/` that documents an **npm package** must drive code that **fully uses that package’s TypeScript surface** — props, return types, config types, event payloads, generics. Do not invent parallel interfaces.
+
+| Rule | Detail |
+|------|--------|
+| Prefer package types | `import type { ButtonProps, MenuProps } from 'ant-design-vue'` — not `interface MyBtn { type?: string }` |
+| Annotate boundaries | Variables, `defineProps` wrappers, store fields, and config objects that mirror a library API must use the library type |
+| Exhaust props typing | When building prop objects / `v-bind` spreads / theme configs, type them as `XxxProps` / `ThemeConfig` / package config |
+| Generics | Use package generics (`useStorage<T>`, `TableColumnsType<Row>`, `RouteRecordRaw`, …) |
+| Tooling configs | Config files use package helpers + types (`defineConfig` from `vite` / `eslint`, not untyped plain objects when a typed helper exists) |
+| Discover types | If unsure of the export name, check the package’s `.d.ts` / docs — still prefer official names over local clones |
+
+Canonical UI example (antdv):
+
+```ts
+import type {
+  ButtonProps,
+  MenuProps,
+  FormInstance,
+  TableColumnsType,
+  ThemeConfig,
+} from 'ant-design-vue'
+import type { Rule } from 'ant-design-vue/es/form'
+
+const buttonProps: ButtonProps = { type: 'primary', htmlType: 'submit' }
+const theme: ThemeConfig = { token: { colorPrimary: '#1677ff' } }
+const columns: TableColumnsType<Persona> = [{ title: 'نام', dataIndex: 'name', key: 'name' }]
+```
+
+Anti-pattern:
+
+```ts
+// ❌ reinventing antdv
+interface MyButtonProps {
+  type?: 'primary' | 'default'
+  loading?: boolean
+}
+```
+
+When editing any npm-package skill, keep a **Package interfaces (mandatory)** section listing the key exported types and showing typed usage.
 
 ## Skill load map (principled order)
 
@@ -158,7 +201,7 @@ if (!first) return
 | composables | Generic inputs/outputs; no untyped returns |
 | utils | Pure functions with explicit signatures + type guards |
 
-More examples: [type-safe-patterns.md](type-safe-patterns.md).
+More examples: [type-safe-patterns.md](type-safe-patterns.md). Full npm-interface policy: [package-interfaces.md](package-interfaces.md).
 
 ## Quality gate (mental CI)
 
@@ -167,6 +210,7 @@ Before calling a step done:
 - [ ] Relevant skills from the map were applied
 - [ ] No `any` / unsafe assertions
 - [ ] `noUncheckedIndexedAccess` handled
+- [ ] Package interfaces used (see [package-interfaces.md](package-interfaces.md)) — no hand-rolled twins of antdv/Vue/Pinia/…
 - [ ] antdv named imports + PascalCase
 - [ ] No `<style>` / custom CSS
 - [ ] Persistence typed via `useStorage<T>`
@@ -177,6 +221,7 @@ Before calling a step done:
 
 - Loading every skill into context when only fixing a button
 - Global `app.use(Antd)` + `a-*` tags (forbidden here)
+- Hand-rolled props/config that duplicate npm package types
 - Hand-rolled `localStorage` instead of VueUse
 - Remote LLM API instead of WebLLM
 - Disabling strictness in tsconfig to silence errors

@@ -22,6 +22,10 @@ Part of `npm run lint` via [npm-run-all2](../npm-run-all2/SKILL.md). Confirm wit
 
 Root `.oxlintrc.json` is the source of truth. [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) reads it to disable overlapping ESLint rules.
 
+## Package interfaces (mandatory)
+
+Configure via official `.oxlintrc.json` and CLI — do not invent a parallel in-repo rule schema. Sync with ESLint through `eslint-plugin-oxlint`’s `buildFromOxlintConfigFile`. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
 ## Rules
 
 1. Prefer fixing oxlint issues when reported — keep `--fix` in the script unless user disables auto-fix.

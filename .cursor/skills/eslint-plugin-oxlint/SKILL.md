@@ -24,6 +24,16 @@ export default defineConfigWithVueTs(
 
 Requires a root `.oxlintrc.json` that matches [oxlint](../oxlint/SKILL.md).
 
+## Package interfaces (mandatory)
+
+Use `buildFromOxlintConfigFile` from the package — do not manually mirror oxlint disables in ESLint. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+```ts
+import pluginOxlint from 'eslint-plugin-oxlint'
+
+...pluginOxlint.buildFromOxlintConfigFile('.oxlintrc.json')
+```
+
 ## Rules
 
 1. Keep ESLint ↔ oxlint in sync through this plugin — do not manually duplicate rule disables.
@@ -33,6 +43,6 @@ Requires a root `.oxlintrc.json` that matches [oxlint](../oxlint/SKILL.md).
 
 ## Checklist
 
-- [ ] Plugin loads from `.oxlintrc.json`
+- [ ] Plugin loads from `.oxlintrc.json` via official API
 - [ ] No redundant overlapping rule noise
 - [ ] Both linters still run in `lint` script

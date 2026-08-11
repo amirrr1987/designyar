@@ -66,6 +66,52 @@ function onSelect({ key }: { key: string }) {
 
 Update `stores/project.ts` `currentStep` when `route` changes (`watch` on `route.name`).
 
+## Package interfaces (mandatory)
+
+Use vue-router’s exported types — do not treat `route.params` as bare `string` without narrowing. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+| Need | Package type |
+|------|----------------|
+| Route table | `RouteRecordRaw` |
+| Router instance | `Router`, `createRouter`, `createWebHistory` |
+| Location | `RouteLocationNormalized`, `RouteLocationRaw` |
+| Meta | extend via module augmentation or typed `meta` helpers |
+| Navigation guards | `NavigationGuard`, `NavigationGuardNext` |
+| Menu click → route | pair with antdv `MenuProps` / click payload; push `RouteLocationRaw` |
+
+```ts
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+  type RouteLocationNormalized,
+  type Router,
+} from 'vue-router'
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/empathize',
+    name: 'empathize',
+    component: () => import('@/views/EmpathizeView.vue'),
+    meta: { title: 'همدلی', step: 0 },
+  },
+]
+
+function titleOf(route: RouteLocationNormalized): string {
+  const t = route.meta.title
+  return typeof t === 'string' ? t : 'UX Flow'
+}
+```
+
+```ts
+const id = computed(() => {
+  const raw = route.params.id
+  return typeof raw === 'string' ? raw : Array.isArray(raw) ? raw[0] : undefined
+})
+```
+
+When wiring antdv `Menu`, type menu props as `MenuProps` from `ant-design-vue` and navigate with typed `router.push`.
+
 ## Rules
 
 1. Lazy-load all views with `() => import(...)`.
@@ -73,11 +119,13 @@ Update `stores/project.ts` `currentStep` when `route` changes (`watch` on `route
 3. Keep titles Persian in `meta.title`.
 4. No auth guards needed for MVP (client-only).
 5. Prefer `createWebHistory` for static hosting; use `createWebHashHistory` only if host lacks SPA fallback and user asks.
+6. Annotate route tables as `RouteRecordRaw[]`; narrow params/meta with package types.
 
 ## Checklist
 
 - [ ] Router registered in `main.ts`
 - [ ] Home + 5 DT routes
 - [ ] Lazy views
+- [ ] `RouteRecordRaw` / location types used (no untyped route bags)
 - [ ] Menu/Steps stay in sync with route
 - [ ] Align with `DESIGN_THINKING_STEPS`

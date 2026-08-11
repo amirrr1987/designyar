@@ -78,7 +78,34 @@ function resolveIcon(name: string): Component {
 }
 ```
 
-Prefer an explicit map over `Icons[name]` without typing.
+## Package interfaces (mandatory)
+
+Icons are Vue components from the package — type maps and slots with Vue + antdv types, not `any`. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+| Need | Type |
+|------|------|
+| Icon component | `FunctionalComponent` / `Component` from `vue` |
+| Icon map | `Record<string, Component>` or better `satisfies Record<DesignStepIconName, Component>` |
+| Button icon slot parent | antdv `ButtonProps` when configuring the host button |
+
+```ts
+import type { Component } from 'vue'
+import type { ButtonProps } from 'ant-design-vue'
+import { PlusOutlined, HeartOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
+
+const iconMap = {
+  HeartOutlined,
+  PlusOutlined,
+} as const satisfies Record<string, Component>
+
+function resolveIcon(name: string): Component {
+  return iconMap[name as keyof typeof iconMap] ?? QuestionCircleOutlined
+}
+
+const addBtn: ButtonProps = { type: 'primary' }
+```
+
+Prefer an explicit typed map over `Icons[name]` without narrowing.
 
 ## Rules
 
@@ -86,10 +113,12 @@ Prefer an explicit map over `Icons[name]` without typing.
 2. Size/color via parent antdv props / theme — not custom CSS on SVG.
 3. Place icons in `#icon` slots or as children beside Persian labels.
 4. Keep imports per-file minimal.
+5. Type icon registries with `Component` / `satisfies` — no `any`.
 
 ## Checklist
 
 - [ ] Named import from `@ant-design/icons-vue`
+- [ ] Icon maps typed (`Component` / `satisfies`)
 - [ ] No emoji icons in UI
-- [ ] Wired into `Button` / `Menu` / `Steps` correctly
+- [ ] Wired into `Button` / `Menu` / `Steps` correctly (host props use antdv `*Props` when built as objects)
 - [ ] Step icons resolve from Design Thinking constants

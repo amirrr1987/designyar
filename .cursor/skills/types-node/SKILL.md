@@ -39,14 +39,25 @@ export default defineConfig({
 
 Prefer `node:` protocol imports (`node:url`, `node:fs`, `node:path`).
 
+## Package interfaces (mandatory)
+
+`@types/node` provides ambient/`node:` module types — use them directly (`URL`, `Buffer`, `process`) instead of declaring local ambient twins. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+```ts
+import { fileURLToPath } from 'node:url'
+import type { Buffer } from 'node:buffer'
+```
+
 ## Rules
 
 1. Do **not** add `"types": ["node"]` to `tsconfig.app.json` — app code is DOM/`@vue/tsconfig`.
 2. Use Node types only in Vite/ESLint/tooling files under `tsconfig.node.json` include.
 3. Avoid depending on ambient Node globals in `src/` Vue app code.
+4. Prefer official `node:` typings over hand-written `declare module 'fs'`.
 
 ## Checklist
 
 - [ ] `@types/node` available for tooling TS
 - [ ] App tsconfig does not pull Node types globally
 - [ ] Prefer `node:` imports
+- [ ] No hand-rolled Node ambient duplicates

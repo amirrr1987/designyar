@@ -89,6 +89,39 @@ Persian system prompts for:
 
 Show load progress with antdv `Progress` / `Spin`; errors with `Alert`.
 
+## Package interfaces (mandatory)
+
+Use `@mlc-ai/web-llm` exported types for the engine and chat payloads — never `any` for completions. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+| Need | Package type / API |
+|------|---------------------|
+| Engine | `MLCEngineInterface`, `CreateMLCEngine` |
+| Init progress | callback report from `initProgressCallback` (type from package / inferred) |
+| Chat messages | package chat message / completion types when exported; otherwise infer from `chat.completions.create` |
+| App UI around AI | antdv `ButtonProps`, `ProgressProps`, `AlertProps` for controls |
+
+```ts
+import {
+  CreateMLCEngine,
+  type MLCEngineInterface,
+} from '@mlc-ai/web-llm'
+import type { Ref, ShallowRef } from 'vue'
+
+const engine: ShallowRef<MLCEngineInterface | null> = shallowRef(null)
+
+async function chat(prompt: string): Promise<string> {
+  const e = engine.value
+  if (!e) throw new Error('مدل آماده نیست')
+  const reply = await e.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }],
+    stream: false,
+  })
+  return reply.choices[0]?.message?.content ?? ''
+}
+```
+
+Prefer package types for engine options; keep domain prompt strings as `string` / app unions.
+
 ## Rules
 
 1. Never call a remote LLM API — only WebLLM in-browser.
@@ -96,10 +129,11 @@ Show load progress with antdv `Progress` / `Spin`; errors with `Alert`.
 3. Keep engine in composable or `stores/ai.ts` — one shared instance.
 4. Persist model preference with VueUse `useStorage` if needed; do not persist huge weights.
 5. Handle WebGPU / init failures with clear Persian error messages.
+6. Type engine refs as `MLCEngineInterface | null` (prefer `shallowRef`).
 
 ## Checklist
 
 - [ ] Logic in `useWebLLM` (or ai store)
 - [ ] Progress + error surfaced in antdv UI
-- [ ] Chat/completions typed; no `any`
+- [ ] `MLCEngineInterface` + typed completions; no `any`
 - [ ] Features match Phase 7 (AI Panel)

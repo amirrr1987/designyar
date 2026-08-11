@@ -55,14 +55,41 @@ No second `<script>` or Options API components unless migrating legacy (there sh
 ## Imports
 
 ```ts
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import type { Ref, ComputedRef } from 'vue'
+import { ref, computed, watch, onMounted, nextTick, shallowRef } from 'vue'
+import type { Ref, ComputedRef, PropType, Component, VNode, CSSProperties } from 'vue'
 ```
+
+## Package interfaces (mandatory)
+
+Use Vue’s exported types — do not invent loose stand-ins. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+| Need | Package type |
+|------|----------------|
+| Ref / computed values | `Ref<T>`, `ComputedRef<T>`, `ShallowRef<T>` |
+| Maybe-ref APIs | `MaybeRef<T>`, `MaybeRefOrGetter<T>` |
+| Components / VNodes | `Component`, `ComponentPublicInstance`, `VNode` |
+| Inline style objects | `CSSProperties` |
+| Injection | `InjectionKey<T>` |
+| App instance | `App` |
+| Emits typing | `defineEmits<{ … }>()` typed payload tuples |
+
+```ts
+import type { Ref, ComputedRef, CSSProperties, InjectionKey } from 'vue'
+
+const loading: Ref<boolean> = ref(false)
+const title: ComputedRef<string> = computed(() => props.title.trim())
+const chipStyle: CSSProperties = { backgroundColor: '#1677ff', color: '#fff' }
+
+export const personaKey: InjectionKey<Ref<Persona | null>> = Symbol('persona')
+```
+
+When wrapping antdv, still use **antdv** props types (`ButtonProps`), not a custom Vue `PropType` clone of antdv.
 
 ## Checklist
 
 - [ ] `<script setup lang="ts">`
 - [ ] Typed props/emits
+- [ ] Vue package types (`Ref`, `ComputedRef`, `CSSProperties`, …) at boundaries
 - [ ] No `<style>` 
-- [ ] antdv PascalCase components
+- [ ] antdv PascalCase components + antdv `*Props` where relevant
 - [ ] Persian UI copy

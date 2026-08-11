@@ -37,6 +37,19 @@ export interface DesignStep {
 }
 ```
 
+## Package props (antdv) — prefer official interfaces
+
+See [package-interfaces.md](package-interfaces.md). Never clone antdv props locally.
+
+```ts
+import type { ButtonProps, MenuProps, ThemeConfig, TableColumnsType } from 'ant-design-vue'
+import type { FormInstance, Rule } from 'ant-design-vue/es/form'
+
+const theme: ThemeConfig = { token: { colorPrimary: '#1677ff' } }
+const menuProps: MenuProps = { mode: 'inline', selectedKeys: ['empathize'] }
+const saveBtn: ButtonProps = { type: 'primary', htmlType: 'submit' }
+```
+
 ## Typed antdv form
 
 ```ts

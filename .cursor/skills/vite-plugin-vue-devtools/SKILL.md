@@ -24,6 +24,20 @@ export default defineConfig({
 })
 ```
 
+## Package interfaces (mandatory)
+
+Use the plugin’s typed factory — register via official default export; do not invent a local plugin options interface unless the package exports one. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+```ts
+import { defineConfig, type UserConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import vueDevTools from 'vite-plugin-vue-devtools'
+
+export default defineConfig({
+  plugins: [vue(), vueDevTools()],
+} satisfies UserConfig)
+```
+
 ## Rules
 
 1. Keep for **local `vite` dev** — it should not affect production bundle meaningfully; do not rely on it in prod code.
@@ -35,4 +49,5 @@ export default defineConfig({
 
 - [ ] Plugin imported and registered in dev config
 - [ ] Placed after `@vitejs/plugin-vue`
+- [ ] Vite config still typed (`defineConfig` / `UserConfig`)
 - [ ] No app runtime imports of the plugin from `src/`

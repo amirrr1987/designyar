@@ -13,6 +13,12 @@ Package: `jiti` ^2.7. Runtime TypeScript/ESM loader used so tools can execute `e
 
 Present as a **devDependency** so ESLint can load [`eslint.config.ts`](../../../eslint.config.ts). Usually transparent — no direct imports in app `src/`.
 
+## Package interfaces (mandatory)
+
+jiti is a loader for `eslint.config.ts` — prefer its automatic ESLint integration over importing jiti into app code or inventing a custom TS-config bootstrap. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+If scripting with jiti explicitly, use the package’s exported `createJiti` / documented API rather than a local loader twin.
+
 ## Rules
 
 1. Keep `eslint.config.ts` (not only `.mjs`) — jiti enables the TS config file.

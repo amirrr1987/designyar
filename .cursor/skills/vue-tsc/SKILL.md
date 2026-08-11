@@ -18,16 +18,27 @@ Package: `vue-tsc` ^3.3. Type-checks `.vue` + TS using the project references se
 
 Confirm before running. `--build` uses root `tsconfig.json` references (`app` + `node`).
 
+## Package interfaces (mandatory)
+
+`vue-tsc` enforces package interfaces at CI time — treat a clean `vue-tsc --build` as the gate that antdv `*Props`, Vue Router `RouteRecordRaw`, Pinia store types, etc. are actually used. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+Do not “fix” errors by:
+
+- introducing `any` / `as any`
+- deleting `noUncheckedIndexedAccess`
+- replacing package types with looser local interfaces
+
 ## Rules
 
 1. Prefer `vue-tsc --build` over plain `tsc` for this Vue app.
 2. Fix type errors in `src/**/*.vue` and `src/**/*.ts` — do not weaken tsconfig to silence errors unless user asks.
 3. Incremental info goes to `node_modules/.tmp/*.tsbuildinfo` (see app/node tsconfigs).
 4. Pair with [typescript](../typescript/SKILL.md) and [vue-tsconfig](../vue-tsconfig/SKILL.md).
-5. antdv / Pinia code must stay typed — no `any` escapes.
+5. antdv / Pinia / VueUse / WebLLM code must stay on **package** types — no `any` escapes.
 
 ## Checklist
 
 - [ ] `type-check` uses `vue-tsc --build`
 - [ ] Build still depends on type-check via `run-p`
 - [ ] SFCs included through `tsconfig.app.json`
+- [ ] Failures fixed with real package types, not casts

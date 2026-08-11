@@ -30,6 +30,12 @@ Package: `@tsconfig/node24` ^24. Base config for **Node-side** TS files (Vite, E
 
 Root [`tsconfig.json`](../../../tsconfig.json) references `./tsconfig.node.json` (project references).
 
+## Package interfaces (mandatory)
+
+JSON base only — extend `@tsconfig/node24/tsconfig.json`; do not copy its compiler defaults into a local twin. Node ambient types come from `@types/node` (`types: ["node"]`). See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+Tooling files under this project should still use package config types (`UserConfig` from Vite, `Linter.Config` from ESLint).
+
 ## Rules
 
 1. Do **not** extend `@tsconfig/node24` from `tsconfig.app.json` (app uses `@vue/tsconfig`).
@@ -42,3 +48,4 @@ Root [`tsconfig.json`](../../../tsconfig.json) references `./tsconfig.node.json`
 - [ ] Node tooling files covered by `tsconfig.node.json`
 - [ ] Still extends `@tsconfig/node24/tsconfig.json`
 - [ ] `noEmit: true` for type-check-only builds
+- [ ] No vendored fork of the base

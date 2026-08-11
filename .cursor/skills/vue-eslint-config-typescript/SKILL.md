@@ -24,6 +24,16 @@ export default defineConfigWithVueTs(
 )
 ```
 
+## Package interfaces (mandatory)
+
+Use the package helpers as the typed surface — `defineConfigWithVueTs` and `vueTsConfigs` — do not hand-roll equivalent parser options. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+
+```ts
+import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+```
+
+Prefer calling `defineConfigWithVueTs(...)` so the returned flat configs stay aligned with the package’s expected `Linter.Config` shapes.
+
 ## Rules
 
 1. Prefer `defineConfigWithVueTs` over hand-rolling parserOptions for `.vue` + TS.
@@ -36,3 +46,4 @@ export default defineConfigWithVueTs(
 - [ ] Config uses `defineConfigWithVueTs`
 - [ ] `vueTsConfigs.recommended` applied
 - [ ] Files globs cover `vue` + `ts`
+- [ ] No hand-rolled twin of this package’s Vue+TS ESLint setup
