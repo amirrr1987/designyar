@@ -372,6 +372,57 @@ export const fa = {
       alertDescription: 'کارت‌ها را در دسته‌ها بچین تا اولویت محتوا روشن شود.',
     },
   } as const,
+  prototypeTools: {
+    color: {
+      tab: '۱. رنگ',
+      why: 'رنگ اصلی هویت بصری و کنتراست را می‌سازد.',
+      primaryTitle: 'رنگ اصلی',
+      accentTitle: 'رنگ تأکیدی',
+      seedPh: '#1677ff',
+      accentPh: '#faad14',
+      generate: 'ساخت و ذخیره',
+      applyQuick: 'اعمال سریع',
+      generateAccent: 'ساخت رنگ تأکیدی',
+      rampHint: '۱۰ پله رنگ از بذر — برای دکمه‌ها و پس‌زمینه.',
+      aiLabel: 'بازبینی پالت با AI',
+      presetsHint: 'یا از رنگ‌های پیشنهادی شروع کن',
+    },
+    wireframe: {
+      tab: '۲. وایرفریم',
+      why: 'قبل از جزئیات UI، اسکلت صفحه را ثابت کن.',
+      hint: 'بلوک‌های ساختاری را انتخاب کن — فقط چیدمان، بدون استایل.',
+      selectedTitle: 'چینش انتخاب‌شده',
+      empty: 'هیچ بلوکی انتخاب نشده',
+      aiSuggest: 'پیشنهاد چیدمان با AI',
+      aiCritique: 'نقد وایرفریم با AI',
+      goalHint: 'حداقل ۲ بلوک انتخاب کن',
+    },
+    type: {
+      tab: '۳. تایپوگرافی',
+      why: 'اندازه پایه و نسبت مقیاس، خوانایی را می‌سازند.',
+      baseSize: 'اندازه پایه (px)',
+      ratio: 'نسبت مقیاس',
+      font: 'فونت',
+      preview: 'پیش‌نمایش',
+      aiLabel: 'بازبینی تایپ با AI',
+    },
+    grid: {
+      alertMessage: 'اختیاری — گرید',
+      alertDescription: 'ستون‌ها و فاصله برای چیدمان دقیق‌تر صفحه.',
+    },
+    spacing: {
+      alertMessage: 'اختیاری — فاصله',
+      alertDescription: 'مقیاس ۸ نقطه‌ای برای فاصله‌های یکدست.',
+    },
+    checklist: {
+      alertMessage: 'اختیاری — چک‌لیست کامپوننت',
+      alertDescription: 'کامپوننت‌های UI که در پروژه استفاده می‌کنی را علامت بزن.',
+    },
+    microcopy: {
+      alertMessage: 'اختیاری — متن UI',
+      alertDescription: 'متن‌های کوتاه دکمه، خطا و empty state.',
+    },
+  } as const,
   getPhase(key: DesignStepKey, _mode: ExperienceMode): PhaseCopy {
     return phases[key]
   },

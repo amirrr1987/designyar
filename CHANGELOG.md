@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R5 — Prototype:** `fa.prototypeTools` for color / wireframe / type + optional tools
+- Color presets from `@ant-design/colors`; wireframe progress toward 2 blocks
+- Contextual primary AI + tab tags from completion engine
+
+### Changed
+
+- Junior: quieter typography (font field hidden); critique AI only in full mode on wireframe
+- Grid, spacing, checklist, microcopy marked اختیاری with info alerts
+
 ## [0.25.0] - 2026-08-11
 
 ### Added

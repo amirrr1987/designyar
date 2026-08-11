@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Button, Card, Space, Tabs } from 'ant-design-vue'
+import { Button, Card, Space, Tabs, Tag } from 'ant-design-vue'
 import type { ButtonProps } from 'ant-design-vue'
 import { AppstoreOutlined } from '@ant-design/icons-vue'
 import ColorPalette from '@/components/prototype/ColorPalette.vue'
@@ -17,6 +17,7 @@ import { useCompletion } from '@/composables/useCompletion'
 import { JUNIOR_DEFAULT_TAB, JUNIOR_ESSENTIAL_TABS } from '@/constants/junior-guide'
 import { fa } from '@/content/fa'
 import { useProjectStore } from '@/stores/project'
+import type { JobId } from '@/domain/completion'
 
 type PrototypeTabKey = 'color' | 'type' | 'grid' | 'spacing' | 'wireframe' | 'checklist' | 'microcopy'
 
@@ -27,6 +28,10 @@ const activeKey = ref<PrototypeTabKey>(JUNIOR_DEFAULT_TAB.prototype)
 
 const isJunior = computed(() => projectStore.isJuniorMode)
 const essentials = JUNIOR_ESSENTIAL_TABS.prototype
+const tools = fa.prototypeTools
+
+const focusJobId = computed(() => phaseProgress('prototype').nextJob?.id)
+const progress = computed(() => phaseProgress('prototype'))
 
 function showTab(key: PrototypeTabKey): boolean {
   if (!isJunior.value || showAdvanced.value) return true
@@ -34,22 +39,48 @@ function showTab(key: PrototypeTabKey): boolean {
 }
 
 function tabFromJob(): PrototypeTabKey {
-  const job = phaseProgress('prototype').nextJob
-  if (job?.id === 'prototype.wireframe') return 'wireframe'
-  if (job?.id === 'prototype.type') return 'type'
+  if (focusJobId.value === 'prototype.wireframe') return 'wireframe'
+  if (focusJobId.value === 'prototype.type') return 'type'
   return 'color'
 }
 
+function isDone(jobId: JobId): boolean {
+  return !progress.value.missing.includes(jobId)
+}
+
+const primaryAiAction = computed(() => {
+  if (focusJobId.value === 'prototype.wireframe') return 'suggest-wireframe-blocks' as const
+  return 'review-design-system' as const
+})
+
+const primaryAiLabel = computed(() => {
+  if (focusJobId.value === 'prototype.wireframe') return tools.wireframe.aiSuggest
+  if (focusJobId.value === 'prototype.type') return tools.type.aiLabel
+  return tools.color.aiLabel
+})
+
 watch(
-  isJunior,
-  (junior) => {
-    if (junior) {
-      activeKey.value = tabFromJob()
-      showAdvanced.value = false
-    }
+  focusJobId,
+  () => {
+    if (!isJunior.value) return
+    const next = tabFromJob()
+    if (showTab(next)) activeKey.value = next
   },
   { immediate: true },
 )
+
+watch(isJunior, (junior) => {
+  if (junior) {
+    activeKey.value = tabFromJob()
+    showAdvanced.value = false
+  }
+})
+
+watch(showAdvanced, (advanced) => {
+  if (!advanced && !showTab(activeKey.value)) {
+    activeKey.value = tabFromJob()
+  }
+})
 
 const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 </script>
@@ -57,27 +88,70 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 <template>
   <PhaseShell phase="prototype">
     <template #ai>
-      <AiChainButton chain="prototype-starter" label="شروع با AI (وایرفریم→متن)" />
+      <AiAssistButton
+        v-if="isJunior"
+        :action="primaryAiAction"
+        :label="primaryAiLabel"
+        section="پروتوتایپ"
+      />
+      <AiChainButton v-else chain="prototype-starter" label="شروع با AI (وایرفریم→متن)" />
     </template>
     <template #ai-more>
       <AiAssistButton
         action="review-design-system"
-        label="بازبینی دیزاین سیستم"
+        :label="tools.color.aiLabel"
         section="پروتوتایپ"
       />
-      <AiAssistButton action="wireframe-critique" label="نقد وایرفریم" section="پروتوتایپ" />
+      <AiAssistButton
+        action="wireframe-critique"
+        :label="tools.wireframe.aiCritique"
+        section="پروتوتایپ"
+      />
       <AiAssistButton action="microcopy" label="تولید متن‌های UI" section="پروتوتایپ" />
     </template>
 
     <Card>
       <Tabs v-model:activeKey="activeKey" type="card">
-        <Tabs.TabPane v-if="showTab('color')" key="color" tab="۱. رنگ">
+        <Tabs.TabPane v-if="showTab('color')" key="color">
+          <template #tab>
+            <Space>
+              <span>{{ tools.color.tab }}</span>
+              <Tag v-if="focusJobId === 'prototype.color'" color="processing">
+                {{ fa.defineTools.currentJob }}
+              </Tag>
+              <Tag v-else-if="isDone('prototype.color')" color="success">
+                {{ fa.defineTools.doneStep }}
+              </Tag>
+            </Space>
+          </template>
           <ColorPalette />
         </Tabs.TabPane>
-        <Tabs.TabPane v-if="showTab('wireframe')" key="wireframe" tab="۲. وایرفریم">
+        <Tabs.TabPane v-if="showTab('wireframe')" key="wireframe">
+          <template #tab>
+            <Space>
+              <span>{{ tools.wireframe.tab }}</span>
+              <Tag v-if="focusJobId === 'prototype.wireframe'" color="processing">
+                {{ fa.defineTools.currentJob }}
+              </Tag>
+              <Tag v-else-if="isDone('prototype.wireframe')" color="success">
+                {{ fa.defineTools.doneStep }}
+              </Tag>
+            </Space>
+          </template>
           <WireframeBuilder />
         </Tabs.TabPane>
-        <Tabs.TabPane v-if="showTab('type')" key="type" tab="۳. تایپوگرافی">
+        <Tabs.TabPane v-if="showTab('type')" key="type">
+          <template #tab>
+            <Space>
+              <span>{{ tools.type.tab }}</span>
+              <Tag v-if="focusJobId === 'prototype.type'" color="processing">
+                {{ fa.defineTools.currentJob }}
+              </Tag>
+              <Tag v-else-if="isDone('prototype.type')" color="success">
+                {{ fa.defineTools.doneStep }}
+              </Tag>
+            </Space>
+          </template>
           <TypographyScale />
         </Tabs.TabPane>
         <Tabs.TabPane v-if="showTab('grid')" key="grid" :tab="`${fa.optionalLabel}: گرید`">

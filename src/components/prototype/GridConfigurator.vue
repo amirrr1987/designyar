@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  Alert,
   Card,
   Col,
   Descriptions,
@@ -13,6 +14,7 @@ import {
 } from 'ant-design-vue'
 import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useGrid } from '@/composables/useGrid'
+import { fa } from '@/content/fa'
 
 const { Text } = Typography
 const { grid, result, patchGrid } = useGrid()
@@ -27,7 +29,13 @@ function onNumber(
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="fa.prototypeTools.grid.alertMessage"
+      :description="fa.prototypeTools.grid.alertDescription"
+    />
     <AiSectionAssist action="review-design-system" label="بازبینی گرید با AI" section="گرید" />
     <Card size="small" title="پیکربندی گرید">
       <Form layout="vertical">

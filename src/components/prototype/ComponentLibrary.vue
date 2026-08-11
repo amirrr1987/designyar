@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { Card, CheckboxGroup, Progress, Space, Typography } from 'ant-design-vue'
+import { Alert, Card, CheckboxGroup, Progress, Space, Typography } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import {
@@ -8,6 +8,7 @@ import {
   DEFAULT_COMPONENT_CHECKLIST,
 } from '@/constants/component-checklist'
 import { usePrototypeStore } from '@/stores/prototype'
+import { fa } from '@/content/fa'
 
 const { Paragraph } = Typography
 
@@ -27,7 +28,13 @@ const progress = computed(() => {
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="fa.prototypeTools.checklist.alertMessage"
+      :description="fa.prototypeTools.checklist.alertDescription"
+    />
     <AiSectionAssist
       action="review-design-system"
       label="بازبینی UI kit با AI"

@@ -1,15 +1,31 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button, Card, Col, Input, Row, Space, Tag, Typography, message } from 'ant-design-vue'
+import {
+  Button,
+  Card,
+  Col,
+  Input,
+  Row,
+  Space,
+  Tag,
+  Typography,
+  message,
+} from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
-import { gold } from '@ant-design/colors'
+import { blue, geekblue, gold, green, magenta, purple, volcano } from '@ant-design/colors'
 import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDesignSystemStore } from '@/stores/designSystem'
+import { useProjectStore } from '@/stores/project'
 import { rampFromSeed } from '@/types/design-system'
+import { fa } from '@/content/fa'
 
 const { Text, Paragraph } = Typography
 const designStore = useDesignSystemStore()
+const projectStore = useProjectStore()
 const { palette } = storeToRefs(designStore)
+const copy = fa.prototypeTools.color
+const job = fa.getJob('prototype.color')
+const isJunior = computed(() => projectStore.isJuniorMode)
 
 const seedDraft = ref(palette.value.seed)
 const accentSeed = ref(gold[5] ?? '#faad14')
@@ -17,18 +33,31 @@ const accentSeed = ref(gold[5] ?? '#faad14')
 const primaryRamp = computed(() => palette.value.primary)
 const accentRamp = computed(() => palette.value.accent)
 
+const primaryPresets = [
+  blue[5] ?? '#1677ff',
+  geekblue[5] ?? '#2f54eb',
+  purple[5] ?? '#722ed1',
+  magenta[5] ?? '#eb2f96',
+  volcano[5] ?? '#fa541c',
+  green[5] ?? '#52c41a',
+] as const
+
 function tagTextColor(index: number): string | undefined {
   return index > 4 ? '#fff' : undefined
 }
 
-function onGeneratePrimary(): void {
-  const seed = seedDraft.value.trim()
+function applyPrimarySeed(seed: string): void {
   if (!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(seed)) {
     message.warning('یک رنگ hex معتبر وارد کنید (مثلاً #1677ff)')
     return
   }
+  seedDraft.value = seed
   designStore.generatePrimaryFromSeed(seed)
-  message.success('رمپ اصلی ساخته و ذخیره شد')
+  message.success('پالت اصلی ذخیره شد')
+}
+
+function onGeneratePrimary(): void {
+  applyPrimarySeed(seedDraft.value.trim())
 }
 
 function onGenerateAccent(): void {
@@ -38,7 +67,7 @@ function onGenerateAccent(): void {
     return
   }
   designStore.setAccentFromSeed(seed)
-  message.success('رمپ اکسنت ذخیره شد')
+  message.success('پالت تأکیدی ذخیره شد')
 }
 
 function onPreviewOnly(): void {
@@ -57,35 +86,55 @@ function onPreviewOnly(): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Paragraph v-if="job && isJunior" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ fa.whyHeading }}</Text>
+      {{ ' ' }}{{ job.why }}
+    </Paragraph>
+
     <AiSectionAssist
       action="review-design-system"
-      label="بازبینی پالت با AI"
+      :label="copy.aiLabel"
       section="پالت رنگ"
     />
-    <Card size="small" title="رنگ اصلی (Primary)">
+
+    <Card size="small" :title="copy.presetsHint">
       <Space wrap>
-        <Input v-model:value="seedDraft" placeholder="#1677ff" allow-clear />
-        <Button type="primary" @click="onGeneratePrimary">ساخت و ذخیره</Button>
-        <Button @click="onPreviewOnly">اعمال سریع</Button>
+        <Button
+          v-for="color in primaryPresets"
+          :key="color"
+          size="small"
+          :style="{ backgroundColor: color, borderColor: color, color: '#fff' }"
+          @click="applyPrimarySeed(color)"
+        >
+          {{ color }}
+        </Button>
       </Space>
-      <Paragraph type="secondary">رمپ ۱۰ پله‌ای با @ant-design/colors</Paragraph>
+    </Card>
+
+    <Card size="small" :title="copy.primaryTitle">
+      <Space wrap>
+        <Input v-model:value="seedDraft" :placeholder="copy.seedPh" allow-clear />
+        <Button type="primary" @click="onGeneratePrimary">{{ copy.generate }}</Button>
+        <Button v-if="!isJunior" @click="onPreviewOnly">{{ copy.applyQuick }}</Button>
+      </Space>
+      <Paragraph type="secondary">{{ copy.rampHint }}</Paragraph>
       <Space wrap>
         <Tag
           v-for="(color, index) in primaryRamp"
           :key="`primary-${index}-${color}`"
           :style="{ backgroundColor: color, color: tagTextColor(index), border: 'none' }"
         >
-          {{ index }} · {{ color }}
+          {{ isJunior ? color : `${index} · ${color}` }}
         </Tag>
       </Space>
-      <Text v-if="primaryRamp.length === 0" type="secondary">رمپی ذخیره نشده است</Text>
+      <Text v-if="primaryRamp.length === 0" type="secondary">هنوز پالتی نداری</Text>
     </Card>
 
-    <Card size="small" title="رنگ اکسنت (Accent)">
+    <Card size="small" :title="copy.accentTitle">
       <Space wrap>
-        <Input v-model:value="accentSeed" placeholder="#faad14" allow-clear />
-        <Button type="primary" @click="onGenerateAccent">ساخت اکسنت</Button>
+        <Input v-model:value="accentSeed" :placeholder="copy.accentPh" allow-clear />
+        <Button type="primary" @click="onGenerateAccent">{{ copy.generateAccent }}</Button>
       </Space>
       <Space wrap>
         <Tag
@@ -93,7 +142,7 @@ function onPreviewOnly(): void {
           :key="`accent-${index}-${color}`"
           :style="{ backgroundColor: color, color: tagTextColor(index), border: 'none' }"
         >
-          {{ index }} · {{ color }}
+          {{ isJunior ? color : `${index} · ${color}` }}
         </Tag>
       </Space>
     </Card>

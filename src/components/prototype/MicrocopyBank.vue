@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import {
+  Alert,
   Button,
   Card,
   Empty,
@@ -20,6 +21,7 @@ import {
   MICROCOPY_CATEGORY_LABELS,
   type MicrocopyCategory,
 } from '@/types/microcopy'
+import { fa } from '@/content/fa'
 
 const { Paragraph, Text } = Typography
 
@@ -47,12 +49,18 @@ function removeEntry(id: string): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="middle">
+  <Space direction="vertical" size="middle" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="fa.prototypeTools.microcopy.alertMessage"
+      :description="fa.prototypeTools.microcopy.alertDescription"
+    />
     <Paragraph type="secondary">
-      میکروکپی‌های تولیدشده با AI اینجا ذخیره می‌شوند — برای copy/paste در طراحی UI.
+      متن‌های کوتاه UI اینجا ذخیره می‌شوند — برای کپی در طراحی.
     </Paragraph>
 
-    <AiAssistButton action="microcopy" label="تولید میکروکپی با AI" section="بانک میکروکپی" />
+    <AiAssistButton action="microcopy" label="تولید متن UI با AI" section="بانک میکروکپی" />
 
     <Empty v-if="sortedEntries.length === 0" description="بانک میکروکپی خالی است" />
 
