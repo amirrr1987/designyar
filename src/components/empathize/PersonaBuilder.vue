@@ -18,7 +18,8 @@ import { getPersonaTemplate } from '@/utils/persona-templates'
 export interface PersonaForm {
   name: string
   role: string
-  age: number | null
+  /** antdv InputNumber uses `undefined` when empty (not `null`). */
+  age: number | undefined
   goals: string
   pains: string
   bio: string
@@ -33,7 +34,7 @@ const formRef = ref<FormInstance>()
 const model = reactive<PersonaForm>({
   name: '',
   role: '',
-  age: null,
+  age: undefined,
   goals: '',
   pains: '',
   bio: '',
@@ -51,7 +52,7 @@ const rules: { [K in keyof PersonaForm]?: Rule[] } = {
 function resetForm(): void {
   model.name = ''
   model.role = ''
-  model.age = null
+  model.age = undefined
   model.goals = ''
   model.pains = ''
   model.bio = ''
@@ -68,7 +69,7 @@ function onTemplateChange(value: unknown): void {
   if (!template) return
   model.name = template.draft.name
   model.role = template.draft.role
-  model.age = template.draft.age
+  model.age = template.draft.age === null ? undefined : template.draft.age
   model.goals = template.draft.goals
   model.pains = template.draft.pains
   model.bio = template.draft.bio
@@ -84,7 +85,7 @@ async function onSubmit(): Promise<void> {
   addPersona({
     name: model.name,
     role: model.role,
-    age: model.age,
+    age: model.age ?? null,
     goals: model.goals,
     pains: model.pains,
     bio: model.bio,

@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import {
-  Card,
-  Col,
-  Input,
-  Row,
-  Select,
-  SelectOption,
-  Space,
-  Typography,
-} from 'ant-design-vue'
+import { Card, Col, Input, Row, Select, SelectOption, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
 import { usePersona } from '@/composables/usePersona'
 import {

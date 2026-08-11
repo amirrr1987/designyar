@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import {
-  Button,
-  Form,
-  FormItem,
-  Input,
-  Popconfirm,
-  Space,
-  Table,
-  message,
-} from 'ant-design-vue'
+import { Button, Form, FormItem, Input, Popconfirm, Space, Table, message } from 'ant-design-vue'
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 import type { TableColumnsType } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'

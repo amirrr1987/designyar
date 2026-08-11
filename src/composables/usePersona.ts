@@ -22,10 +22,7 @@ export function usePersona() {
     return store.add(persona)
   }
 
-  function updatePersona(
-    id: string,
-    patch: Partial<Omit<Persona, 'id' | 'createdAt'>>,
-  ): boolean {
+  function updatePersona(id: string, patch: Partial<Omit<Persona, 'id' | 'createdAt'>>): boolean {
     return store.update(id, patch)
   }
 
