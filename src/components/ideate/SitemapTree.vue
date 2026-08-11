@@ -4,6 +4,7 @@ import { Button, Card, Empty, Input, Popconfirm, Space, Tree, message } from 'an
 import type { TreeProps } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useIdeateStore } from '@/stores/ideate'
 import type { SitemapNode } from '@/types/ideate'
 
@@ -84,6 +85,8 @@ function onDeleteSelected(): void {
 
 <template>
   <Space direction="vertical" size="middle">
+    <AiAssistButton action="suggest-sitemap" label="پیشنهاد IA با AI" />
+
     <Card size="small" title="افزودن صفحه ریشه">
       <Space wrap>
         <Input v-model:value="rootTitle" placeholder="مثلاً محصولات" @press-enter="onAddRoot" />

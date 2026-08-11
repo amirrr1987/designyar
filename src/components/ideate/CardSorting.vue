@@ -18,6 +18,7 @@ import {
 } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useIdeateStore } from '@/stores/ideate'
 
 const ideateStore = useIdeateStore()
@@ -87,6 +88,8 @@ function currentCategoryId(cardId: string): string | undefined {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiAssistButton action="suggest-card-sort" label="پیشنهاد کارت‌ها با AI" />
+
     <Card size="small" title="افزودن کارت محتوا">
       <Space wrap>
         <Input v-model:value="draftLabel" placeholder="مثلاً فیلتر قیمت" @press-enter="onAddCard" />

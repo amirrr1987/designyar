@@ -20,6 +20,12 @@ export const AI_CHAINS: readonly AiChainDef[] = [
     description: 'یادداشت تحقیق → پرسونا → نقشه همدلی',
     steps: ['seed-research-notes', 'persona-suggest', 'synthesize-empathy'],
   },
+  {
+    id: 'ideate-complete',
+    label: 'زنجیره Ideate کامل',
+    description: 'طوفان ایده → جریان کاربر → نقشه سایت → card sort',
+    steps: ['brainstorm-ideas', 'suggest-userflow', 'suggest-sitemap', 'suggest-card-sort'],
+  },
 ] as const
 
 export type AiChainId = (typeof AI_CHAINS)[number]['id']

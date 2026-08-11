@@ -6,6 +6,7 @@ import CardSorting from '@/components/ideate/CardSorting.vue'
 import SitemapTree from '@/components/ideate/SitemapTree.vue'
 import UserflowCanvas from '@/components/ideate/UserflowCanvas.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
+import AiChainButton from '@/components/shared/AiChainButton.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
 type IdeateTabKey = 'brainstorm' | 'userflow' | 'sitemap' | 'cardsort'
@@ -21,6 +22,7 @@ const activeKey = ref<IdeateTabKey>('brainstorm')
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
+        <AiChainButton chain="ideate-complete" label="زنجیره Ideate (ایده→flow→IA→cards)" />
         <AiAssistButton action="brainstorm-ideas" label="طوفان ایده با AI" />
         <AiAssistButton action="suggest-userflow" label="پیشنهاد جریان کاربر" />
       </Space>

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-08-11
+
+### Added
+
+- **Phase Coach** در StepProgress — راهنمای گام بعدی با دکمه AI
+- اکشن‌های `suggest-sitemap` و `suggest-card-sort` با اعمال مستقیم
+- اکشن **`test-to-hmw`** — بازخورد Test به Define (سوالات HMW)
+- زنجیره **Ideate کامل** (ایده → userflow → sitemap → card sort)
+- context `testSummary` برای promptهای Test
+
 ## [0.13.0] - 2026-08-11
 
 ### Added

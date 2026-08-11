@@ -39,6 +39,11 @@ export interface AiEmpathyMapDraft {
   quadrants: EmpathyQuadrants
 }
 
+export interface AiSitemapNodeDraft {
+  title: string
+  children?: AiSitemapNodeDraft[]
+}
+
 export type AiApplyPayload =
   | { type: 'personas'; items: AiPersonaDraft[] }
   | { type: 'hmw'; items: string[] }
@@ -50,6 +55,8 @@ export type AiApplyPayload =
   | { type: 'testSummary'; item: string }
   | { type: 'researchNotes'; item: string }
   | { type: 'empathyMaps'; items: AiEmpathyMapDraft[] }
+  | { type: 'sitemap'; items: AiSitemapNodeDraft[] }
+  | { type: 'sortCards'; items: string[] }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -100,6 +107,17 @@ export function isAiEmpathyMapDraft(value: unknown): value is AiEmpathyMapDraft 
   return typeof value.personaId === 'string' && isEmpathyQuadrants(value.quadrants)
 }
 
+function isAiSitemapNodeDraft(value: unknown): value is AiSitemapNodeDraft {
+  if (!isRecord(value)) return false
+  if (typeof value.title !== 'string') return false
+  if (value.children === undefined) return true
+  return Array.isArray(value.children) && value.children.every(isAiSitemapNodeDraft)
+}
+
+export function isAiSitemapNodeDraftArray(value: unknown): value is AiSitemapNodeDraft[] {
+  return Array.isArray(value) && value.every(isAiSitemapNodeDraft)
+}
+
 export interface AiStructuredJson {
   personas?: unknown
   hmwQuestions?: unknown
@@ -112,6 +130,8 @@ export interface AiStructuredJson {
   testSummary?: unknown
   researchNotes?: unknown
   empathyMaps?: unknown
+  sitemapNodes?: unknown
+  sortCards?: unknown
 }
 
 export function isAiStructuredJson(value: unknown): value is AiStructuredJson {

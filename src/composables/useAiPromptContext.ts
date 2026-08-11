@@ -82,6 +82,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
     'footer',
   ])
   const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
+  const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
 
   function buildContext(userHint?: string): AiPromptContext {
     const personasSummary = personas.value
@@ -194,6 +195,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
       heuristicAverage,
       heuristicWeakSummary,
       contrastSummary,
+      testSummary: testSummary.value.trim() || undefined,
       userHint,
     }
   }

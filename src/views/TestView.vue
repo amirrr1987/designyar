@@ -20,7 +20,10 @@ const activeKey = ref<TestTabKey>('contrast')
     <Card>
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
-      <AiAssistButton action="summarize-test" label="خلاصه یافته‌ها با AI" />
+      <Space wrap>
+        <AiAssistButton action="summarize-test" label="خلاصه یافته‌ها با AI" />
+        <AiAssistButton action="test-to-hmw" label="HMW از یافته‌های تست" />
+      </Space>
     </Card>
 
     <Card>

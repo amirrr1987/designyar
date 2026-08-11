@@ -164,6 +164,54 @@ function checksFor(action: AiActionId): CheckDef[] {
           test: (ctx) => hasText(ctx.problemSentence),
         },
       ]
+    case 'suggest-sitemap':
+      return [
+        {
+          id: 'ideas',
+          label: 'ایده‌ها',
+          essential: true,
+          test: (ctx) => hasText(ctx.ideasSummary),
+        },
+        {
+          id: 'userflow',
+          label: 'جریان کاربر',
+          essential: false,
+          test: (ctx) => hasText(ctx.userflowSummary),
+        },
+      ]
+    case 'suggest-card-sort':
+      return [
+        {
+          id: 'ideas',
+          label: 'ایده‌ها',
+          essential: true,
+          test: (ctx) => hasText(ctx.ideasSummary),
+        },
+        {
+          id: 'sitemap',
+          label: 'نقشه سایت',
+          essential: false,
+          test: (ctx) => hasText(ctx.sitemapSummary),
+        },
+      ]
+    case 'test-to-hmw':
+      return [
+        {
+          id: 'test-summary',
+          label: 'خلاصه تست',
+          essential: false,
+          test: (ctx) => hasText(ctx.testSummary),
+        },
+        {
+          id: 'wcag-or-heuristic',
+          label: 'WCAG یا هیوریستیک',
+          essential: true,
+          test: (ctx) =>
+            (ctx.wcagProgress !== undefined && ctx.wcagProgress > 0) ||
+            (ctx.heuristicAverage !== undefined && ctx.heuristicAverage > 0) ||
+            hasText(ctx.testSummary),
+        },
+      ]
     case 'summarize-test':
       return [
         {

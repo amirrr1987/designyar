@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import { computed, h } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { Steps } from 'ant-design-vue'
+import { Alert, Button, Space, Steps } from 'ant-design-vue'
 import type { StepProps } from 'ant-design-vue'
+import { RobotOutlined } from '@ant-design/icons-vue'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { resolveStepIcon } from '@/constants/step-icons'
+import { usePhaseCoach } from '@/composables/usePhaseCoach'
 import { useProjectStore } from '@/stores/project'
 
 const route = useRoute()
 const router = useRouter()
 const projectStore = useProjectStore()
+const { coach, runCoachAction } = usePhaseCoach()
 
 /** 0-based index for antdv Steps `current`. */
 const current = computed(() => {
@@ -37,5 +40,24 @@ function onChange(next: number): void {
 </script>
 
 <template>
-  <Steps type="navigation" size="small" :current="current" :items="items" @change="onChange" />
+  <Space direction="vertical" size="middle" style="width: 100%; margin-bottom: 16px">
+    <Steps type="navigation" size="small" :current="current" :items="items" @change="onChange" />
+
+    <Alert v-if="coach" type="info" show-icon>
+      <template #message>
+        <Space wrap>
+          <span>{{ coach.hint }}</span>
+          <Button
+            v-if="coach.actionId"
+            type="link"
+            size="small"
+            @click="runCoachAction"
+          >
+            <template #icon><RobotOutlined /></template>
+            {{ coach.actionLabel ?? 'باز کردن AI' }}
+          </Button>
+        </Space>
+      </template>
+    </Alert>
+  </Space>
 </template>

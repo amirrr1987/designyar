@@ -17,9 +17,12 @@ export type AiActionId =
   | 'microcopy'
   | 'brainstorm-ideas'
   | 'suggest-userflow'
+  | 'suggest-sitemap'
+  | 'suggest-card-sort'
   | 'review-design-system'
   | 'wireframe-critique'
   | 'summarize-test'
+  | 'test-to-hmw'
 
 export interface AiActionDef {
   id: AiActionId
@@ -133,6 +136,22 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     applyLabel: 'افزودن مراحل به جریان',
   },
   {
+    id: 'suggest-sitemap',
+    label: 'پیشنهاد نقشه سایت',
+    description: 'IA درختی از ایده‌ها و جریان کاربر',
+    phase: 'ideate',
+    structured: true,
+    applyLabel: 'اعمال نقشه سایت',
+  },
+  {
+    id: 'suggest-card-sort',
+    label: 'پیشنهاد کارت‌های مرتب‌سازی',
+    description: 'ویژگی‌ها و محتوا برای card sorting',
+    phase: 'ideate',
+    structured: true,
+    applyLabel: 'افزودن کارت‌ها',
+  },
+  {
     id: 'review-design-system',
     label: 'بازبینی Design System',
     description: 'رنگ، تایپ، فاصله و گرید — پیشنهاد بهبود',
@@ -153,6 +172,14 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     phase: 'test',
     structured: true,
     applyLabel: 'ذخیره در گزارش usability',
+  },
+  {
+    id: 'test-to-hmw',
+    label: 'HMW از یافته‌های تست',
+    description: 'تبدیل مشکلات تست به سوالات How Might We',
+    phase: 'test',
+    structured: true,
+    applyLabel: 'افزودن سوالات HMW',
   },
 ] as const
 
@@ -187,6 +214,7 @@ export interface AiPromptContext {
   heuristicAverage?: number
   heuristicWeakSummary?: string
   contrastSummary?: string
+  testSummary?: string
   userHint?: string
 }
 
@@ -235,6 +263,16 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
     '{"flowSteps":[{"kind":"start|action|decision|end","label":""}]}',
     '۶ تا ۱۰ مرحله منطقی؛ kind فقط یکی از start/action/decision/end؛ فقط JSON معتبر.',
   ].join('\n'),
+  'suggest-sitemap': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"sitemapNodes":[{"title":"صفحه","children":[{"title":"زیرصفحه"}]}]}',
+    '۴ تا ۱۲ گره در ساختار درختی؛ فقط title و children؛ فقط JSON معتبر.',
+  ].join('\n'),
+  'suggest-card-sort': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"sortCards":["عنوان کارت ۱","عنوان کارت ۲"]}',
+    '۸ تا ۱۵ کارت کوتاه و مشخص؛ فقط JSON معتبر.',
+  ].join('\n'),
   'refine-problem': [
     'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
     '{"problem":{"user":"","need":"","insight":""}}',
@@ -248,6 +286,11 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
   'summarize-test': [
     'ابتدا خلاصه فارسی بده. در انتها ```json:',
     '{"testSummary":"خلاصه یکپارچه برای گزارش"}',
+  ].join('\n'),
+  'test-to-hmw': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"hmwQuestions":["چگونه می‌توانیم …؟"]}',
+    '۴ تا ۶ سوال HMW بر اساس یافته‌های تست؛ فقط JSON معتبر.',
   ].join('\n'),
   'analyze-notes': undefined,
   'analyze-competitors': undefined,
@@ -275,12 +318,16 @@ export function buildSystemPrompt(action: AiActionId): string {
     microcopy: 'خروجی: CTA، پیام خطا، empty state، راهنمای کوتاه — هر کدام یک خط.',
     'brainstorm-ideas': 'ابتدا ۱ جمله جهت‌گیری. سپس JSON ایده‌ها.',
     'suggest-userflow': 'ابتدا ۱ جمله هدف جریان. سپس JSON مراحل.',
+    'suggest-sitemap': 'ابتدا ۱ جمله خلاصه IA. سپس JSON sitemapNodes.',
+    'suggest-card-sort': 'ابتدا ۱ جمله جهت‌گیری. سپس JSON sortCards.',
     'review-design-system':
       'خروجی: نقاط قوت، ۳–۵ پیشنهاد بهبود توکن (رنگ/تایپ/فاصله/گرید)، ریسک a11y.',
     'wireframe-critique':
       'خروجی: ارزیابی چیدمان، جاهای خالی/شلوغ، ۳ پیشنهاد بهبود ساختار صفحه.',
     'summarize-test':
       'خروجی: وضعیت کنتراست/WCAG/هیوریستیک، ۳ ریسک، ۳ اقدام بعدی؛ سپس JSON testSummary.',
+    'test-to-hmw':
+      'ابتدا ۲ جمله جمع‌بندی یافته‌ها. سپس JSON سوالات HMW برای بازگشت به Define.',
   }
 
   const jsonPart = JSON_FOOTER[action]
@@ -369,6 +416,19 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       if (ctx.userflowSummary?.trim()) parts.push(`جریان فعلی:\n${ctx.userflowSummary}`)
       parts.push('جریان کاربر پیشنهادی بده.')
       break
+    case 'suggest-sitemap':
+      if (ctx.ideasSummary?.trim()) parts.push(`ایده‌ها:\n${ctx.ideasSummary}`)
+      if (ctx.userflowSummary?.trim()) parts.push(`جریان کاربر:\n${ctx.userflowSummary}`)
+      if (ctx.sitemapSummary?.trim()) parts.push(`نقشه فعلی:\n${ctx.sitemapSummary}`)
+      if (ctx.problemSentence?.trim()) parts.push(`مسئله: ${ctx.problemSentence}`)
+      parts.push('ساختار IA / نقشه سایت پیشنهادی بده.')
+      break
+    case 'suggest-card-sort':
+      if (ctx.ideasSummary?.trim()) parts.push(`ایده‌ها:\n${ctx.ideasSummary}`)
+      if (ctx.sitemapSummary?.trim()) parts.push(`IA:\n${ctx.sitemapSummary}`)
+      if (ctx.cardSortSummary?.trim()) parts.push(`کارت‌های فعلی:\n${ctx.cardSortSummary}`)
+      parts.push('کارت‌های محتوا/ویژگی برای card sorting پیشنهاد بده.')
+      break
     case 'review-design-system':
       if (ctx.designSystemSummary?.trim()) parts.push(`Design System:\n${ctx.designSystemSummary}`)
       if (ctx.contrastSummary?.trim()) parts.push(`کنتراست: ${ctx.contrastSummary}`)
@@ -390,6 +450,15 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       if (ctx.heuristicWeakSummary?.trim())
         parts.push(`ضعیف‌ترین هیوریستیک‌ها:\n${ctx.heuristicWeakSummary}`)
       parts.push('یافته‌های تست را خلاصه کن.')
+      break
+    case 'test-to-hmw':
+      if (ctx.testSummary?.trim()) parts.push(`خلاصه تست:\n${ctx.testSummary}`)
+      if (ctx.contrastSummary?.trim()) parts.push(`کنتراست: ${ctx.contrastSummary}`)
+      if (ctx.wcagProgress !== undefined) parts.push(`پیشرفت WCAG: ${ctx.wcagProgress}%`)
+      if (ctx.heuristicWeakSummary?.trim())
+        parts.push(`هیوریستیک ضعیف:\n${ctx.heuristicWeakSummary}`)
+      if (ctx.povSentence?.trim()) parts.push(`POV: ${ctx.povSentence}`)
+      parts.push('از یافته‌های تست سوالات HMW برای دور بعد Design Thinking بساز.')
       break
     default: {
       const _exhaustive: never = action
@@ -444,6 +513,16 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         hints.push('ایده یا بیان مسئله را برای جریان کاربر پر کنید.')
       }
       break
+    case 'suggest-sitemap':
+      if (!ctx.ideasSummary?.trim() && !ctx.userflowSummary?.trim()) {
+        hints.push('ایده یا جریان کاربر را برای IA پر کنید.')
+      }
+      break
+    case 'suggest-card-sort':
+      if (!ctx.ideasSummary?.trim() && !ctx.sitemapSummary?.trim()) {
+        hints.push('ایده یا نقشه سایت را برای card sort پر کنید.')
+      }
+      break
     case 'review-design-system':
       if (!ctx.designSystemSummary?.trim()) {
         hints.push('توکن‌های Prototype را تنظیم کنید.')
@@ -461,6 +540,11 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         !ctx.contrastSummary?.trim()
       ) {
         hints.push('حداقل یکی از ابزار Test را پر کنید.')
+      }
+      break
+    case 'test-to-hmw':
+      if (!ctx.testSummary?.trim() && ctx.wcagProgress === 0 && !ctx.heuristicWeakSummary?.trim()) {
+        hints.push('خلاصه تست یا داده WCAG/هیوریستیک را پر کنید.')
       }
       break
     case 'microcopy':

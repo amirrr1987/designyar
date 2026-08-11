@@ -5,7 +5,16 @@ import { useIdeateStore } from '@/stores/ideate'
 import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
-import type { AiApplyPayload } from '@/types/ai-response'
+import type { AiApplyPayload, AiSitemapNodeDraft } from '@/types/ai-response'
+import type { SitemapNode } from '@/types/ideate'
+
+function draftToSitemapNode(draft: AiSitemapNodeDraft): SitemapNode {
+  return {
+    key: crypto.randomUUID(),
+    title: draft.title.trim(),
+    children: draft.children?.length ? draft.children.map(draftToSitemapNode) : [],
+  }
+}
 
 const PERSONA_AVATAR_COLORS = ['#1677ff', '#eb2f96', '#52c41a', '#faad14', '#722ed1', '#13c2c2'] as const
 
@@ -143,6 +152,21 @@ export function useAiApply() {
           empathySelectedPersona.value = first.personaId
         }
         return applied
+      }
+      case 'sitemap': {
+        const nodes = payload.items.map(draftToSitemapNode)
+        ideateStore.setSitemap(nodes)
+        return nodes.length
+      }
+      case 'sortCards': {
+        let added = 0
+        for (const label of payload.items) {
+          const trimmed = label.trim()
+          if (!trimmed) continue
+          ideateStore.addSortCard(trimmed)
+          added += 1
+        }
+        return added
       }
       default: {
         const _exhaustive: never = payload
