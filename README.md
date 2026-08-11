@@ -1,48 +1,43 @@
-# UI-UX-AI
+# دیزاین‌یار (UX Flow)
 
-This template should help get you started developing with Vue 3 in Vite.
+اپلیکیشن کلاینت‌ساید برای کمک به فرآیند Design Thinking — Vue 3، Pinia، Ant Design Vue (RTL فارسی)، VueUse و WebLLM.
 
-## Recommended IDE Setup
-
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Recommended Browser Setup
-
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+## راه‌اندازی
 
 ```sh
 pnpm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 pnpm dev
 ```
 
-### Type-Check, Compile and Minify for Production
+## کیفیت
 
 ```sh
+pnpm run type-check
+pnpm run lint
+pnpm run format
 pnpm build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+`pnpm build` خروجی استاتیک را در `dist/` می‌سازد (همراه type-check).
 
-```sh
-pnpm lint
-```
+## استقرار استاتیک (SPA)
+
+اپ فقط فرانت است؛ backend ندارد. برای مسیرهای Vue Router باید همه درخواست‌ها به `index.html` برگردند.
+
+### Vercel
+
+فایل `vercel.json` در ریشه پروژه rewrite به `index.html` دارد. کافی است ریپو را به Vercel وصل کنید.
+
+### Netlify
+
+فایل `public/_redirects` با قانون SPA در بیلد به `dist/` کپی می‌شود.
+
+### GitHub Pages
+
+1. اگر سایت روی ساب‌مسیر است (مثلاً `username.github.io/designyar/`) در `vite.config.ts` مقدار `base: '/designyar/'` را تنظیم کنید.
+2. بعد از `pnpm build`، محتویات `dist/` را به branch `gh-pages` بفرستید (یا از Action استفاده کنید).
+3. برای fallback، یک `404.html` کپی از `index.html` در `dist/` رایج است، یا از Actionهای SPA استفاده کنید.
+
+## یادداشت WebLLM
+
+مدل‌ها داخل مرورگر دانلود/اجرا می‌شوند؛ برای دمو روی شبکهٔ کند اولین بارگذاری زمان‌بر است. HTTPS برای WebGPU/WASM در پروداکشن توصیه می‌شود.

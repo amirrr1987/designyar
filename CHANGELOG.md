@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-08-11
+
+### Added
+
+- پیکربندی SPA fallback برای Netlify (`public/_redirects`) و Vercel (`vercel.json`)
+- راهنمای استقرار استاتیک در `README.md`
+
 ## [0.9.0] - 2026-08-11
 
 ### Added

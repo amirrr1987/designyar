@@ -565,17 +565,17 @@ Each as typed action enum + prompt builder function (no `any`).
 
 ## Success criteria (ship checklist)
 
-- [ ] Runs entirely in the browser (no server)
-- [ ] ONLY Ant Design Vue for UI (no custom CSS)
-- [ ] Named imports + PascalCase components
-- [ ] RTL Persian interface
-- [ ] All data in LocalStorage via `useStorage`
-- [ ] 5 Design Thinking stages + navigation
-- [ ] WebLLM AI panel
-- [ ] JSON export/import
-- [ ] Responsive `Row`/`Col`
-- [ ] Full-safe TS (`vue-tsc --build` clean)
-- [ ] Static-deployable `dist/`
+- [x] Runs entirely in the browser (no server)
+- [x] ONLY Ant Design Vue for UI (no custom CSS)
+- [x] Named imports + PascalCase components
+- [x] RTL Persian interface
+- [x] All data in LocalStorage via `useStorage`
+- [x] 5 Design Thinking stages + navigation
+- [x] WebLLM AI panel
+- [x] JSON export/import
+- [x] Responsive `Row`/`Col`
+- [x] Full-safe TS (`vue-tsc --build` clean)
+- [x] Static-deployable `dist/`
 
 ---
 
@@ -603,4 +603,4 @@ Skills: ux-flow-compose + ux-flow + ant-design-vue + full-safe-type-ts rule.
 | 6 Test | ☑ | 0.7.0 |
 | 7 WebLLM | ☑ | 0.8.0 |
 | 8 Export | ☑ | 0.9.0 |
-| 9 Release | ☐ | |
+| 9 Release | ☑ | 0.9.1 — `pnpm build` OK |
