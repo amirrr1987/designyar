@@ -8,18 +8,16 @@ import HeuristicEval from '@/components/test/HeuristicEval.vue'
 import UsabilityReport from '@/components/test/UsabilityReport.vue'
 import WCAGChecklist from '@/components/test/WCAGChecklist.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import PhaseAiActions from '@/components/shared/PhaseAiActions.vue'
-import PhaseFlowNav from '@/components/shared/PhaseFlowNav.vue'
-import PhaseHero from '@/components/shared/PhaseHero.vue'
-import PhaseJuniorGuide from '@/components/shared/PhaseJuniorGuide.vue'
-import { getStepByKey } from '@/constants/design-thinking-steps'
+import PhaseShell from '@/components/shell/PhaseShell.vue'
+import { useCompletion } from '@/composables/useCompletion'
 import { JUNIOR_DEFAULT_TAB, JUNIOR_ESSENTIAL_TABS } from '@/constants/junior-guide'
+import { fa } from '@/content/fa'
 import { useProjectStore } from '@/stores/project'
 
 type TestTabKey = 'contrast' | 'wcag' | 'heuristics' | 'report'
 
-const step = getStepByKey('test')
 const projectStore = useProjectStore()
+const { phaseProgress } = useCompletion()
 const showAdvanced = ref(false)
 const activeKey = ref<TestTabKey>(JUNIOR_DEFAULT_TAB.test)
 
@@ -31,11 +29,18 @@ function showTab(key: TestTabKey): boolean {
   return (essentials as readonly string[]).includes(key)
 }
 
+function tabFromJob(): TestTabKey {
+  const job = phaseProgress('test').nextJob
+  if (job?.id === 'test.wcag') return 'wcag'
+  if (job?.id === 'test.report') return 'report'
+  return 'contrast'
+}
+
 watch(
   isJunior,
   (junior) => {
     if (junior) {
-      activeKey.value = JUNIOR_DEFAULT_TAB.test
+      activeKey.value = tabFromJob()
       showAdvanced.value = false
     }
   },
@@ -46,36 +51,14 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 </script>
 
 <template>
-  <Space direction="vertical" size="large" style="width: 100%">
-    <PhaseHero
-      :title="step.title"
-      :description="
-        isJunior
-          ? 'خوانایی رنگ و دسترسی را چک کنید؛ بعد گزارش کوتاه بنویسید.'
-          : step.description
-      "
-      :color="step.color"
-      :icon="step.icon"
-      badge="مرحله ۵ از ۵"
-    >
-      <template #actions>
-        <PhaseAiActions>
-          <template #primary>
-            <AiAssistButton action="summarize-test" label="خلاصه یافته‌ها با AI" section="Test" />
-          </template>
-          <template #more>
-            <AiAssistButton
-              action="test-to-hmw"
-              label="سوالات جدید از یافته‌های تست"
-              section="Test"
-            />
-            <AiAssistButton action="test-to-ideas" label="ایده اصلاح از تست" section="Test" />
-          </template>
-        </PhaseAiActions>
-      </template>
-    </PhaseHero>
-
-    <PhaseJuniorGuide phase="test" />
+  <PhaseShell phase="test">
+    <template #ai>
+      <AiAssistButton action="summarize-test" label="خلاصه یافته‌ها با AI" section="تست" />
+    </template>
+    <template #ai-more>
+      <AiAssistButton action="test-to-hmw" label="سوالات جدید از یافته‌های تست" section="تست" />
+      <AiAssistButton action="test-to-ideas" label="ایده اصلاح از تست" section="تست" />
+    </template>
 
     <Card>
       <Tabs v-model:activeKey="activeKey" type="card">
@@ -95,7 +78,7 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
         <Tabs.TabPane
           v-if="showTab('heuristics')"
           key="heuristics"
-          :tab="isJunior ? 'قوانین کاربردپذیری' : 'هیوریستیک'"
+          :tab="`${fa.optionalLabel}: قوانین کاربردپذیری`"
         >
           <HeuristicEval />
         </Tabs.TabPane>
@@ -104,11 +87,9 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
       <Space v-if="isJunior && !showAdvanced" style="width: 100%; margin-top: 16px">
         <Button v-bind="advancedBtn" @click="showAdvanced = true">
           <template #icon><AppstoreOutlined /></template>
-          ابزارهای بیشتر (قوانین کاربردپذیری / هیوریستیک)
+          {{ fa.moreTools }} (قوانین کاربردپذیری)
         </Button>
       </Space>
     </Card>
-
-    <PhaseFlowNav current-key="test" />
-  </Space>
+  </PhaseShell>
 </template>

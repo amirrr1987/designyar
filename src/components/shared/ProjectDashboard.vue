@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, h } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, h, ref } from 'vue'
 import {
   Alert,
   Button,
   Card,
   Col,
+  Collapse,
+  CollapsePanel,
   Form,
   FormItem,
   Input,
@@ -22,38 +23,33 @@ import { storeToRefs } from 'pinia'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 import { resolveStepIcon } from '@/constants/step-icons'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import { useWCAG } from '@/composables/useWCAG'
+import { useCompletion } from '@/composables/useCompletion'
+import { useSoftGate } from '@/composables/useSoftGate'
 import { useDefineStore } from '@/stores/define'
-import { useDesignSystemStore } from '@/stores/designSystem'
 import { useEmpathizeStore } from '@/stores/empathize'
 import { useIdeateStore } from '@/stores/ideate'
 import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
-import { usePrototypeStore } from '@/stores/prototype'
-import { useTestStore } from '@/stores/test'
+import { fa } from '@/content/fa'
 import type { DesignStepKey } from '@/types/project'
+import { isDesignStepKey } from '@/types/project'
 
 const { Paragraph, Text, Title } = Typography
-const router = useRouter()
 const projectStore = useProjectStore()
 const personaStore = usePersonaStore()
 const defineStore = useDefineStore()
 const ideateStore = useIdeateStore()
-const designStore = useDesignSystemStore()
 const empathizeStore = useEmpathizeStore()
-const prototypeStore = usePrototypeStore()
-const testStore = useTestStore()
-const { progress: wcagProgress } = useWCAG()
+const { projectProgress, nextJob, jobCopy, phaseProgress } = useCompletion()
+const { requestNavigate } = useSoftGate()
 
 const { personas } = storeToRefs(personaStore)
-const { problem, pov, hmw } = storeToRefs(defineStore)
-const { ideas, flowNodes, sitemap } = storeToRefs(ideateStore)
-const { palette } = storeToRefs(designStore)
-const { researchNotes, competitors, empathyMaps } = storeToRefs(empathizeStore)
-const { wireframeBlocks } = storeToRefs(prototypeStore)
-const { usabilityReportSummary: testSummary } = storeToRefs(testStore)
+const { hmw } = storeToRefs(defineStore)
+const { ideas } = storeToRefs(ideateStore)
+const { competitors } = storeToRefs(empathizeStore)
 
 const isJunior = computed(() => projectStore.isJuniorMode)
+const overviewOpen = ref<string[]>([])
 
 const projectName = computed({
   get: () => projectStore.project.name,
@@ -80,120 +76,34 @@ const hasProjectBrief = computed(
   () => briefTitle.value.trim().length > 0 || briefDescription.value.trim().length > 0,
 )
 
-interface StepStat {
-  key: DesignStepKey
-  title: string
-  percent: number
-  detail: string
-}
+const overallPercent = computed(() => projectProgress.value.overallPercent)
 
-const stepStats = computed((): StepStat[] => {
-  const empathizeChecks = [
-    hasProjectBrief.value,
-    personas.value.length > 0,
-    researchNotes.value.trim().length > 0,
-    competitors.value.length > 0,
-    Object.keys(empathyMaps.value).length > 0,
-  ]
-  const empathizeDone = empathizeChecks.filter(Boolean).length
-
-  const defineChecks = [
-    problem.value.user.trim().length > 0 && problem.value.need.trim().length > 0,
-    pov.value.user.trim().length > 0 && pov.value.need.trim().length > 0,
-    hmw.value.length > 0,
-  ]
-  const defineDone = defineChecks.filter(Boolean).length
-
-  const ideateChecks = [
-    ideas.value.length > 0,
-    flowNodes.value.length > 0,
-    sitemap.value.length > 0,
-  ]
-  const ideateDone = ideateChecks.filter(Boolean).length
-
-  const prototypeChecks = [
-    palette.value.primary.length > 0,
-    palette.value.accent.length > 0,
-    wireframeBlocks.value.length > 0,
-  ]
-  const prototypeDone = prototypeChecks.filter(Boolean).length
-
-  const testChecks = [wcagProgress.value >= 30, testSummary.value.trim().length > 0]
-  const testDone = testChecks.filter(Boolean).length
-  const testPercent = Math.round((testDone / testChecks.length) * 50 + wcagProgress.value * 0.5)
-
-  return [
-    {
-      key: 'empathize',
-      title: 'همدلی',
-      percent: Math.round((empathizeDone / empathizeChecks.length) * 100),
-      detail: `${empathizeDone}/${empathizeChecks.length} بخش`,
-    },
-    {
-      key: 'define',
-      title: 'تعریف مسئله',
-      percent: Math.round((defineDone / defineChecks.length) * 100),
-      detail: `${defineDone}/${defineChecks.length} بخش`,
-    },
-    {
-      key: 'ideate',
-      title: 'ایده‌پردازی',
-      percent: Math.round((ideateDone / ideateChecks.length) * 100),
-      detail: `${ideateDone}/${ideateChecks.length} ابزار`,
-    },
-    {
-      key: 'prototype',
-      title: 'پروتوتایپ',
-      percent: Math.round((prototypeDone / prototypeChecks.length) * 100),
-      detail: `${prototypeDone}/${prototypeChecks.length} بخش`,
-    },
-    {
-      key: 'test',
-      title: 'تست',
-      percent: Math.min(100, testPercent),
-      detail: `دسترسی ${wcagProgress.value}%`,
-    },
-  ]
-})
-
-const overallPercent = computed(() => {
-  if (stepStats.value.length === 0) return 0
-  const sum = stepStats.value.reduce((acc, s) => acc + s.percent, 0)
-  return Math.round(sum / stepStats.value.length)
-})
-
-/** First incomplete step — primary CTA for flow. */
-const nextStep = computed(() => {
-  for (const step of DESIGN_THINKING_STEPS) {
-    const stat = stepStats.value.find((s) => s.key === step.key)
-    if (!stat || stat.percent < 100) return step
-  }
-  return undefined
-})
+const nextJobCopy = computed(() => jobCopy(nextJob.value.id))
 
 const ctaBtn: ButtonProps = { type: 'primary', size: 'large' }
-const stepBtn: ButtonProps = { type: 'primary', block: true }
-
-function goToStep(route: (typeof DESIGN_THINKING_STEPS)[number]['route'], step: number): void {
-  projectStore.setStep(step)
-  void router.push(route)
-}
+const stepBtn: ButtonProps = { type: 'default', block: true }
 
 function goNextRecommended(): void {
-  const step = nextStep.value
-  if (!step) {
-    void router.push({ name: 'synthesis' })
+  const job = nextJob.value
+  if (job.phase === 'home') {
+    // Stay on brief — scroll focus is form above
     return
   }
-  goToStep(step.route, step.step)
+  if (job.phase === 'synthesis') {
+    requestNavigate('synthesis')
+    return
+  }
+  if (isDesignStepKey(job.phase)) {
+    requestNavigate(job.phase)
+  }
 }
 
 function goSynthesis(): void {
-  void router.push({ name: 'synthesis' })
+  requestNavigate('synthesis')
 }
 
-function statFor(key: DesignStepKey): StepStat | undefined {
-  return stepStats.value.find((s) => s.key === key)
+function goPhase(key: DesignStepKey): void {
+  requestNavigate(key)
 }
 
 function statusColor(percent: number): string {
@@ -201,6 +111,8 @@ function statusColor(percent: number): string {
   if (percent >= 40) return 'processing'
   return 'default'
 }
+
+const needsBriefFirst = computed(() => nextJob.value.id === 'home.brief')
 </script>
 
 <template>
@@ -208,29 +120,31 @@ function statusColor(percent: number): string {
     <Card>
       <Space direction="vertical" size="middle">
         <Space wrap align="center">
-          <Tag color="geekblue">{{ isJunior ? 'شروع آسان' : 'شروع پروژه' }}</Tag>
-          <Title :level="3" style="margin: 0">خوش آمدید به دیزاین‌یار</Title>
+          <Tag color="geekblue">{{ isJunior ? fa.modes.junior : fa.modes.full }}</Tag>
+          <Title :level="3" style="margin: 0">خوش آمدید به {{ fa.brand }}</Title>
         </Space>
         <Paragraph type="secondary" style="margin-bottom: 0">
-          <template v-if="isJunior">
-            فقط سه کار: شرح پروژه را بنویس → دکمهٔ «ادامه» را بزن → در هر مرحله راهنمای سبز را
-            دنبال کن. ابزارهای پیشرفته را بعداً روشن می‌کنی.
-          </template>
-          <template v-else>
-            مسیر پنج‌مرحله‌ای Design Thinking را با AI طی کنید — از همدلی تا تست و جمع‌بندی.
-          </template>
+          {{ fa.tagline }}
         </Paragraph>
+
         <Alert
-          v-if="nextStep"
+          v-if="needsBriefFirst"
           type="info"
           show-icon
-          :message="`گام پیشنهادی: ${nextStep.title}`"
-          :description="nextStep.description"
+          :message="nextJobCopy?.title ?? 'شرح پروژه را بنویس'"
+          :description="nextJobCopy?.why"
+        />
+        <Alert
+          v-else-if="nextJob.phase !== 'synthesis'"
+          type="info"
+          show-icon
+          :message="`کار بعدی: ${nextJobCopy?.title ?? ''}`"
+          :description="nextJobCopy?.why"
         >
           <template #action>
             <Button v-bind="ctaBtn" @click="goNextRecommended">
               <template #icon><RocketOutlined /></template>
-              ادامه {{ nextStep.title }}
+              {{ fa.primaryCtaHome }}
             </Button>
           </template>
         </Alert>
@@ -238,7 +152,7 @@ function statusColor(percent: number): string {
           v-else
           type="success"
           show-icon
-          message="همه مراحل تکمیل شده‌اند"
+          message="مسیر اصلی تکمیل شده"
           description="می‌توانید جمع‌بندی نهایی پروژه را ببینید."
         >
           <template #action>
@@ -267,7 +181,7 @@ function statusColor(percent: number): string {
           <Input.TextArea
             v-model:value="briefDescription"
             :rows="5"
-            placeholder="محصول چیست؟ برای چه کسی؟ چه مشکلی حل می‌کند؟ محدودیت‌ها و اهداف کلیدی…"
+            placeholder="محصول چیست؟ برای چه کسی؟ چه مشکلی حل می‌کند؟"
             allow-clear
           />
         </FormItem>
@@ -278,6 +192,14 @@ function statusColor(percent: number): string {
               label="بهبود شرح با AI"
               section="شرح پروژه"
             />
+            <Button
+              v-if="hasProjectBrief && !needsBriefFirst"
+              v-bind="ctaBtn"
+              @click="goNextRecommended"
+            >
+              <template #icon><RocketOutlined /></template>
+              {{ fa.primaryCtaHome }}
+            </Button>
           </Space>
         </FormItem>
       </Form>
@@ -288,18 +210,14 @@ function statusColor(percent: number): string {
         message="شرح پروژه را بنویسید"
         description="AI و فرم‌های همه مراحل از این context استفاده می‌کنند."
       />
-      <Alert
-        v-else-if="!projectName.trim()"
-        type="warning"
-        show-icon
-        message="نام پروژه را وارد کنید"
-        description="در خروجی JSON و گزارش‌ها استفاده می‌شود."
-      />
     </Card>
 
     <Card title="پیشرفت کلی">
       <Space direction="vertical" size="large" style="width: 100%">
-        <Progress :percent="overallPercent" status="active" />
+        <Progress
+          :percent="overallPercent"
+          :status="overallPercent >= 100 ? 'success' : 'active'"
+        />
         <Row :gutter="[16, 16]">
           <Col :xs="12" :sm="8" :md="6">
             <Statistic title="پرسوناها" :value="personas.length" />
@@ -317,53 +235,45 @@ function statusColor(percent: number): string {
       </Space>
     </Card>
 
-    <Card :title="isJunior ? '۵ گام مسیر شما' : 'مراحل دیزاین تینکینگ'">
-      <Alert
-        v-if="isJunior"
-        type="info"
-        show-icon
-        style="margin-bottom: 16px"
-        message="پیشنهاد: به‌ترتیب برو — اول همدلی، بعد تعریف مسئله"
-        description="می‌توانی آزادانه جابه‌جا شوی، ولی برای یادگیری بهتر است یک‌به‌یک جلو بروی."
-      />
-      <Row :gutter="[16, 16]">
-        <Col
-          v-for="step in DESIGN_THINKING_STEPS"
-          :key="step.key"
-          :xs="24"
-          :sm="12"
-          :md="8"
-          :lg="8"
-        >
-          <Card size="small" hoverable>
-            <template #title>
-              <Space>
-                <Tag :color="step.color" :icon="h(resolveStepIcon(step.icon))">
-                  {{ step.step }}
+    <Collapse v-model:activeKey="overviewOpen">
+      <CollapsePanel key="steps" :header="isJunior ? 'نمای کلی ۵ گام (اختیاری)' : 'مراحل مسیر'">
+        <Row :gutter="[16, 16]">
+          <Col
+            v-for="step in DESIGN_THINKING_STEPS"
+            :key="step.key"
+            :xs="24"
+            :sm="12"
+            :md="8"
+          >
+            <Card size="small">
+              <template #title>
+                <Space>
+                  <Tag :color="step.color" :icon="h(resolveStepIcon(step.icon))">
+                    {{ step.step }}
+                  </Tag>
+                  <Text strong>{{ fa.phaseTitle(step.key, projectStore.experienceMode) }}</Text>
+                </Space>
+              </template>
+              <Space direction="vertical" style="width: 100%">
+                <Paragraph type="secondary">
+                  {{ fa.phaseDescription(step.key, projectStore.experienceMode) }}
+                </Paragraph>
+                <Progress
+                  :percent="phaseProgress(step.key).percent"
+                  size="small"
+                  status="active"
+                />
+                <Tag :color="statusColor(phaseProgress(step.key).percent)">
+                  {{ phaseProgress(step.key).percent }}٪
                 </Tag>
-                <Text strong>{{ step.title }}</Text>
+                <Button v-bind="stepBtn" @click="goPhase(step.key)">
+                  ورود
+                </Button>
               </Space>
-            </template>
-            <Space direction="vertical" style="width: 100%">
-              <Paragraph type="secondary">{{ step.description }}</Paragraph>
-              <Progress
-                :percent="statFor(step.key)?.percent ?? 0"
-                size="small"
-                status="active"
-              />
-              <Tag :color="statusColor(statFor(step.key)?.percent ?? 0)">
-                {{ statFor(step.key)?.detail ?? '—' }}
-              </Tag>
-              <Button v-bind="stepBtn" @click="goToStep(step.route, step.step)">
-                <template #icon>
-                  <component :is="resolveStepIcon(step.icon)" />
-                </template>
-                ورود به {{ step.title }}
-              </Button>
-            </Space>
-          </Card>
-        </Col>
-      </Row>
-    </Card>
+            </Card>
+          </Col>
+        </Row>
+      </CollapsePanel>
+    </Collapse>
   </Space>
 </template>

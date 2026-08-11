@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.22.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R1 — One Job shell:** `PhaseShell`, `PrimaryTaskCard`, `SoftGateModal`
+- Soft gate in junior mode (Sider + Prev/Next) with Skip / go recommended
+- Home: single completion-driven CTA; step overview collapsed
+- Default tabs align with completion `nextJob`
+
+### Changed
+
+- Removed top `StepProgress` dual-nav; Sider is the only primary spine
+- Phase views wrap tools in `PhaseShell` (badge + primary task + collapsed AI + footer)
+- Dashboard progress uses `domain/completion` (no divergent stats)
+
 ## [0.21.0] - 2026-08-11
 
 ### Added

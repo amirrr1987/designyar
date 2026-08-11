@@ -10,20 +10,18 @@ import PersonaCard from '@/components/empathize/PersonaCard.vue'
 import ResearchNotes from '@/components/empathize/ResearchNotes.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import AiChainButton from '@/components/shared/AiChainButton.vue'
-import PhaseAiActions from '@/components/shared/PhaseAiActions.vue'
-import PhaseFlowNav from '@/components/shared/PhaseFlowNav.vue'
-import PhaseHero from '@/components/shared/PhaseHero.vue'
-import PhaseJuniorGuide from '@/components/shared/PhaseJuniorGuide.vue'
+import PhaseShell from '@/components/shell/PhaseShell.vue'
 import { usePersona } from '@/composables/usePersona'
-import { getStepByKey } from '@/constants/design-thinking-steps'
+import { useCompletion } from '@/composables/useCompletion'
 import { JUNIOR_DEFAULT_TAB, JUNIOR_ESSENTIAL_TABS } from '@/constants/junior-guide'
+import { fa } from '@/content/fa'
 import { useProjectStore } from '@/stores/project'
 
 type EmpathizeTabKey = 'personas' | 'empathy' | 'notes' | 'competitors'
 
-const step = getStepByKey('empathize')
 const projectStore = useProjectStore()
 const { personas, removePersona } = usePersona()
+const { phaseProgress } = useCompletion()
 const showAdvanced = ref(false)
 const activeKey = ref<EmpathizeTabKey>(JUNIOR_DEFAULT_TAB.empathize)
 
@@ -39,11 +37,17 @@ function showTab(key: EmpathizeTabKey): boolean {
   return isEssential(key)
 }
 
+function tabFromJob(): EmpathizeTabKey {
+  const job = phaseProgress('empathize').nextJob
+  if (job?.id === 'empathize.persona') return 'personas'
+  return 'notes'
+}
+
 watch(
   isJunior,
   (junior) => {
     if (junior) {
-      activeKey.value = JUNIOR_DEFAULT_TAB.empathize
+      activeKey.value = tabFromJob()
       showAdvanced.value = false
     }
   },
@@ -52,7 +56,7 @@ watch(
 
 watch(showAdvanced, (advanced) => {
   if (!advanced && !showTab(activeKey.value)) {
-    activeKey.value = JUNIOR_DEFAULT_TAB.empathize
+    activeKey.value = tabFromJob()
   }
 })
 
@@ -60,38 +64,16 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
 </script>
 
 <template>
-  <Space direction="vertical" size="large" style="width: 100%">
-    <PhaseHero
-      :title="step.title"
-      :description="
-        isJunior
-          ? 'کاربر را بشناس — یادداشت بنویس، بعد پرسونا بساز.'
-          : step.description
-      "
-      :color="step.color"
-      :icon="step.icon"
-      badge="مرحله ۱ از ۵"
-    >
-      <template #actions>
-        <PhaseAiActions>
-          <template #primary>
-            <AiChainButton chain="empathize-starter" label="شروع با AI (یادداشت→پرسونا)" />
-          </template>
-          <template #more>
-            <AiAssistButton
-              action="seed-research-notes"
-              label="پیشنهاد یادداشت"
-              section="Empathize"
-            />
-            <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا" section="Empathize" />
-            <AiAssistButton action="analyze-notes" label="تحلیل یادداشت" section="Empathize" />
-            <AiAssistButton action="analyze-competitors" label="تحلیل رقبا" section="Empathize" />
-          </template>
-        </PhaseAiActions>
-      </template>
-    </PhaseHero>
-
-    <PhaseJuniorGuide phase="empathize" />
+  <PhaseShell phase="empathize">
+    <template #ai>
+      <AiChainButton chain="empathize-starter" label="شروع با AI (یادداشت→پرسونا)" />
+    </template>
+    <template #ai-more>
+      <AiAssistButton action="seed-research-notes" label="پیشنهاد یادداشت" section="همدلی" />
+      <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا" section="همدلی" />
+      <AiAssistButton action="analyze-notes" label="تحلیل یادداشت" section="همدلی" />
+      <AiAssistButton action="analyze-competitors" label="تحلیل رقبا" section="همدلی" />
+    </template>
 
     <Card>
       <Tabs v-model:activeKey="activeKey" type="card">
@@ -115,11 +97,15 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
           </Space>
         </Tabs.TabPane>
 
-        <Tabs.TabPane v-if="showTab('empathy')" key="empathy" tab="نقشه همدلی">
+        <Tabs.TabPane v-if="showTab('empathy')" key="empathy" :tab="`${fa.optionalLabel}: نقشه همدلی`">
           <EmpathyMap />
         </Tabs.TabPane>
 
-        <Tabs.TabPane v-if="showTab('competitors')" key="competitors" tab="رقبا">
+        <Tabs.TabPane
+          v-if="showTab('competitors')"
+          key="competitors"
+          :tab="`${fa.optionalLabel}: رقبا`"
+        >
           <CompetitorTable />
         </Tabs.TabPane>
       </Tabs>
@@ -127,11 +113,9 @@ const advancedBtn: ButtonProps = { type: 'dashed', block: true }
       <Space v-if="isJunior && !showAdvanced" style="width: 100%; margin-top: 16px">
         <Button v-bind="advancedBtn" @click="showAdvanced = true">
           <template #icon><AppstoreOutlined /></template>
-          ابزارهای بیشتر (نقشه همدلی، رقبا)
+          {{ fa.moreTools }} (نقشه همدلی، رقبا)
         </Button>
       </Space>
     </Card>
-
-    <PhaseFlowNav current-key="empathize" />
-  </Space>
+  </PhaseShell>
 </template>
