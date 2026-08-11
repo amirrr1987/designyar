@@ -23,8 +23,7 @@ export function calculateGrid(input: GridCalcInput): GridCalcResult {
   const bounded = Math.min(containerWidth, maxWidth || containerWidth)
   const contentWidth = Math.max(0, bounded - margin * 2)
   const totalGutters = gutter * Math.max(0, columns - 1)
-  const columnWidth =
-    columns > 0 ? Math.max(0, (contentWidth - totalGutters) / columns) : 0
+  const columnWidth = columns > 0 ? Math.max(0, (contentWidth - totalGutters) / columns) : 0
 
   return {
     contentWidth: round2(contentWidth),
@@ -37,11 +36,7 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100
 }
 
-export function spanWidth(
-  columnWidth: number,
-  gutter: number,
-  span: number,
-): number {
+export function spanWidth(columnWidth: number, gutter: number, span: number): number {
   const s = Math.max(1, Math.floor(span))
   return round2(columnWidth * s + gutter * (s - 1))
 }

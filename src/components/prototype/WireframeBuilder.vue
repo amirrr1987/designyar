@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  Card,
-  Checkbox,
-  Col,
-  Row,
-  Space,
-  Typography,
-} from 'ant-design-vue'
+import { Card, Checkbox, Col, Row, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
 
 const { Text, Paragraph } = Typography
@@ -55,10 +48,7 @@ function onToggle(id: string, checked: boolean | string | number): void {
     <Row :gutter="[16, 16]">
       <Col v-for="block in BLOCKS" :key="block.id" :xs="24" :sm="12" :md="8">
         <Card size="small" :title="block.label">
-          <Checkbox
-            :checked="isSelected(block.id)"
-            @update:checked="(v) => onToggle(block.id, v)"
-          >
+          <Checkbox :checked="isSelected(block.id)" @update:checked="(v) => onToggle(block.id, v)">
             {{ block.description }}
           </Checkbox>
         </Card>

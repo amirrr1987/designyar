@@ -11,14 +11,15 @@ export function useGrid(containerWidth?: number) {
 
   const width = computed(() => containerWidth ?? grid.value.maxWidth ?? DEFAULT_CONTAINER)
 
-  const result = computed((): GridCalcResult =>
-    calculateGrid({
-      columns: grid.value.columns,
-      gutter: grid.value.gutter,
-      margin: grid.value.margin,
-      maxWidth: grid.value.maxWidth,
-      containerWidth: width.value,
-    }),
+  const result = computed(
+    (): GridCalcResult =>
+      calculateGrid({
+        columns: grid.value.columns,
+        gutter: grid.value.gutter,
+        margin: grid.value.margin,
+        maxWidth: grid.value.maxWidth,
+        containerWidth: width.value,
+      }),
   )
 
   function widthForSpan(span: number): number {

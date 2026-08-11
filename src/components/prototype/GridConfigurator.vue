@@ -81,9 +81,7 @@ function onNumber(
           </Card>
         </Col>
       </Row>
-      <Text type="secondary">
-        پیش‌نمایش تقریبی با سیستم ۲۴ ستونی antdv (span ≈ ۲۴ / columns)
-      </Text>
+      <Text type="secondary"> پیش‌نمایش تقریبی با سیستم ۲۴ ستونی antdv (span ≈ ۲۴ / columns) </Text>
     </Card>
   </Space>
 </template>

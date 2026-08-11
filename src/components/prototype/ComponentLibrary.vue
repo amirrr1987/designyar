@@ -1,13 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  Card,
-  Checkbox,
-  CheckboxGroup,
-  Progress,
-  Space,
-  Typography,
-} from 'ant-design-vue'
+import { Card, CheckboxGroup, Progress, Space, Typography } from 'ant-design-vue'
 import { useStorage } from '@vueuse/core'
 
 const { Paragraph } = Typography

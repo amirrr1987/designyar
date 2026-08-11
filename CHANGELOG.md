@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ماشین‌حساب گرید + `GridConfigurator.vue` و composable `useGrid`
 - مقیاس فاصله ۸pt و نمایش توکن‌ها در `SpacingScale.vue`
 - وایر فریم بلوکی و چک‌لیست کامپوننت در `WireframeBuilder` / `ComponentLibrary`
+- ترکیب PrototypeView با Tabs ابزارهای دیزاین‌سیستم
 
 ## [0.5.0] - 2026-08-11
 

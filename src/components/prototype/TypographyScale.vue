@@ -1,15 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {
-  Card,
-  Form,
-  FormItem,
-  Input,
-  InputNumber,
-  Slider,
-  Space,
-  Typography,
-} from 'ant-design-vue'
+import { Card, Form, FormItem, Input, InputNumber, Slider, Space, Typography } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
 import { useDesignSystemStore } from '@/stores/designSystem'
 
@@ -28,9 +19,7 @@ function buildSteps(baseSize: number, ratio: number): number[] {
   return steps
 }
 
-const previewSteps = computed(() =>
-  buildSteps(typography.value.baseSize, typography.value.ratio),
-)
+const previewSteps = computed(() => buildSteps(typography.value.baseSize, typography.value.ratio))
 
 function onBaseChange(value: number | string | null): void {
   if (typeof value !== 'number') return
@@ -38,9 +27,11 @@ function onBaseChange(value: number | string | null): void {
   designStore.patchTypography({ baseSize: value, steps })
 }
 
-function onRatioChange(value: number): void {
-  const steps = buildSteps(typography.value.baseSize, value)
-  designStore.patchTypography({ ratio: value, steps })
+function onRatioChange(value: number | [number, number]): void {
+  const ratio = typeof value === 'number' ? value : value[0]
+  if (ratio === undefined) return
+  const steps = buildSteps(typography.value.baseSize, ratio)
+  designStore.patchTypography({ ratio, steps })
 }
 
 function onFontFamilyChange(value: string): void {
@@ -78,17 +69,19 @@ function titleLevel(index: number): 1 | 2 | 3 | 4 | 5 {
           />
         </FormItem>
         <FormItem label="فونت">
-          <Input
-            :value="typography.fontFamily"
-            @update:value="onFontFamilyChange"
-          />
+          <Input :value="typography.fontFamily" @update:value="onFontFamilyChange" />
         </FormItem>
       </Form>
     </Card>
 
     <Card size="small" title="پیش‌نمایش">
       <Space direction="vertical">
-        <Space v-for="(size, index) in previewSteps" :key="`step-${index}`" direction="vertical" size="small">
+        <Space
+          v-for="(size, index) in previewSteps"
+          :key="`step-${index}`"
+          direction="vertical"
+          size="small"
+        >
           <Text type="secondary">{{ size }}px</Text>
           <Title :level="titleLevel(index)" :style="{ fontSize: `${size}px` }">
             نمونه متن فارسی — دیزاین‌یار

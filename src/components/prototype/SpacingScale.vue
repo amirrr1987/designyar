@@ -58,11 +58,7 @@ function applyCanonical8pt(): void {
 
     <Card size="small" title="توکن‌ها">
       <Descriptions :column="2" size="small" bordered>
-        <DescriptionsItem
-          v-for="row in rows"
-          :key="row.name"
-          :label="row.name"
-        >
+        <DescriptionsItem v-for="row in rows" :key="row.name" :label="row.name">
           <Tag>{{ row.value }}px</Tag>
         </DescriptionsItem>
       </Descriptions>
