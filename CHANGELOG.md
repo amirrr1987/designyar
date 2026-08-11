@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - فرم بیان مسئله با پیش‌نمایش جمله فارسی در `ProblemStatement.vue`
 - سازنده POV با اتصال اختیاری به پرسونا در `POVBuilder.vue`
 - لیست سوالات How Might We با رأی و حذف در `HMWQuestions.vue`
+- ترکیب DefineView: بیان مسئله + POV + HMW
 
 ## [0.3.0] - 2026-08-11
 

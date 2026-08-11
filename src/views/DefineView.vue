@@ -1,12 +1,35 @@
 <script setup lang="ts">
-import { Card } from 'ant-design-vue'
+import { Card, Divider, Space, Typography } from 'ant-design-vue'
+import HMWQuestions from '@/components/define/HMWQuestions.vue'
+import POVBuilder from '@/components/define/POVBuilder.vue'
+import ProblemStatementForm from '@/components/define/ProblemStatement.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
+const { Title, Paragraph } = Typography
 const step = getStepByKey('define')
 </script>
 
 <template>
-  <Card :title="step.title">
-    {{ step.description }}
-  </Card>
+  <Space direction="vertical" size="large">
+    <Card>
+      <Title :level="3">{{ step.title }}</Title>
+      <Paragraph>{{ step.description }}</Paragraph>
+    </Card>
+
+    <Card title="۱. بیان مسئله">
+      <ProblemStatementForm />
+    </Card>
+
+    <Divider />
+
+    <Card title="۲. نقطه دید (POV)">
+      <POVBuilder />
+    </Card>
+
+    <Divider />
+
+    <Card title="۳. سوالات How Might We">
+      <HMWQuestions />
+    </Card>
+  </Space>
 </template>

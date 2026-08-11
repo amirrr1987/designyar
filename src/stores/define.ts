@@ -12,10 +12,7 @@ import {
 } from '@/types/define'
 
 export const useDefineStore = defineStore('define', () => {
-  const problem = useStorage<ProblemStatement>(
-    'ux-flow-problem',
-    createEmptyProblemStatement(),
-  )
+  const problem = useStorage<ProblemStatement>('ux-flow-problem', createEmptyProblemStatement())
   const pov = useStorage<POV>('ux-flow-pov', createEmptyPOV())
   const hmw = useStorage<HMWItem[]>('ux-flow-hmw', [])
 

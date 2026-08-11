@@ -43,9 +43,7 @@ export function assemblePOVSentence(p: POV): string {
 export function isProblemStatement(value: unknown): value is ProblemStatement {
   if (typeof value !== 'object' || value === null) return false
   const v = value as Record<string, unknown>
-  return (
-    typeof v.user === 'string' && typeof v.need === 'string' && typeof v.insight === 'string'
-  )
+  return typeof v.user === 'string' && typeof v.need === 'string' && typeof v.insight === 'string'
 }
 
 export function isPOV(value: unknown): value is POV {
