@@ -14,11 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - قانون Cursor برای اجرای دستی دستورات ترمینال توسط کاربر (بدون اجرای خودکار shell)
 - بوت‌استرپ RTL فارسی: `index.html` با `lang=fa` / `dir=rtl`، `ant-design-vue/dist/reset.css` در `main.ts`، و `ConfigProvider` با `fa_IR` در `App.vue`
 - شش مسیر lazy-load (`/` + پنج مرحله) با `RouteMeta` تایپ‌شده و viewهای placeholder بر پایه `Card`
+- استورهای Pinia با `useStorage`: `project`، `persona`، `designSystem`، `ai` (کلیدهای `ux-flow-*`)
 
 ### Changed
 
 - حذف scaffold و `<style>` از `App.vue`؛ فقط `ConfigProvider` + `RouterView`
 - عنوان صفحه به «دیزاین‌یار»
+- حذف استور نمونه `counter`
 
 ## [0.0.0] - 2026-08-11
 
