@@ -17,6 +17,8 @@ Stack skills (read as needed): [vue](../vue/SKILL.md) · [ant-design-vue](../ant
 
 Tooling skills: [vite](../vite/SKILL.md) · [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) · [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) · [typescript](../typescript/SKILL.md) · [vue-tsc](../vue-tsc/SKILL.md) · [vue-tsconfig](../vue-tsconfig/SKILL.md) · [tsconfig-node24](../tsconfig-node24/SKILL.md) · [types-node](../types-node/SKILL.md) · [eslint](../eslint/SKILL.md) · [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md) · [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) · [vue-eslint-parser](../vue-eslint-parser/SKILL.md) · [eslint-config-prettier](../eslint-config-prettier/SKILL.md) · [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) · [oxlint](../oxlint/SKILL.md) · [oxfmt](../oxfmt/SKILL.md) · [npm-run-all2](../npm-run-all2/SKILL.md) · [jiti](../jiti/SKILL.md).
 
+**Phase end:** always run [keep-a-changelog](../keep-a-changelog/SKILL.md) — SemVer `package.json` + Keep a Changelog `CHANGELOG.md`.
+
 ## Critical behavior
 
 1. **No custom CSS** — only Ant Design Vue (see antdv skill).
@@ -33,7 +35,8 @@ Tooling skills: [vite](../vite/SKILL.md) · [vitejs-plugin-vue](../vitejs-plugin
 2. If terminal needed → show command → WAIT for confirmation
 3. After confirmation → continue
 4. Show / write the file
-5. Ask to proceed to the next step
+5. When the phase is complete → keep-a-changelog (version + CHANGELOG)
+6. Ask to proceed to the next step / phase
 ```
 
 ## Tech stack (installed)
@@ -202,3 +205,4 @@ Prefer smaller models (e.g. SmolLM / Phi) when demos must load quickly; keep the
 3. Build one component / file at a time (unless user asks for a batch)
 4. Test each phase before moving on
 5. Persian copy; TypeScript; `<script setup>`
+6. End of each phase → [keep-a-changelog](../keep-a-changelog/SKILL.md) (SemVer + CHANGELOG)

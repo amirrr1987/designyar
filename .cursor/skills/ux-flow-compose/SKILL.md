@@ -31,6 +31,7 @@ Also obey project rule `.cursor/rules/full-safe-type-ts.mdc`.
 |------|------|
 | Any feature, phase, module plan | [ux-flow](../ux-flow/SKILL.md) |
 | Combining skills / typed architecture | **this skill** |
+| End of each phase (version + CHANGELOG) | [keep-a-changelog](../keep-a-changelog/SKILL.md) |
 
 ### B. App runtime (feature code)
 
@@ -80,7 +81,8 @@ Load **only** skills relevant to the current task after the product + typing bas
 5. Implement with named antdv imports / PascalCase tags
 6. Persist via useStorage inside Pinia (typed generics)
 7. Run type-check mindset: code must pass vue-tsc --build
-8. Ask before next file/phase
+8. Phase done → load keep-a-changelog (SemVer + CHANGELOG.md)
+9. Ask before next file/phase
 ```
 
 ## Full-safe type contracts
@@ -169,6 +171,7 @@ Before calling a step done:
 - [ ] No `<style>` / custom CSS
 - [ ] Persistence typed via `useStorage<T>`
 - [ ] Would pass `vue-tsc --build`, `lint`, `oxfmt` (ask before running)
+- [ ] Phase end: [keep-a-changelog](../keep-a-changelog/SKILL.md) applied if closing a phase
 
 ## Anti-patterns
 

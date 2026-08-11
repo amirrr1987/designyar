@@ -1,11 +1,10 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ConfigProvider } from 'ant-design-vue'
+import faIR from 'ant-design-vue/es/locale/fa_IR'
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <ConfigProvider :locale="faIR" direction="rtl" component-size="middle">
+    <RouterView />
+  </ConfigProvider>
 </template>
-
-<style scoped></style>
