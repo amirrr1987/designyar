@@ -8,7 +8,7 @@ const { Content } = Layout
 </script>
 
 <template>
-  <Layout>
+  <Layout style="min-height: 100vh">
     <AppSider />
     <Layout>
       <AppHeader />

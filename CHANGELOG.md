@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - قالب‌های پرسونا در `utils/persona-templates.ts` و composable `usePersona`
+- UI پرسونا: `PersonaBuilder`، `PersonaCard` و لیست در `EmpathizeView`
 
 ## [0.2.0] - 2026-08-11
 
