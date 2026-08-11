@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Card, Col, Empty, Row, Space, Typography } from 'ant-design-vue'
+import CompetitorTable from '@/components/empathize/CompetitorTable.vue'
 import EmpathyMap from '@/components/empathize/EmpathyMap.vue'
 import PersonaBuilder from '@/components/empathize/PersonaBuilder.vue'
 import PersonaCard from '@/components/empathize/PersonaCard.vue'
@@ -38,6 +39,10 @@ const { personas, removePersona } = usePersona()
 
     <Card title="یادداشت تحقیق">
       <ResearchNotes />
+    </Card>
+
+    <Card title="رقبا">
+      <CompetitorTable />
     </Card>
   </Space>
 </template>

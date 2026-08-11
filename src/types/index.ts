@@ -20,3 +20,6 @@ export {
   isEmpathyQuadrants,
   isEmpathyMapEntry,
 } from './empathy-map'
+
+export type { CompetitorRow } from './competitor'
+export { isCompetitorRow, isCompetitorRowArray } from './competitor'
