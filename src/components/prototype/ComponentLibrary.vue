@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { Card, CheckboxGroup, Progress, Space, Typography } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import {
   COMPONENT_CHECKLIST_OPTIONS,
   DEFAULT_COMPONENT_CHECKLIST,
 } from '@/constants/component-checklist'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { usePrototypeStore } from '@/stores/prototype'
 
 const { Paragraph } = Typography
 
-const checked = useStorage<string[]>(STORAGE_KEYS.componentChecklist, [...DEFAULT_COMPONENT_CHECKLIST])
+const prototypeStore = usePrototypeStore()
+const { componentChecklist: checked } = storeToRefs(prototypeStore)
+
+onMounted(() => {
+  if (checked.value.length === 0) {
+    prototypeStore.setComponentChecklist([...DEFAULT_COMPONENT_CHECKLIST])
+  }
+})
 
 const progress = computed(() => {
   if (COMPONENT_CHECKLIST_OPTIONS.length === 0) return 0

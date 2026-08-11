@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Card, Checkbox, Col, Row, Space, Typography } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { WIREFRAME_BLOCK_DEFS } from '@/constants/wireframe-blocks'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { usePrototypeStore } from '@/stores/prototype'
 
 const { Text, Paragraph } = Typography
 
-const selected = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, ['header', 'content', 'footer'])
+const prototypeStore = usePrototypeStore()
+const { wireframeBlocks: selected } = storeToRefs(prototypeStore)
 
 const selectedSet = computed(() => new Set(selected.value))
 

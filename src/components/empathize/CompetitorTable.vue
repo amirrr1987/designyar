@@ -3,10 +3,10 @@ import { reactive, ref } from 'vue'
 import { Button, Form, FormItem, Input, Popconfirm, Space, Table, message } from 'ant-design-vue'
 import type { FormInstance, Rule } from 'ant-design-vue/es/form'
 import type { TableColumnsType } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { useEmpathizeStore } from '@/stores/empathize'
 import type { CompetitorRow } from '@/types/competitor'
 
 interface CompetitorForm {
@@ -16,7 +16,8 @@ interface CompetitorForm {
   url: string
 }
 
-const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
+const empathizeStore = useEmpathizeStore()
+const { competitors } = storeToRefs(empathizeStore)
 const formRef = ref<FormInstance>()
 
 const model = reactive<CompetitorForm>({
@@ -54,20 +55,18 @@ async function onAdd(): Promise<void> {
   } catch {
     return
   }
-  const row: CompetitorRow = {
-    id: crypto.randomUUID(),
+  empathizeStore.addCompetitor({
     name: model.name,
     strength: model.strength,
     weakness: model.weakness,
     url: model.url.trim() ? model.url.trim() : undefined,
-  }
-  competitors.value = [...competitors.value, row]
+  })
   message.success('رقیب افزوده شد')
   resetForm()
 }
 
 function onRemove(id: string): void {
-  competitors.value = competitors.value.filter((row) => row.id !== id)
+  empathizeStore.removeCompetitor(id)
 }
 </script>
 

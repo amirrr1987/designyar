@@ -1,9 +1,11 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { usePersistenceStore } from '@/stores/persistence'
 import { getAiChain, type AiChainId } from '@/constants/ai-chains'
 import type { AiActionId } from '@/utils/ai-prompts'
+import { createDefaultAiPrefs, type AiPrefs } from '@/types/ai-prefs'
+import { getAiProvider } from '@/ai'
+import { AiProviderError } from '@/ai/types'
 
 function getChainStepCount(chainId: AiChainId): number {
   return getAiChain(chainId).steps.length
@@ -14,21 +16,17 @@ function getChainStep(chainId: AiChainId, index: number): AiActionId | null {
   return step ?? null
 }
 
-export interface AiPrefs {
-  /** Groq model id preference. */
-  selectedModelId: string
-}
-
-const DEFAULT_MODEL_ID = 'groq/compound-mini'
-
-function createDefaultAiPrefs(): AiPrefs {
-  return {
-    selectedModelId: DEFAULT_MODEL_ID,
-  }
-}
+export type { AiPrefs }
 
 export const useAiStore = defineStore('ai', () => {
-  const prefs = useStorage<AiPrefs>(STORAGE_KEYS.aiPrefs, createDefaultAiPrefs())
+  const persistence = usePersistenceStore()
+
+  const prefs = computed({
+    get: () => persistence.document.aiPrefs,
+    set: (value: AiPrefs) => {
+      persistence.patchAiPrefs(value)
+    },
+  })
 
   /** Runtime only — not persisted. */
   const isLoading = ref(false)
@@ -45,9 +43,15 @@ export const useAiStore = defineStore('ai', () => {
 
   const selectedModelId = computed(() => prefs.value.selectedModelId)
 
+  const provider = computed(() =>
+    getAiProvider({
+      getDefaultModelId: () => prefs.value.selectedModelId,
+    }),
+  )
+
   function setSelectedModelId(modelId: string): void {
     if (!modelId.trim()) return
-    prefs.value = { ...prefs.value, selectedModelId: modelId }
+    persistence.patchAiPrefs({ selectedModelId: modelId })
   }
 
   function setLoading(value: boolean): void {
@@ -145,8 +149,60 @@ export const useAiStore = defineStore('ai', () => {
     }
   }
 
+  function validateProvider(): boolean {
+    if (!provider.value.isAvailable()) {
+      setError(
+        'کلید API تنظیم نشده — در .env.local مقدار VITE_GROQ_API_KEY را از console.groq.com/keys قرار دهید',
+      )
+      setReady(false)
+      return false
+    }
+    setError('')
+    setReady(true)
+    return true
+  }
+
+  async function completeAssist(prompt: string, systemPrompt?: string): Promise<string> {
+    if (!validateProvider()) {
+      throw new AiProviderError(
+        'missing_key',
+        'کلید API یافت نشد — VITE_GROQ_API_KEY را در .env.local تنظیم کنید',
+      )
+    }
+
+    setLoading(true)
+    setLastResponse('')
+    setError('')
+
+    try {
+      const messages = [
+        ...(systemPrompt
+          ? [{ role: 'system' as const, content: systemPrompt }]
+          : []),
+        { role: 'user' as const, content: prompt },
+      ]
+      const result = await provider.value.complete({
+        messages,
+        modelId: selectedModelId.value,
+      })
+      setLastResponse(result.text)
+      return result.text
+    } catch (e: unknown) {
+      const message =
+        e instanceof AiProviderError
+          ? e.message
+          : e instanceof Error
+            ? e.message
+            : String(e)
+      setError(message)
+      throw e instanceof Error ? e : new Error(message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   function reset(): void {
-    prefs.value = createDefaultAiPrefs()
+    persistence.patchAiPrefs(createDefaultAiPrefs())
     isLoading.value = false
     isReady.value = false
     progress.value = 0
@@ -163,6 +219,7 @@ export const useAiStore = defineStore('ai', () => {
   return {
     prefs,
     selectedModelId,
+    provider,
     isLoading,
     isReady,
     progress,
@@ -191,6 +248,8 @@ export const useAiStore = defineStore('ai', () => {
     cancelChain,
     getChainProgress,
     clearSessionOutput,
+    validateProvider,
+    completeAssist,
     reset,
   }
 })

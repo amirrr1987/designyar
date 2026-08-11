@@ -26,7 +26,7 @@ const current = computed(() => {
 const items = computed((): StepProps[] =>
   DESIGN_THINKING_STEPS.map((step) => ({
     title: step.title,
-    description: step.description,
+    description: projectStore.isJuniorMode ? undefined : step.description,
     icon: h(resolveStepIcon(step.icon)),
   })),
 )

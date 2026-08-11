@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-08-11
+
+### Added
+
+- **Rebuild R0 — foundation:** single document persistence `ux-flow:v1` + `schemaVersion`
+- **`src/content/fa.ts`** — Persian copy / glossary / DoD / job labels (single source)
+- **`src/domain/completion.ts`** — pure completion engine (`nextJob`, phase %, soft-gate helper)
+- **`src/domain/migrate.ts`** — legacy multi-key → v1 document migration
+- **Domain stores:** `empathize`, `prototype`, `test`, `meta` + `persistence` (sole `useStorage`)
+- **`AiProvider` interface** + Groq provider (`src/ai/`) for swappable AI runtime
+- Export format **v5** reading/writing the document
+
+### Changed
+
+- All domain `useStorage` calls outside Pinia removed — components/composables use stores
+- `Project` includes `schemaVersion`; package remains `ui-ux-ai` / brand دیزاین‌یار
+
+### Removed
+
+- Scattered LocalStorage keys as runtime source of truth (kept as legacy migrate map only)
+
+## [0.20.0] - 2026-08-11
+
+### Added
+
+- **حالت ساده (جونیور)** — پیش‌فرض؛ سوییچ در هدر برای حالت حرفه‌ای
+- **`experienceMode`** روی پروژه (`junior` | `full`) با persist و سازگاری import قدیمی
+- **`PhaseJuniorGuide`** — راهنمای «از اینجا شروع کن» + چک‌لیست + واژه‌نامه هر مرحله
+- **`PhaseAiActions`** — یک اکشن AI اصلی؛ بقیه پشت «ابزارهای بیشتر AI»
+- **`junior-guide` constants** — تب‌های ضروری، تب پیش‌فرض هم‌راستا با مربی
+
+### Changed
+
+- مراحل Empathize / Ideate / Prototype / Test — در حالت ساده فقط ابزارهای ضروری؛ بقیه پشت دکمه
+- برچسب‌های فارسی ساده‌تر (دیدگاه کاربر، چگونه می‌توانیم، دسترسی‌پذیری، متن UI)
+- خانه — onboarding سه‌مرحله‌ای برای جونیور + پیشنهاد مسیر ترتیبی
+- سایدبار شماره‌گذاری‌شده؛ Steps بدون توضیحات شلوغ در حالت ساده
+- پیشرفت Prototype/Test واقعی‌تر (وایرفریم + گزارش)
+- متن مربی فاز — اختیاری‌ها مشخص و jargon کمتر
+
 ## [0.19.0] - 2026-08-11
 
 ### Added

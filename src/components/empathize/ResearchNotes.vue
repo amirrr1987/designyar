@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Alert, Card, Input, Space } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { useEmpathizeStore } from '@/stores/empathize'
 
 const Textarea = Input.TextArea
-const notes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
+const empathizeStore = useEmpathizeStore()
+const { researchNotes: notes } = storeToRefs(empathizeStore)
 </script>
 
 <template>

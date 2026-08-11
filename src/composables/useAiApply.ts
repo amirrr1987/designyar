@@ -1,16 +1,15 @@
-import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { useAiHistory } from '@/composables/useAiHistory'
 import { useDefineStore } from '@/stores/define'
+import { useEmpathizeStore } from '@/stores/empathize'
 import { useIdeateStore } from '@/stores/ideate'
+import { useMetaStore } from '@/stores/meta'
 import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
+import { usePrototypeStore } from '@/stores/prototype'
+import { useTestStore } from '@/stores/test'
 import type { AiChainId } from '@/constants/ai-chains'
-import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { AiApplyPayload, AiSitemapNodeDraft } from '@/types/ai-response'
-import type { MicrocopyEntry } from '@/types/microcopy'
-import type { CompetitorRow } from '@/types/competitor'
 import type { SitemapNode } from '@/types/ideate'
 import type { AiActionId } from '@/utils/ai-prompts'
 import {
@@ -50,22 +49,20 @@ export function useAiApply() {
   const defineStore = useDefineStore()
   const ideateStore = useIdeateStore()
   const projectStore = useProjectStore()
+  const empathizeStore = useEmpathizeStore()
+  const prototypeStore = usePrototypeStore()
+  const testStore = useTestStore()
+  const metaStore = useMetaStore()
   const { addEntry } = useAiHistory()
   const { problem, pov } = storeToRefs(defineStore)
   const { sitemap } = storeToRefs(ideateStore)
-
-  const usabilityReportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
-  const projectSynthesis = useStorage<string>(STORAGE_KEYS.projectSynthesis, '')
-  const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
-  const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
-  const empathySelectedPersona = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, 'general')
-  const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
-  const wireframeBlocks = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
-    'header',
-    'content',
-    'footer',
-  ])
-  const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
+  const {
+    researchNotes,
+    empathySelectedPersona,
+  } = storeToRefs(empathizeStore)
+  const { wireframeBlocks } = storeToRefs(prototypeStore)
+  const { usabilityReportSummary } = storeToRefs(testStore)
+  const { projectSynthesis } = storeToRefs(metaStore)
 
   function applyPayload(payload: AiApplyPayload, audit?: AiApplyAudit): number {
     const before = audit
@@ -172,34 +169,27 @@ export function useAiApply() {
         return 1
       }
       case 'testSummary': {
-        usabilityReportSummary.value = payload.item
+        testStore.setUsabilityReportSummary(payload.item)
         return 1
       }
       case 'projectSynthesis': {
-        projectSynthesis.value = payload.item
+        metaStore.setProjectSynthesis(payload.item)
         return 1
       }
       case 'researchNotes': {
-        researchNotes.value = payload.item
+        empathizeStore.setResearchNotes(payload.item)
         return 1
       }
       case 'empathyMaps': {
         let applied = 0
         for (const draft of payload.items) {
           if (!draft.personaId.trim()) continue
-          empathyMaps.value = {
-            ...empathyMaps.value,
-            [draft.personaId]: {
-              personaId: draft.personaId,
-              quadrants: {
-                says: draft.quadrants.says.trim(),
-                thinks: draft.quadrants.thinks.trim(),
-                does: draft.quadrants.does.trim(),
-                feels: draft.quadrants.feels.trim(),
-              },
-              updatedAt: new Date().toISOString(),
-            },
-          }
+          empathizeStore.upsertEmpathyMap(draft.personaId, {
+            says: draft.quadrants.says.trim(),
+            thinks: draft.quadrants.thinks.trim(),
+            does: draft.quadrants.does.trim(),
+            feels: draft.quadrants.feels.trim(),
+          })
           applied += 1
         }
         const first = payload.items[0]
@@ -225,33 +215,27 @@ export function useAiApply() {
       }
       case 'microcopy': {
         let added = 0
-        const next = [...microcopyBank.value]
         for (const draft of payload.items) {
           if (!draft.text.trim()) continue
-          next.push({
-            id: crypto.randomUUID(),
+          prototypeStore.addMicrocopy({
             category: draft.category,
             text: draft.text.trim(),
             context: draft.context?.trim() ?? '',
-            createdAt: new Date().toISOString(),
           })
           added += 1
         }
-        microcopyBank.value = next
         return added
       }
       case 'wireframeBlocks': {
         if (payload.items.length === 0) return 0
-        wireframeBlocks.value = [...payload.items]
+        prototypeStore.setWireframeBlocks([...payload.items])
         return payload.items.length
       }
       case 'competitors': {
         let added = 0
-        const next = [...competitors.value]
         for (const draft of payload.items) {
           if (!draft.name.trim() || !draft.strength.trim() || !draft.weakness.trim()) continue
-          next.push({
-            id: crypto.randomUUID(),
+          empathizeStore.addCompetitor({
             name: draft.name.trim(),
             strength: draft.strength.trim(),
             weakness: draft.weakness.trim(),
@@ -259,7 +243,6 @@ export function useAiApply() {
           })
           added += 1
         }
-        competitors.value = next
         return added
       }
       default: {

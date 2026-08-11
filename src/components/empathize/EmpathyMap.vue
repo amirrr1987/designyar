@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import { Card, Col, Input, Row, Select, SelectOption, Space, Typography } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import {
-  createEmptyQuadrants,
-  type EmpathyMapsByPersona,
-  type EmpathyQuadrants,
-} from '@/types/empathy-map'
+import { useEmpathizeStore } from '@/stores/empathize'
+import { createEmptyQuadrants, type EmpathyQuadrants } from '@/types/empathy-map'
 
 const GENERAL_KEY = 'general'
 const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
 const { personas } = usePersona()
-
-const maps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
-const selectedPersonaId = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, GENERAL_KEY)
+const empathizeStore = useEmpathizeStore()
+const { empathyMaps: maps, empathySelectedPersona: selectedPersonaId } =
+  storeToRefs(empathizeStore)
 
 const personaOptions = computed(() => [
   { value: GENERAL_KEY, label: 'عمومی (بدون پرسونا)' },
@@ -30,14 +26,7 @@ const quadrants = computed({
     return entry?.quadrants ?? createEmptyQuadrants()
   },
   set(next: EmpathyQuadrants): void {
-    maps.value = {
-      ...maps.value,
-      [selectedPersonaId.value]: {
-        personaId: selectedPersonaId.value,
-        quadrants: next,
-        updatedAt: new Date().toISOString(),
-      },
-    }
+    empathizeStore.upsertEmpathyMap(selectedPersonaId.value, next)
   },
 })
 

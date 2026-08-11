@@ -83,7 +83,9 @@ function goNext(): void {
 <template>
   <Card size="small">
     <Space direction="vertical" size="small">
-      <Text type="secondary">ادامه مسیر Design Thinking</Text>
+      <Text type="secondary">
+        {{ projectStore.isJuniorMode ? 'گام بعدی مسیر شما' : 'ادامه مسیر Design Thinking' }}
+      </Text>
       <Space wrap>
         <Button v-bind="prevBtn" @click="goHome">
           <template #icon><HomeOutlined /></template>

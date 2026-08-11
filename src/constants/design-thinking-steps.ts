@@ -21,7 +21,7 @@ export const DESIGN_THINKING_STEPS = [
   {
     key: 'empathize',
     title: 'همدلی',
-    description: 'درک کاربر و نیازهای او',
+    description: 'کاربر را بشناس — یادداشت و پرسونا',
     route: '/empathize',
     icon: 'HeartOutlined',
     color: '#f5222d',
@@ -30,7 +30,7 @@ export const DESIGN_THINKING_STEPS = [
   {
     key: 'define',
     title: 'تعریف مسئله',
-    description: 'تعریف دقیق مسئله و دیدگاه کاربر',
+    description: 'مسئله را روشن کن و سوال بساز',
     route: '/define',
     icon: 'AimOutlined',
     color: '#fa8c16',
@@ -39,7 +39,7 @@ export const DESIGN_THINKING_STEPS = [
   {
     key: 'ideate',
     title: 'ایده‌پردازی',
-    description: 'تولید ایده و طراحی معماری اطلاعات',
+    description: 'ایده بساز و مسیر کاربر را بچین',
     route: '/ideate',
     icon: 'BulbOutlined',
     color: '#fadb14',
@@ -48,7 +48,7 @@ export const DESIGN_THINKING_STEPS = [
   {
     key: 'prototype',
     title: 'پروتوتایپ',
-    description: 'ساخت نمونه اولیه و دیزاین سیستم',
+    description: 'رنگ و اسکلت صفحه را بساز',
     route: '/prototype',
     icon: 'ExperimentOutlined',
     color: '#52c41a',
@@ -57,7 +57,7 @@ export const DESIGN_THINKING_STEPS = [
   {
     key: 'test',
     title: 'تست',
-    description: 'ارزیابی و تست کاربردپذیری',
+    description: 'خوانایی و دسترسی را بررسی کن',
     route: '/test',
     icon: 'CheckCircleOutlined',
     color: '#1890ff',

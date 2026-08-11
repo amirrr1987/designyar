@@ -1,61 +1,51 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import {
+  useEmpathizeStore,
+  type PersonaDraft,
+} from '@/stores/empathize'
 import type { Persona } from '@/types/persona'
 
-export type PersonaDraft = Omit<Persona, 'id' | 'createdAt'> & {
-  id?: string
-  createdAt?: string
-}
-
-function createId(): string {
-  return crypto.randomUUID()
-}
-
+/**
+ * Backward-compatible facade — personas live in `empathize` store / document slice.
+ * Prefer `useEmpathizeStore` in new code.
+ */
 export const usePersonaStore = defineStore('persona', () => {
-  const personas = useStorage<Persona[]>(STORAGE_KEYS.personas, [])
+  const empathize = useEmpathizeStore()
 
-  const count = computed(() => personas.value.length)
+  const personas = computed({
+    get: () => empathize.personas,
+    set: (value: Persona[]) => {
+      empathize.replaceAll({
+        researchNotes: empathize.researchNotes,
+        personas: value,
+        empathyMaps: empathize.empathyMaps,
+        empathySelectedPersona: empathize.empathySelectedPersona,
+        competitors: empathize.competitors,
+      })
+    },
+  })
+
+  const count = computed(() => empathize.personaCount)
 
   function getById(id: string): Persona | undefined {
-    return personas.value.find((p) => p.id === id)
+    return empathize.getPersonaById(id)
   }
 
   function add(draft: PersonaDraft): Persona {
-    const persona: Persona = {
-      id: draft.id ?? createId(),
-      name: draft.name,
-      role: draft.role,
-      age: draft.age,
-      goals: draft.goals,
-      pains: draft.pains,
-      bio: draft.bio,
-      avatarColor: draft.avatarColor,
-      createdAt: draft.createdAt ?? new Date().toISOString(),
-    }
-    personas.value = [...personas.value, persona]
-    return persona
+    return empathize.addPersona(draft)
   }
 
   function update(id: string, patch: Partial<Omit<Persona, 'id' | 'createdAt'>>): boolean {
-    const index = personas.value.findIndex((p) => p.id === id)
-    if (index < 0) return false
-    const current = personas.value[index]
-    if (!current) return false
-    const next: Persona = { ...current, ...patch, id: current.id, createdAt: current.createdAt }
-    const copy = [...personas.value]
-    copy[index] = next
-    personas.value = copy
-    return true
+    return empathize.updatePersona(id, patch)
   }
 
   function remove(id: string): void {
-    personas.value = personas.value.filter((p) => p.id !== id)
+    empathize.removePersona(id)
   }
 
   function clear(): void {
-    personas.value = []
+    empathize.clearPersonas()
   }
 
   return {
@@ -68,3 +58,5 @@ export const usePersonaStore = defineStore('persona', () => {
     clear,
   }
 })
+
+export type { PersonaDraft }

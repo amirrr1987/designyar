@@ -1,20 +1,20 @@
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { storeToRefs } from 'pinia'
 import { usePersona } from '@/composables/usePersona'
 import { useWCAG } from '@/composables/useWCAG'
-import { HEURISTIC_RULES, type HeuristicEvalMap } from '@/constants/heuristic-rules'
+import { HEURISTIC_RULES } from '@/constants/heuristic-rules'
 import { summarizeComponentChecklist } from '@/constants/component-checklist'
 import { summarizeWireframeBlocks } from '@/constants/wireframe-blocks'
 import { WCAG_CHECKLIST } from '@/constants/wcag-checklist'
 import { useDefineStore } from '@/stores/define'
 import { useDesignSystemStore } from '@/stores/designSystem'
+import { useEmpathizeStore } from '@/stores/empathize'
 import { useIdeateStore } from '@/stores/ideate'
+import { useMetaStore } from '@/stores/meta'
 import { useProjectStore } from '@/stores/project'
-import type { CompetitorRow } from '@/types/competitor'
+import { usePrototypeStore } from '@/stores/prototype'
+import { useTestStore } from '@/stores/test'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { SitemapNode } from '@/types/ideate'
-import type { MicrocopyEntry } from '@/types/microcopy'
 import { MICROCOPY_CATEGORY_LABELS } from '@/types/microcopy'
 import { evaluateContrast } from '@/utils/contrast'
 import type { AiPromptContext } from '@/utils/ai-prompts'
@@ -61,25 +61,24 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
   const defineStore = useDefineStore()
   const ideateStore = useIdeateStore()
   const designStore = useDesignSystemStore()
+  const empathizeStore = useEmpathizeStore()
+  const prototypeStore = usePrototypeStore()
+  const testStore = useTestStore()
+  const metaStore = useMetaStore()
   const { personas } = usePersona()
   const { progress: wcagProgress, checkedIds } = useWCAG()
   const { problemSentence, povSentence, hmw } = storeToRefs(defineStore)
   const { ideas, flowNodes, sitemap, cardSort } = storeToRefs(ideateStore)
   const { palette, typography, grid, spacing } = storeToRefs(designStore)
-
-  const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
-  const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
-  const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
-  const wireframeBlockIds = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
-    'header',
-    'content',
-    'footer',
-  ])
-  const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
-  const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
-  const projectSynthesisStored = useStorage<string>(STORAGE_KEYS.projectSynthesis, '')
-  const componentChecklist = useStorage<string[]>(STORAGE_KEYS.componentChecklist, [])
-  const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
+  const { researchNotes, empathyMaps, competitors } = storeToRefs(empathizeStore)
+  const {
+    wireframeBlocks: wireframeBlockIds,
+    componentChecklist,
+    microcopyBank,
+  } = storeToRefs(prototypeStore)
+  const { heuristicEval: evaluations, usabilityReportSummary: testSummary } =
+    storeToRefs(testStore)
+  const { projectSynthesis: projectSynthesisStored } = storeToRefs(metaStore)
 
   function buildContext(userHint?: string): AiPromptContext {
     const personasSummary = personas.value

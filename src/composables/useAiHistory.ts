@@ -1,6 +1,6 @@
 import { computed } from 'vue'
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { storeToRefs } from 'pinia'
+import { useMetaStore } from '@/stores/meta'
 import {
   isAiHistoryEntry,
   trimHistoryEntries,
@@ -8,25 +8,26 @@ import {
 } from '@/types/ai-history'
 
 export function useAiHistory() {
-  const entries = useStorage<AiHistoryEntry[]>(STORAGE_KEYS.aiHistory, [])
+  const metaStore = useMetaStore()
+  const { aiHistory } = storeToRefs(metaStore)
 
   const sortedEntries = computed(() =>
-    [...entries.value].sort(
+    [...aiHistory.value].sort(
       (a, b) => new Date(b.appliedAt).getTime() - new Date(a.appliedAt).getTime(),
     ),
   )
 
   function addEntry(entry: AiHistoryEntry): void {
     if (!isAiHistoryEntry(entry)) return
-    entries.value = trimHistoryEntries([entry, ...entries.value])
+    metaStore.setAiHistory(trimHistoryEntries([entry, ...aiHistory.value]))
   }
 
   function removeEntry(id: string): void {
-    entries.value = entries.value.filter((entry) => entry.id !== id)
+    metaStore.setAiHistory(aiHistory.value.filter((entry) => entry.id !== id))
   }
 
   function clearHistory(): void {
-    entries.value = []
+    metaStore.clearAiHistory()
   }
 
   return {

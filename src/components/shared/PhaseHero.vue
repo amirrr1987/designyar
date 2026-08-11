@@ -38,7 +38,7 @@ const titleIcon = computed(() => {
       </Paragraph>
 
       <Space v-if="$slots.actions" wrap align="center">
-        <Text type="secondary">دستیار این مرحله:</Text>
+        <Text type="secondary">کمک AI:</Text>
         <slot name="actions" />
       </Space>
     </Space>

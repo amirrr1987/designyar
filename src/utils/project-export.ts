@@ -1,9 +1,11 @@
-import type { AiPrefs } from '@/stores/ai'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
-import type { HeuristicEvalMap } from '@/constants/heuristic-rules'
-import type { CompetitorRow } from '@/types/competitor'
+import { UX_FLOW_DOCUMENT_KEY } from '@/constants/storage-keys'
+import type { AiPrefs } from '@/types/ai-prefs'
+import { createDefaultAiPrefs, isAiPrefs } from '@/types/ai-prefs'
 import type { AiHistoryEntry } from '@/types/ai-history'
 import { isAiHistoryEntryArray } from '@/types/ai-history'
+import type { HeuristicEvalMap } from '@/types/heuristic-eval'
+import { isHeuristicEvalMap } from '@/types/heuristic-eval'
+import type { CompetitorRow } from '@/types/competitor'
 import type { HMWItem, POV, ProblemStatement } from '@/types/define'
 import type { DesignSystem } from '@/types/design-system'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
@@ -11,6 +13,7 @@ import type { CardSortState, FlowNode, IdeaCard, SitemapNode } from '@/types/ide
 import type { Persona } from '@/types/persona'
 import type { MicrocopyEntry } from '@/types/microcopy'
 import type { Project } from '@/types/project'
+import type { UxFlowDocument } from '@/types/document'
 import {
   createDefaultDesignSystem,
   createDefaultProject,
@@ -32,11 +35,14 @@ import {
   isSitemapNodeArray,
 } from '@/types/ideate'
 import { isMicrocopyEntryArray } from '@/types/microcopy'
+import { createDefaultDocument, normalizeDocument, isUxFlowDocument } from '@/types/document'
+import { migrateToDocumentV1 } from '@/domain/migrate'
 
-export const UX_FLOW_EXPORT_VERSION = 4 as const
+/** Export file format version (flat payload for round-trip + legacy imports). */
+export const UX_FLOW_EXPORT_VERSION = 5 as const
 
 export interface UxFlowExport {
-  version: typeof UX_FLOW_EXPORT_VERSION
+  version: typeof UX_FLOW_EXPORT_VERSION | 4 | 3 | 2 | 1
   exportedAt: string
   data: {
     project: Project
@@ -90,23 +96,6 @@ function isCardSortState(value: unknown): value is CardSortState {
   )
 }
 
-function isAiPrefs(value: unknown): value is AiPrefs {
-  if (!isRecord(value)) return false
-  return typeof value.selectedModelId === 'string'
-}
-
-function isHeuristicEvalMap(value: unknown): value is HeuristicEvalMap {
-  if (!isRecord(value)) return false
-  return Object.values(value).every((entry) => {
-    if (!isRecord(entry)) return false
-    return (
-      typeof entry.ruleId === 'string' &&
-      typeof entry.rating === 'number' &&
-      typeof entry.notes === 'string'
-    )
-  })
-}
-
 function isEmpathyMaps(value: unknown): value is EmpathyMapsByPersona {
   if (!isRecord(value)) return false
   return Object.values(value).every((entry) => {
@@ -124,40 +113,108 @@ function isEmpathyMaps(value: unknown): value is EmpathyMapsByPersona {
   })
 }
 
-function readOr<T>(key: string, fallback: T, guard: (value: unknown) => value is T): T {
+function readDocument(): UxFlowDocument {
   try {
-    const raw = localStorage.getItem(key)
-    if (raw === null) return fallback
+    const raw = localStorage.getItem(UX_FLOW_DOCUMENT_KEY)
+    if (raw === null) {
+      return migrateToDocumentV1().document
+    }
     const data: unknown = JSON.parse(raw)
-    return guard(data) ? data : fallback
+    if (isUxFlowDocument(data)) return data
+    return normalizeDocument(data)
   } catch {
-    return fallback
+    return createDefaultDocument()
   }
 }
 
-function isString(value: unknown): value is string {
-  return typeof value === 'string'
+export function documentToExportData(doc: UxFlowDocument): UxFlowExport['data'] {
+  return {
+    project: normalizeProject(doc.project),
+    personas: doc.empathize.personas,
+    empathyMaps: doc.empathize.empathyMaps,
+    empathySelectedPersona: doc.empathize.empathySelectedPersona,
+    researchNotes: doc.empathize.researchNotes,
+    competitors: doc.empathize.competitors,
+    problem: doc.define.problem,
+    pov: doc.define.pov,
+    hmw: doc.define.hmw,
+    ideas: doc.ideate.ideas,
+    userflow: doc.ideate.flowNodes,
+    sitemap: doc.ideate.sitemap,
+    cardSort: doc.ideate.cardSort,
+    designSystem: doc.prototype.designSystem,
+    wireframeBlocks: doc.prototype.wireframeBlocks,
+    componentChecklist: doc.prototype.componentChecklist,
+    wcagChecked: doc.test.wcagChecked,
+    heuristicEval: doc.test.heuristicEval,
+    aiPrefs: doc.aiPrefs,
+    usabilityReportSummary: doc.test.usabilityReportSummary,
+    microcopyBank: doc.prototype.microcopyBank,
+    aiHistory: doc.meta.aiHistory,
+    projectSynthesis: doc.meta.projectSynthesis,
+  }
+}
+
+export function exportDataToDocument(data: UxFlowExport['data']): UxFlowDocument {
+  return normalizeDocument({
+    schemaVersion: 1,
+    project: { ...normalizeProject(data.project), schemaVersion: 1 },
+    empathize: {
+      researchNotes: data.researchNotes,
+      personas: data.personas,
+      empathyMaps: data.empathyMaps,
+      empathySelectedPersona: data.empathySelectedPersona,
+      competitors: data.competitors,
+    },
+    define: {
+      problem: data.problem,
+      pov: data.pov,
+      hmw: data.hmw,
+    },
+    ideate: {
+      ideas: data.ideas,
+      flowNodes: data.userflow,
+      sitemap: data.sitemap,
+      cardSort: data.cardSort,
+    },
+    prototype: {
+      designSystem: data.designSystem,
+      wireframeBlocks: data.wireframeBlocks,
+      componentChecklist: data.componentChecklist,
+      microcopyBank: data.microcopyBank,
+    },
+    test: {
+      wcagChecked: data.wcagChecked,
+      heuristicEval: data.heuristicEval,
+      usabilityReportSummary: data.usabilityReportSummary,
+    },
+    meta: {
+      projectSynthesis: data.projectSynthesis,
+      aiHistory: data.aiHistory,
+    },
+    aiPrefs: data.aiPrefs,
+  })
 }
 
 export function isUxFlowExport(value: unknown): value is UxFlowExport {
   if (!isRecord(value)) return false
-  if (value.version !== UX_FLOW_EXPORT_VERSION && value.version !== 3 && value.version !== 2 && value.version !== 1) {
+  if (
+    value.version !== UX_FLOW_EXPORT_VERSION &&
+    value.version !== 4 &&
+    value.version !== 3 &&
+    value.version !== 2 &&
+    value.version !== 1
+  ) {
     return false
   }
   if (typeof value.exportedAt !== 'string') return false
   if (!isRecord(value.data)) return false
   const d = value.data
-  const summaryOk =
-    value.version === 1 ||
-    typeof d.usabilityReportSummary === 'string'
+  const summaryOk = value.version === 1 || typeof d.usabilityReportSummary === 'string'
   const microcopyOk =
-    value.version <= 2 ||
-    isMicrocopyEntryArray(d.microcopyBank) ||
-    d.microcopyBank === undefined
+    value.version <= 2 || isMicrocopyEntryArray(d.microcopyBank) || d.microcopyBank === undefined
   const historyOk =
-    value.version <= 2 ||
-    isAiHistoryEntryArray(d.aiHistory) ||
-    d.aiHistory === undefined
+    value.version <= 2 || isAiHistoryEntryArray(d.aiHistory) || d.aiHistory === undefined
   const synthesisOk =
     value.version <= 3 ||
     typeof d.projectSynthesis === 'string' ||
@@ -190,40 +247,11 @@ export function isUxFlowExport(value: unknown): value is UxFlowExport {
 }
 
 export function buildUxFlowExport(): UxFlowExport {
+  const doc = readDocument()
   return {
     version: UX_FLOW_EXPORT_VERSION,
     exportedAt: new Date().toISOString(),
-    data: {
-      project: normalizeProject(
-        readOr(STORAGE_KEYS.project, createDefaultProject(), isProject),
-      ),
-      personas: readOr(STORAGE_KEYS.personas, [], isPersonaArray),
-      empathyMaps: readOr(STORAGE_KEYS.empathyMaps, {}, isEmpathyMaps),
-      empathySelectedPersona: readOr(STORAGE_KEYS.empathySelectedPersona, 'general', isString),
-      researchNotes: readOr(STORAGE_KEYS.researchNotes, '', isString),
-      competitors: readOr(STORAGE_KEYS.competitors, [], isCompetitorRowArray),
-      problem: readOr(STORAGE_KEYS.problem, createEmptyProblemStatement(), isProblemStatement),
-      pov: readOr(STORAGE_KEYS.pov, createEmptyPOV(), isPOV),
-      hmw: readOr(STORAGE_KEYS.hmw, [], isHMWItemArray),
-      ideas: readOr(STORAGE_KEYS.ideas, [], isIdeaCardArray),
-      userflow: readOr(STORAGE_KEYS.userflow, [], isFlowNodeArray),
-      sitemap: readOr(STORAGE_KEYS.sitemap, [], isSitemapNodeArray),
-      cardSort: readOr(STORAGE_KEYS.cardSort, createEmptyCardSortState(), isCardSortState),
-      designSystem: readOr(STORAGE_KEYS.designSystem, createDefaultDesignSystem(), isDesignSystem),
-      wireframeBlocks: readOr(STORAGE_KEYS.wireframeBlocks, [], isStringArray),
-      componentChecklist: readOr(STORAGE_KEYS.componentChecklist, [], isStringArray),
-      wcagChecked: readOr(STORAGE_KEYS.wcagChecked, [], isStringArray),
-      heuristicEval: readOr(STORAGE_KEYS.heuristicEval, {}, isHeuristicEvalMap),
-      aiPrefs: readOr(
-        STORAGE_KEYS.aiPrefs,
-        { selectedModelId: 'groq/compound-mini' },
-        isAiPrefs,
-      ),
-      usabilityReportSummary: readOr(STORAGE_KEYS.usabilityReportSummary, '', isString),
-      microcopyBank: readOr(STORAGE_KEYS.microcopyBank, [], isMicrocopyEntryArray),
-      aiHistory: readOr(STORAGE_KEYS.aiHistory, [], isAiHistoryEntryArray),
-      projectSynthesis: readOr(STORAGE_KEYS.projectSynthesis, '', isString),
-    },
+    data: documentToExportData(doc),
   }
 }
 
@@ -240,4 +268,14 @@ export function downloadUxFlowExport(filename = 'designyar-export.json'): void {
   anchor.click()
   document.body.removeChild(anchor)
   URL.revokeObjectURL(url)
+}
+
+/** @deprecated Defaults kept for type-check of old call sites during rebuild. */
+export const _exportDefaults = {
+  createDefaultProject,
+  createDefaultDesignSystem,
+  createEmptyProblemStatement,
+  createEmptyPOV,
+  createEmptyCardSortState,
+  createDefaultAiPrefs,
 }

@@ -28,6 +28,7 @@ import { useAiApply, type AiApplyAudit } from '@/composables/useAiApply'
 import { useAiPromptContext } from '@/composables/useAiPromptContext'
 import { useGroq } from '@/composables/useGroq'
 import { useAiStore } from '@/stores/ai'
+import { useProjectStore } from '@/stores/project'
 import type { AiApplyPayload } from '@/types/ai-response'
 import { getContextReadiness } from '@/utils/ai-context-readiness'
 import { getProjectContextCoverage } from '@/utils/ai-context-coverage'
@@ -45,6 +46,7 @@ import {
 const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
 const aiStore = useAiStore()
+const projectStore = useProjectStore()
 const { selectedModelId, isLoading, isReady, lastResponse, error, activeChainId } =
   storeToRefs(aiStore)
 const { models, validateApiKey, chat } = useGroq()
@@ -311,8 +313,12 @@ function onClearResponse(): void {
     <Alert
       type="info"
       show-icon
-      message="دستیار Design Thinking (Groq)"
-      description="هر اکشن از کل artifactهای پروژه (شرح، Empathize، Define، Ideate، Prototype، Test) context می‌گیرد — نه فقط همین صفحه."
+      :message="projectStore.isJuniorMode ? 'دستیار AI' : 'دستیار Design Thinking (Groq)'"
+      :description="
+        projectStore.isJuniorMode
+          ? 'یک اکشن انتخاب کن و بفرست. اگر مطمئن نیستی، همان پیشنهادی که در صفحه باز شده را نگه دار.'
+          : 'هر اکشن از کل artifactهای پروژه (شرح، Empathize، Define، Ideate، Prototype، Test) context می‌گیرد — نه فقط همین صفحه.'
+      "
     />
 
     <Card size="small" title="پوشش داده پروژه در AI">

@@ -13,23 +13,22 @@ import {
   Tag,
   Typography,
 } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { storeToRefs } from 'pinia'
 import { useContrast } from '@/composables/useContrast'
 import { useWCAG } from '@/composables/useWCAG'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import { HEURISTIC_RULES, type HeuristicEvalMap } from '@/constants/heuristic-rules'
+import { HEURISTIC_RULES } from '@/constants/heuristic-rules'
 import { useDesignSystemStore } from '@/stores/designSystem'
+import { useTestStore } from '@/stores/test'
 import { evaluateContrast } from '@/utils/contrast'
 
 const { Paragraph, Text } = Typography
 const { progress: wcagProgress, checkedCount, total: wcagTotal } = useWCAG()
 const designStore = useDesignSystemStore()
 const { palette } = storeToRefs(designStore)
-
-const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
-const reportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
+const testStore = useTestStore()
+const { heuristicEval: evaluations, usabilityReportSummary: reportSummary } =
+  storeToRefs(testStore)
 
 const designContrast = computed(() => {
   const fg = palette.value.primary[7] ?? '#000000'

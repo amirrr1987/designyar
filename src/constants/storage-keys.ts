@@ -1,12 +1,10 @@
+export const UX_FLOW_DOCUMENT_KEY = 'ux-flow:v1' as const
+
 /**
- * Canonical LocalStorage keys for UX Flow.
- *
- * Persistence rules (Phase 8.4 audit):
- * - Runtime app state uses VueUse `useStorage` only (via these keys).
- * - Direct `localStorage` is allowed only in import/export hydrate helpers.
- * - Debounce is not required; module payloads stay small enough for sync writes.
+ * Legacy multi-key LocalStorage map (pre–schema v1).
+ * Used only by `domain/migrate.ts` — do not write new domain data here.
  */
-export const STORAGE_KEYS = {
+export const LEGACY_STORAGE_KEYS = {
   project: 'ux-flow-project',
   personas: 'ux-flow-personas',
   empathyMaps: 'ux-flow-empathy-maps',
@@ -32,11 +30,17 @@ export const STORAGE_KEYS = {
   projectSynthesis: 'ux-flow-project-synthesis',
 } as const
 
-export type StorageKeyId = keyof typeof STORAGE_KEYS
-export type StorageKeyValue = (typeof STORAGE_KEYS)[StorageKeyId]
+export type LegacyStorageKeyId = keyof typeof LEGACY_STORAGE_KEYS
+export type LegacyStorageKeyValue = (typeof LEGACY_STORAGE_KEYS)[LegacyStorageKeyId]
 
-export const STORAGE_KEY_LIST = Object.values(STORAGE_KEYS) as readonly StorageKeyValue[]
+/** @deprecated Prefer `UX_FLOW_DOCUMENT_KEY` + document slices. Kept as alias for migrate/import. */
+export const STORAGE_KEYS = LEGACY_STORAGE_KEYS
 
-export function isStorageKeyValue(value: string): value is StorageKeyValue {
+export type StorageKeyId = LegacyStorageKeyId
+export type StorageKeyValue = LegacyStorageKeyValue
+
+export const STORAGE_KEY_LIST = Object.values(LEGACY_STORAGE_KEYS) as readonly LegacyStorageKeyValue[]
+
+export function isStorageKeyValue(value: string): value is LegacyStorageKeyValue {
   return (STORAGE_KEY_LIST as readonly string[]).includes(value)
 }

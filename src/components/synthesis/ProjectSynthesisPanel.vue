@@ -11,17 +11,18 @@ import {
   Tag,
   Typography,
 } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useAiPromptContext } from '@/composables/useAiPromptContext'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { useMetaStore } from '@/stores/meta'
 import { getProjectContextCoverage } from '@/utils/ai-context-coverage'
 import { buildSynthesisSections } from '@/utils/project-synthesis-sections'
 
 const { Title, Paragraph, Text } = Typography
 
 const { buildContext } = useAiPromptContext()
-const projectSynthesis = useStorage<string>(STORAGE_KEYS.projectSynthesis, '')
+const metaStore = useMetaStore()
+const { projectSynthesis } = storeToRefs(metaStore)
 
 const ctx = computed(() => buildContext())
 const sections = computed(() => buildSynthesisSections(ctx.value))
@@ -30,7 +31,7 @@ const coverage = computed(() => getProjectContextCoverage(ctx.value))
 const filledCount = computed(() => coverage.value.items.filter((i) => i.filled).length)
 
 function clearSynthesis(): void {
-  projectSynthesis.value = ''
+  metaStore.setProjectSynthesis('')
 }
 </script>
 

@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { Card, Col, Input, Rate, Row, Space, Statistic, Typography } from 'ant-design-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   HEURISTIC_RULES,
-  type HeuristicEvalMap,
   type HeuristicEvaluation,
 } from '@/constants/heuristic-rules'
+import { useTestStore } from '@/stores/test'
 
 const Textarea = Input.TextArea
 const { Paragraph, Text } = Typography
 
-const evaluations = useStorage<HeuristicEvalMap>(STORAGE_KEYS.heuristicEval, {})
+const testStore = useTestStore()
+const { heuristicEval: evaluations } = storeToRefs(testStore)
 
 const average = computed(() => {
   const ratings = HEURISTIC_RULES.map((rule) => evaluations.value[rule.id]?.rating ?? 0)

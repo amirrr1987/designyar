@@ -9,6 +9,7 @@ import {
   Button,
   Drawer,
   Space,
+  Switch,
   Upload,
   Divider,
   message,
@@ -27,6 +28,14 @@ const { Text, Title } = Typography
 const projectStore = useProjectStore()
 const aiStore = useAiStore()
 const { panelOpen } = storeToRefs(aiStore)
+
+/** Switch checked = junior (ساده). */
+const juniorSwitch = computed({
+  get: () => projectStore.isJuniorMode,
+  set: (value: boolean) => {
+    projectStore.setExperienceMode(value ? 'junior' : 'full')
+  },
+})
 
 const projectName = computed({
   get: () => projectStore.project.name,
@@ -74,7 +83,9 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
         <Space wrap align="center" size="middle">
           <Space direction="vertical" :size="0">
             <Title :level="5" style="margin: 0">دیزاین‌یار</Title>
-            <Text type="secondary">همراه Design Thinking</Text>
+            <Text type="secondary">
+              {{ juniorSwitch ? 'مسیر ساده برای شروع UI/UX' : 'همراه Design Thinking' }}
+            </Text>
           </Space>
           <Divider type="vertical" />
           <Input
@@ -87,6 +98,10 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
       </Col>
       <Col :xs="24" :md="12" :lg="10">
         <Space wrap style="width: 100%; justify-content: flex-end">
+          <Space align="center">
+            <Text type="secondary">حالت ساده</Text>
+            <Switch v-model:checked="juniorSwitch" checked-children="روشن" un-checked-children="خاموش" />
+          </Space>
           <Upload
             :before-upload="beforeUpload"
             :show-upload-list="false"

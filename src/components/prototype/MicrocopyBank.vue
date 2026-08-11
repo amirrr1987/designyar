@@ -13,18 +13,18 @@ import {
   message,
 } from 'ant-design-vue'
 import { DeleteOutlined } from '@ant-design/icons-vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { usePrototypeStore } from '@/stores/prototype'
 import {
   MICROCOPY_CATEGORY_LABELS,
   type MicrocopyCategory,
-  type MicrocopyEntry,
 } from '@/types/microcopy'
 
 const { Paragraph, Text } = Typography
 
-const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
+const prototypeStore = usePrototypeStore()
+const { microcopyBank } = storeToRefs(prototypeStore)
 
 const categoryColor: Record<MicrocopyCategory, string> = {
   cta: 'blue',
@@ -41,7 +41,7 @@ const sortedEntries = computed(() =>
 )
 
 function removeEntry(id: string): void {
-  microcopyBank.value = microcopyBank.value.filter((entry) => entry.id !== id)
+  prototypeStore.removeMicrocopy(id)
   message.success('مورد حذف شد')
 }
 </script>

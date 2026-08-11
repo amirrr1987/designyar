@@ -28,7 +28,7 @@ const menuItems = computed((): ItemType[] => {
   }
   const steps: ItemType[] = DESIGN_THINKING_STEPS.map((step) => ({
     key: step.key,
-    label: step.title,
+    label: projectStore.isJuniorMode ? `${step.step}. ${step.title}` : step.title,
     icon: () => h(resolveStepIcon(step.icon)),
   }))
   const synthesis: ItemType = {
@@ -60,7 +60,9 @@ const onSelect: MenuProps['onSelect'] = (info) => {
   <Sider breakpoint="lg" collapsed-width="0" :width="232" theme="light">
     <Space direction="vertical" size="small" style="width: 100%; padding: 16px 16px 8px">
       <Title :level="4" style="margin: 0">دیزاین‌یار</Title>
-      <Text type="secondary">Design Thinking</Text>
+      <Text type="secondary">
+        {{ projectStore.isJuniorMode ? '۵ گام به‌ترتیب' : 'Design Thinking' }}
+      </Text>
     </Space>
     <Menu
       mode="inline"

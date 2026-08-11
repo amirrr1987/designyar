@@ -18,20 +18,19 @@ import {
 } from 'ant-design-vue'
 import type { ButtonProps } from 'ant-design-vue'
 import { ArrowLeftOutlined, RocketOutlined } from '@ant-design/icons-vue'
-import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { resolveStepIcon } from '@/constants/step-icons'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useWCAG } from '@/composables/useWCAG'
 import { useDefineStore } from '@/stores/define'
 import { useDesignSystemStore } from '@/stores/designSystem'
+import { useEmpathizeStore } from '@/stores/empathize'
 import { useIdeateStore } from '@/stores/ideate'
 import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
-import type { CompetitorRow } from '@/types/competitor'
-import type { EmpathyMapsByPersona } from '@/types/empathy-map'
+import { usePrototypeStore } from '@/stores/prototype'
+import { useTestStore } from '@/stores/test'
 import type { DesignStepKey } from '@/types/project'
 
 const { Paragraph, Text, Title } = Typography
@@ -41,16 +40,20 @@ const personaStore = usePersonaStore()
 const defineStore = useDefineStore()
 const ideateStore = useIdeateStore()
 const designStore = useDesignSystemStore()
+const empathizeStore = useEmpathizeStore()
+const prototypeStore = usePrototypeStore()
+const testStore = useTestStore()
 const { progress: wcagProgress } = useWCAG()
 
 const { personas } = storeToRefs(personaStore)
 const { problem, pov, hmw } = storeToRefs(defineStore)
 const { ideas, flowNodes, sitemap } = storeToRefs(ideateStore)
 const { palette } = storeToRefs(designStore)
+const { researchNotes, competitors, empathyMaps } = storeToRefs(empathizeStore)
+const { wireframeBlocks } = storeToRefs(prototypeStore)
+const { usabilityReportSummary: testSummary } = storeToRefs(testStore)
 
-const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
-const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
-const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
+const isJunior = computed(() => projectStore.isJuniorMode)
 
 const projectName = computed({
   get: () => projectStore.project.name,
@@ -108,10 +111,16 @@ const stepStats = computed((): StepStat[] => {
   ]
   const ideateDone = ideateChecks.filter(Boolean).length
 
-  const prototypeChecks = [palette.value.primary.length > 0, palette.value.accent.length > 0]
+  const prototypeChecks = [
+    palette.value.primary.length > 0,
+    palette.value.accent.length > 0,
+    wireframeBlocks.value.length > 0,
+  ]
   const prototypeDone = prototypeChecks.filter(Boolean).length
 
-  const testPercent = wcagProgress.value
+  const testChecks = [wcagProgress.value >= 30, testSummary.value.trim().length > 0]
+  const testDone = testChecks.filter(Boolean).length
+  const testPercent = Math.round((testDone / testChecks.length) * 50 + wcagProgress.value * 0.5)
 
   return [
     {
@@ -136,13 +145,13 @@ const stepStats = computed((): StepStat[] => {
       key: 'prototype',
       title: 'پروتوتایپ',
       percent: Math.round((prototypeDone / prototypeChecks.length) * 100),
-      detail: `${prototypeDone}/${prototypeChecks.length} پالت`,
+      detail: `${prototypeDone}/${prototypeChecks.length} بخش`,
     },
     {
       key: 'test',
       title: 'تست',
-      percent: testPercent,
-      detail: `WCAG ${testPercent}%`,
+      percent: Math.min(100, testPercent),
+      detail: `دسترسی ${wcagProgress.value}%`,
     },
   ]
 })
@@ -199,11 +208,17 @@ function statusColor(percent: number): string {
     <Card>
       <Space direction="vertical" size="middle">
         <Space wrap align="center">
-          <Tag color="geekblue">شروع پروژه</Tag>
+          <Tag color="geekblue">{{ isJunior ? 'شروع آسان' : 'شروع پروژه' }}</Tag>
           <Title :level="3" style="margin: 0">خوش آمدید به دیزاین‌یار</Title>
         </Space>
         <Paragraph type="secondary" style="margin-bottom: 0">
-          مسیر پنج‌مرحله‌ای Design Thinking را با AI طی کنید — از همدلی تا تست و جمع‌بندی.
+          <template v-if="isJunior">
+            فقط سه کار: شرح پروژه را بنویس → دکمهٔ «ادامه» را بزن → در هر مرحله راهنمای سبز را
+            دنبال کن. ابزارهای پیشرفته را بعداً روشن می‌کنی.
+          </template>
+          <template v-else>
+            مسیر پنج‌مرحله‌ای Design Thinking را با AI طی کنید — از همدلی تا تست و جمع‌بندی.
+          </template>
         </Paragraph>
         <Alert
           v-if="nextStep"
@@ -293,7 +308,7 @@ function statusColor(percent: number): string {
             <Statistic title="ایده‌ها" :value="ideas.length" />
           </Col>
           <Col :xs="12" :sm="8" :md="6">
-            <Statistic title="HMW" :value="hmw.length" />
+            <Statistic :title="isJunior ? 'سوالات' : 'HMW'" :value="hmw.length" />
           </Col>
           <Col :xs="12" :sm="8" :md="6">
             <Statistic title="رقبا" :value="competitors.length" />
@@ -302,7 +317,15 @@ function statusColor(percent: number): string {
       </Space>
     </Card>
 
-    <Card title="مراحل دیزاین تینکینگ">
+    <Card :title="isJunior ? '۵ گام مسیر شما' : 'مراحل دیزاین تینکینگ'">
+      <Alert
+        v-if="isJunior"
+        type="info"
+        show-icon
+        style="margin-bottom: 16px"
+        message="پیشنهاد: به‌ترتیب برو — اول همدلی، بعد تعریف مسئله"
+        description="می‌توانی آزادانه جابه‌جا شوی، ولی برای یادگیری بهتر است یک‌به‌یک جلو بروی."
+      />
       <Row :gutter="[16, 16]">
         <Col
           v-for="step in DESIGN_THINKING_STEPS"

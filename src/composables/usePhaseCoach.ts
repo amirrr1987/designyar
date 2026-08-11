@@ -1,18 +1,16 @@
 import { computed, type ComputedRef } from 'vue'
 import { useRoute } from 'vue-router'
-import { useStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useWCAG } from '@/composables/useWCAG'
 import { usePersona } from '@/composables/usePersona'
-import { STORAGE_KEYS } from '@/constants/storage-keys'
 import { getStepByNumber } from '@/constants/design-thinking-steps'
 import { useDefineStore } from '@/stores/define'
+import { useEmpathizeStore } from '@/stores/empathize'
 import { useIdeateStore } from '@/stores/ideate'
+import { usePrototypeStore } from '@/stores/prototype'
 import { useProjectStore } from '@/stores/project'
+import { useTestStore } from '@/stores/test'
 import { useAiStore } from '@/stores/ai'
-import type { EmpathyMapsByPersona } from '@/types/empathy-map'
-import type { CompetitorRow } from '@/types/competitor'
-import type { MicrocopyEntry } from '@/types/microcopy'
 import type { DesignStepKey } from '@/types/project'
 import { isAiActionId } from '@/utils/ai-prompts'
 import {
@@ -39,22 +37,17 @@ export function usePhaseCoach(): {
   const projectStore = useProjectStore()
   const defineStore = useDefineStore()
   const ideateStore = useIdeateStore()
+  const empathizeStore = useEmpathizeStore()
+  const prototypeStore = usePrototypeStore()
+  const testStore = useTestStore()
   const aiStore = useAiStore()
   const { count: personaCount } = usePersona()
   const { progress: wcagProgress } = useWCAG()
   const { problem, pov, hmw } = storeToRefs(defineStore)
   const { ideas, flowNodes, sitemap, cardSort } = storeToRefs(ideateStore)
-
-  const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
-  const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
-  const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
-  const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
-  const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
-  const wireframeBlocks = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
-    'header',
-    'content',
-    'footer',
-  ])
+  const { researchNotes, empathyMaps, competitors } = storeToRefs(empathizeStore)
+  const { wireframeBlocks, microcopyBank } = storeToRefs(prototypeStore)
+  const { usabilityReportSummary: testSummary } = storeToRefs(testStore)
 
   const stepKey = computed((): DesignStepKey | 'home' => {
     const name = route.name
