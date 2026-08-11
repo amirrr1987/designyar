@@ -1,13 +1,21 @@
 import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
+import { useAiHistory } from '@/composables/useAiHistory'
 import { useDefineStore } from '@/stores/define'
 import { useIdeateStore } from '@/stores/ideate'
 import { usePersonaStore } from '@/stores/persona'
 import { useProjectStore } from '@/stores/project'
+import type { AiChainId } from '@/constants/ai-chains'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { AiApplyPayload, AiSitemapNodeDraft } from '@/types/ai-response'
 import type { MicrocopyEntry } from '@/types/microcopy'
 import type { SitemapNode } from '@/types/ideate'
+import type { AiActionId } from '@/utils/ai-prompts'
+import {
+  buildAiHistoryEntry,
+  captureApplyBeforeState,
+} from '@/utils/ai-apply-diff'
 
 function draftToSitemapNode(draft: AiSitemapNodeDraft): SitemapNode {
   return {
@@ -31,18 +39,49 @@ function normalizeHmwQuestion(question: string): string {
   return `چگونه می‌توانیم ${trimmed.replace(/\?$/, '')}؟`
 }
 
+export interface AiApplyAudit {
+  actionId: AiActionId
+  chainId?: AiChainId
+}
+
 export function useAiApply() {
   const personaStore = usePersonaStore()
   const defineStore = useDefineStore()
   const ideateStore = useIdeateStore()
   const projectStore = useProjectStore()
+  const { addEntry } = useAiHistory()
+  const { problem, pov } = storeToRefs(defineStore)
+  const { sitemap } = storeToRefs(ideateStore)
+
   const usabilityReportSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
   const researchNotes = useStorage<string>(STORAGE_KEYS.researchNotes, '')
   const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
   const empathySelectedPersona = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, 'general')
   const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
 
-  function applyPayload(payload: AiApplyPayload): number {
+  function applyPayload(payload: AiApplyPayload, audit?: AiApplyAudit): number {
+    const before = audit
+      ? captureApplyBeforeState(payload, {
+          problem: problem.value,
+          pov: pov.value,
+          briefTitle: projectStore.briefTitle,
+          briefDescription: projectStore.briefDescription,
+          researchNotes: researchNotes.value,
+          testSummary: usabilityReportSummary.value,
+          sitemap: sitemap.value,
+        })
+      : null
+
+    const count = applyPayloadCore(payload)
+
+    if (audit && count > 0 && before) {
+      addEntry(buildAiHistoryEntry(audit.actionId, payload, count, before, audit.chainId))
+    }
+
+    return count
+  }
+
+  function applyPayloadCore(payload: AiApplyPayload): number {
     switch (payload.type) {
       case 'personas': {
         let added = 0

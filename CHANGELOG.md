@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-08-11
+
+### Added
+
+- **تاریخچه اعمال AI** — audit log با before/after diff در پنل AI
+- ذخیره تا ۴۰ رکورد اعمال (اکشن، زنجیره، خلاصه، diff)
+- export/import شامل `aiHistory`
+
 ## [0.15.0] - 2026-08-11
 
 ### Added
@@ -20,7 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - دکمه میکروکپی از Define به Prototype منتقل شد
-- Phase Coach: راهنمای میکروکopi در Prototype و بازخورد حلقه‌ای Test
+- Phase Coach: راهنمای میکروکپی در Prototype و بازخورد حلقه‌ای Test
 
 ## [0.14.0] - 2026-08-11
 

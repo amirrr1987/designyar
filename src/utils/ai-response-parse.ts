@@ -4,7 +4,6 @@ import {
   isAiFlowStepDraft,
   isAiIdeaDraft,
   isAiPersonaDraft,
-  isAiProjectBriefDraft,
   isAiStatementDraft,
   isAiStructuredJson,
   isAiSitemapNodeDraftArray,

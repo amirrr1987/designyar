@@ -23,7 +23,8 @@ import {
   StopOutlined,
 } from '@ant-design/icons-vue'
 import { AI_CHAINS } from '@/constants/ai-chains'
-import { useAiApply } from '@/composables/useAiApply'
+import AiHistoryList from '@/components/shared/AiHistoryList.vue'
+import { useAiApply, type AiApplyAudit } from '@/composables/useAiApply'
 import { useAiPromptContext } from '@/composables/useAiPromptContext'
 import { useGroq } from '@/composables/useGroq'
 import { useAiStore } from '@/stores/ai'
@@ -191,8 +192,15 @@ async function onSend(): Promise<void> {
   await runSend()
 }
 
+function applyAudit(): AiApplyAudit {
+  return {
+    actionId: actionId.value,
+    chainId: activeChainId.value ?? undefined,
+  }
+}
+
 async function continueChainAfterApply(parsed: AiApplyPayload): Promise<void> {
-  const count = applyPayload(parsed)
+  const count = applyPayload(parsed, applyAudit())
   if (count === 0) {
     aiStore.cancelChain()
     chainRunning.value = false
@@ -255,7 +263,7 @@ function onApply(): void {
     message.warning('داده قابل اعمال یافت نشد')
     return
   }
-  const count = applyPayload(payload)
+  const count = applyPayload(payload, applyAudit())
   if (count === 0) {
     message.warning('مورد معتبری برای افزودن نبود')
     return
@@ -449,5 +457,7 @@ function onClearResponse(): void {
         {{ lastResponse }}
       </Paragraph>
     </Card>
+
+    <AiHistoryList />
   </Space>
 </template>

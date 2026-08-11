@@ -2,6 +2,8 @@ import type { AiPrefs } from '@/stores/ai'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { HeuristicEvalMap } from '@/constants/heuristic-rules'
 import type { CompetitorRow } from '@/types/competitor'
+import type { AiHistoryEntry } from '@/types/ai-history'
+import { isAiHistoryEntryArray } from '@/types/ai-history'
 import type { HMWItem, POV, ProblemStatement } from '@/types/define'
 import type { DesignSystem } from '@/types/design-system'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
@@ -58,6 +60,7 @@ export interface UxFlowExport {
     aiPrefs: AiPrefs
     usabilityReportSummary: string
     microcopyBank: MicrocopyEntry[]
+    aiHistory: AiHistoryEntry[]
   }
 }
 
@@ -150,9 +153,14 @@ export function isUxFlowExport(value: unknown): value is UxFlowExport {
     value.version <= 2 ||
     isMicrocopyEntryArray(d.microcopyBank) ||
     d.microcopyBank === undefined
+  const historyOk =
+    value.version <= 2 ||
+    isAiHistoryEntryArray(d.aiHistory) ||
+    d.aiHistory === undefined
   return (
     summaryOk &&
     microcopyOk &&
+    historyOk &&
     isProject(d.project) &&
     isPersonaArray(d.personas) &&
     isEmpathyMaps(d.empathyMaps) &&
@@ -207,6 +215,7 @@ export function buildUxFlowExport(): UxFlowExport {
       ),
       usabilityReportSummary: readOr(STORAGE_KEYS.usabilityReportSummary, '', isString),
       microcopyBank: readOr(STORAGE_KEYS.microcopyBank, [], isMicrocopyEntryArray),
+      aiHistory: readOr(STORAGE_KEYS.aiHistory, [], isAiHistoryEntryArray),
     },
   }
 }

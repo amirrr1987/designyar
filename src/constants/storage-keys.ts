@@ -28,6 +28,7 @@ export const STORAGE_KEYS = {
   aiPrefs: 'ux-flow-ai-prefs',
   usabilityReportSummary: 'ux-flow-usability-report-summary',
   microcopyBank: 'ux-flow-microcopy-bank',
+  aiHistory: 'ux-flow-ai-history',
 } as const
 
 export type StorageKeyId = keyof typeof STORAGE_KEYS
