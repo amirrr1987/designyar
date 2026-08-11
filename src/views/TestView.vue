@@ -5,6 +5,7 @@ import ContrastChecker from '@/components/test/ContrastChecker.vue'
 import HeuristicEval from '@/components/test/HeuristicEval.vue'
 import UsabilityReport from '@/components/test/UsabilityReport.vue'
 import WCAGChecklist from '@/components/test/WCAGChecklist.vue'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
 type TestTabKey = 'contrast' | 'wcag' | 'heuristics' | 'report'
@@ -19,6 +20,7 @@ const activeKey = ref<TestTabKey>('contrast')
     <Card>
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
+      <AiAssistButton action="summarize-test" label="خلاصه یافته‌ها با AI" />
     </Card>
 
     <Card>

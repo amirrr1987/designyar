@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
+import type { AiActionId } from '@/utils/ai-prompts'
 
 export interface AiPrefs {
   /** WebLLM model id preference (engine loads at runtime). */
@@ -24,6 +25,8 @@ export const useAiStore = defineStore('ai', () => {
   const progress = ref(0)
   const lastResponse = ref('')
   const error = ref('')
+  const panelOpen = ref(false)
+  const pendingAction = ref<AiActionId | null>(null)
 
   const selectedModelId = computed(() => prefs.value.selectedModelId)
 
@@ -52,6 +55,25 @@ export const useAiStore = defineStore('ai', () => {
     error.value = value
   }
 
+  function openPanel(action?: AiActionId): void {
+    if (action) pendingAction.value = action
+    panelOpen.value = true
+  }
+
+  function closePanel(): void {
+    panelOpen.value = false
+  }
+
+  function setPanelOpen(value: boolean): void {
+    panelOpen.value = value
+  }
+
+  function consumePendingAction(): AiActionId | null {
+    const action = pendingAction.value
+    pendingAction.value = null
+    return action
+  }
+
   function clearSessionOutput(): void {
     lastResponse.value = ''
     error.value = ''
@@ -64,6 +86,8 @@ export const useAiStore = defineStore('ai', () => {
     progress.value = 0
     lastResponse.value = ''
     error.value = ''
+    panelOpen.value = false
+    pendingAction.value = null
   }
 
   return {
@@ -74,12 +98,18 @@ export const useAiStore = defineStore('ai', () => {
     progress,
     lastResponse,
     error,
+    panelOpen,
+    pendingAction,
     setSelectedModelId,
     setLoading,
     setReady,
     setProgress,
     setLastResponse,
     setError,
+    openPanel,
+    closePanel,
+    setPanelOpen,
+    consumePendingAction,
     clearSessionOutput,
     reset,
   }

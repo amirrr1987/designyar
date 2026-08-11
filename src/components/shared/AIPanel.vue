@@ -53,12 +53,11 @@ const actionOptions = computed(() =>
 const selectedAction = computed(() => AI_ACTIONS.find((a) => a.id === actionId.value))
 
 watch(
-  actionId,
-  (id) => {
-    const def = AI_ACTIONS.find((a) => a.id === id)
-    if (def && !prompt.value.trim()) {
-      prompt.value = ''
-    }
+  () => aiStore.panelOpen,
+  (open) => {
+    if (!open) return
+    const pending = aiStore.consumePendingAction()
+    if (pending) actionId.value = pending
   },
   { immediate: true },
 )

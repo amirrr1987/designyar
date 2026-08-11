@@ -6,6 +6,7 @@ import EmpathyMap from '@/components/empathize/EmpathyMap.vue'
 import PersonaBuilder from '@/components/empathize/PersonaBuilder.vue'
 import PersonaCard from '@/components/empathize/PersonaCard.vue'
 import ResearchNotes from '@/components/empathize/ResearchNotes.vue'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { usePersona } from '@/composables/usePersona'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
@@ -22,6 +23,10 @@ const activeKey = ref<EmpathizeTabKey>('personas')
     <Card>
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
+      <Space wrap>
+        <AiAssistButton action="persona-suggest" label="پیشنهاد پرسونا با AI" />
+        <AiAssistButton action="analyze-notes" label="تحلیل یادداشت با AI" />
+      </Space>
     </Card>
 
     <Card>
