@@ -5,11 +5,11 @@ import { STORAGE_KEYS } from '@/constants/storage-keys'
 import type { AiActionId } from '@/utils/ai-prompts'
 
 export interface AiPrefs {
-  /** WebLLM model id preference (engine loads at runtime). */
+  /** Groq model id preference. */
   selectedModelId: string
 }
 
-const DEFAULT_MODEL_ID = 'SmolLM2-360M-Instruct-q4f16_1-MLC'
+const DEFAULT_MODEL_ID = 'groq/compound-mini'
 
 function createDefaultAiPrefs(): AiPrefs {
   return {

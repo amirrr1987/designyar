@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   Input,
-  Progress,
   Select,
   Space,
   Spin,
@@ -13,9 +12,9 @@ import {
   message,
 } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
-import { RobotOutlined, SendOutlined } from '@ant-design/icons-vue'
+import { LinkOutlined, RobotOutlined, SendOutlined } from '@ant-design/icons-vue'
 import { useAiPromptContext } from '@/composables/useAiPromptContext'
-import { useWebLLM } from '@/composables/useWebLLM'
+import { useGroq } from '@/composables/useGroq'
 import { useAiStore } from '@/stores/ai'
 import {
   AI_ACTIONS,
@@ -28,8 +27,8 @@ import {
 const Textarea = Input.TextArea
 const { Text, Paragraph } = Typography
 const aiStore = useAiStore()
-const { selectedModelId, isLoading, isReady, progress, lastResponse, error } = storeToRefs(aiStore)
-const { models, initModel, chat } = useWebLLM()
+const { selectedModelId, isLoading, isReady, lastResponse, error } = storeToRefs(aiStore)
+const { models, validateApiKey, chat } = useGroq()
 const { buildContext } = useAiPromptContext()
 
 const actionId = ref<AiActionId>('persona-suggest')
@@ -38,7 +37,7 @@ const prompt = ref('')
 const modelOptions = computed(() =>
   models.map((id) => ({
     value: id,
-    label: id.replace(/-MLC$/, ''),
+    label: id.replace(/^groq\//, ''),
   })),
 )
 
@@ -55,20 +54,17 @@ watch(
   () => aiStore.panelOpen,
   (open) => {
     if (!open) return
+    validateApiKey()
     const pending = aiStore.consumePendingAction()
     if (pending) actionId.value = pending
   },
   { immediate: true },
 )
 
-async function onLoadModel(): Promise<void> {
-  message.loading({ content: 'در حال بارگذاری مدل…', key: 'llm', duration: 0 })
-  await initModel(selectedModelId.value)
-  if (aiStore.error) {
-    message.error({ content: 'بارگذاری ناموفق', key: 'llm' })
-    return
+function onCheckConnection(): void {
+  if (validateApiKey()) {
+    message.success('کلید API یافت شد — آماده اجرا')
   }
-  message.success({ content: 'مدل آماده است', key: 'llm' })
 }
 
 function onActionChange(value: unknown): void {
@@ -84,6 +80,8 @@ function onModelChange(value: unknown): void {
 }
 
 async function onSend(): Promise<void> {
+  if (!validateApiKey()) return
+
   const ctx = buildContext(prompt.value.trim() || undefined)
   const userPrompt = buildUserPrompt(actionId.value, ctx)
   const systemPrompt = buildSystemPrompt(actionId.value)
@@ -97,24 +95,37 @@ async function onSend(): Promise<void> {
 </script>
 
 <template>
-  <Spin :spinning="isLoading && !isReady">
+  <Spin :spinning="isLoading">
     <Space direction="vertical" size="middle">
       <Alert
         type="info"
         show-icon
-        message="هوش مصنوعی داخل مرورگر (WebLLM)"
-        description="مدل روی دستگاه شما اجرا می‌شود؛ اولین بار ممکن است دانلود طول بکشد."
+        message="هوش مصنوعی Groq (compound-mini)"
+        description="پاسخ از Groq Cloud با جست‌وجوی وب و ابزارهای compound — کلید API را در .env.local تنظیم کنید."
       />
+
+      <Alert
+        v-if="!isReady"
+        type="warning"
+        show-icon
+        message="کلید API یافت نشد"
+        description="فایل .env.local را با VITE_GROQ_API_KEY=... بسازید (از console.groq.com/keys)."
+      >
+        <template #action>
+          <Button size="small" type="link" href="https://console.groq.com/keys" target="_blank">
+            <template #icon><LinkOutlined /></template>
+            دریافت کلید
+          </Button>
+        </template>
+      </Alert>
 
       <Space wrap>
         <Select :value="selectedModelId" :options="modelOptions" @update:value="onModelChange" />
-        <Button type="primary" :loading="isLoading" @click="onLoadModel">
+        <Button :loading="isLoading" @click="onCheckConnection">
           <template #icon><RobotOutlined /></template>
-          بارگذاری مدل
+          بررسی اتصال
         </Button>
       </Space>
-
-      <Progress v-if="isLoading || progress > 0" :percent="progress" status="active" />
 
       <Alert
         v-if="error"
@@ -129,7 +140,7 @@ async function onSend(): Promise<void> {
         v-if="isReady"
         type="success"
         show-icon
-        message="مدل آماده است — اکشن را انتخاب و اجرا کنید"
+        message="آماده — اکشن را انتخاب و اجرا کنید"
       />
 
       <Select :value="actionId" :options="actionOptions" @update:value="onActionChange" />

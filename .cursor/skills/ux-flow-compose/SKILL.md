@@ -28,14 +28,14 @@ Also obey project rule `.cursor/rules/full-safe-type-ts.mdc`.
 
 Each skill under `.cursor/skills/` that documents an **npm package** must drive code that **fully uses that package’s TypeScript surface** — props, return types, config types, event payloads, generics. Do not invent parallel interfaces.
 
-| Rule | Detail |
-|------|--------|
-| Prefer package types | `import type { ButtonProps, MenuProps } from 'ant-design-vue'` — not `interface MyBtn { type?: string }` |
-| Annotate boundaries | Variables, `defineProps` wrappers, store fields, and config objects that mirror a library API must use the library type |
-| Exhaust props typing | When building prop objects / `v-bind` spreads / theme configs, type them as `XxxProps` / `ThemeConfig` / package config |
-| Generics | Use package generics (`useStorage<T>`, `TableColumnsType<Row>`, `RouteRecordRaw`, …) |
-| Tooling configs | Config files use package helpers + types (`defineConfig` from `vite` / `eslint`, not untyped plain objects when a typed helper exists) |
-| Discover types | If unsure of the export name, check the package’s `.d.ts` / docs — still prefer official names over local clones |
+| Rule                 | Detail                                                                                                                                 |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Prefer package types | `import type { ButtonProps, MenuProps } from 'ant-design-vue'` — not `interface MyBtn { type?: string }`                               |
+| Annotate boundaries  | Variables, `defineProps` wrappers, store fields, and config objects that mirror a library API must use the library type                |
+| Exhaust props typing | When building prop objects / `v-bind` spreads / theme configs, type them as `XxxProps` / `ThemeConfig` / package config                |
+| Generics             | Use package generics (`useStorage<T>`, `TableColumnsType<Row>`, `RouteRecordRaw`, …)                                                   |
+| Tooling configs      | Config files use package helpers + types (`defineConfig` from `vite` / `eslint`, not untyped plain objects when a typed helper exists) |
+| Discover types       | If unsure of the export name, check the package’s `.d.ts` / docs — still prefer official names over local clones                       |
 
 Canonical UI example (antdv):
 
@@ -70,47 +70,47 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 
 ### A. Product / workflow
 
-| When | Read |
-|------|------|
-| Any feature, phase, module plan | [ux-flow](../ux-flow/SKILL.md) |
-| Combining skills / typed architecture | **this skill** |
+| When                                    | Read                                             |
+| --------------------------------------- | ------------------------------------------------ |
+| Any feature, phase, module plan         | [ux-flow](../ux-flow/SKILL.md)                   |
+| Combining skills / typed architecture   | **this skill**                                   |
 | End of each phase (version + CHANGELOG) | [keep-a-changelog](../keep-a-changelog/SKILL.md) |
 
 ### B. App runtime (feature code)
 
-| Concern | Skill |
-|---------|--------|
-| SFC / Composition API | [vue](../vue/SKILL.md) |
-| Routes / Menu sync | [vue-router](../vue-router/SKILL.md) |
-| Stores | [pinia](../pinia/SKILL.md) |
-| LocalStorage / browser utils | [vueuse-core](../vueuse-core/SKILL.md) |
-| UI components | [ant-design-vue](../ant-design-vue/SKILL.md) |
-| Icons | [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) |
-| Color ramps | [ant-design-colors](../ant-design-colors/SKILL.md) |
-| In-browser AI | [web-llm](../web-llm/SKILL.md) |
+| Concern                      | Skill                                                    |
+| ---------------------------- | -------------------------------------------------------- |
+| SFC / Composition API        | [vue](../vue/SKILL.md)                                   |
+| Routes / Menu sync           | [vue-router](../vue-router/SKILL.md)                     |
+| Stores                       | [pinia](../pinia/SKILL.md)                               |
+| LocalStorage / browser utils | [vueuse-core](../vueuse-core/SKILL.md)                   |
+| UI components                | [ant-design-vue](../ant-design-vue/SKILL.md)             |
+| Icons                        | [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) |
+| Color ramps                  | [ant-design-colors](../ant-design-colors/SKILL.md)       |
+| In-browser AI                | [web-llm](../web-llm/SKILL.md)                           |
 
 ### C. Tooling (config / scripts / CI quality)
 
-| Concern | Skill |
-|---------|--------|
-| Dev server / build | [vite](../vite/SKILL.md) |
-| Vue SFC plugin | [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) |
-| DevTools plugin | [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) |
-| TS compiler | [typescript](../typescript/SKILL.md) |
-| SFC typecheck | [vue-tsc](../vue-tsc/SKILL.md) |
-| App tsconfig | [vue-tsconfig](../vue-tsconfig/SKILL.md) |
-| Node tsconfig | [tsconfig-node24](../tsconfig-node24/SKILL.md) |
-| Node types | [types-node](../types-node/SKILL.md) |
-| ESLint | [eslint](../eslint/SKILL.md) |
-| Vue ESLint | [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md) |
-| Vue+TS ESLint | [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) |
-| Vue parser | [vue-eslint-parser](../vue-eslint-parser/SKILL.md) |
-| Prettier skip | [eslint-config-prettier](../eslint-config-prettier/SKILL.md) |
-| Oxlint bridge | [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) |
-| Oxlint | [oxlint](../oxlint/SKILL.md) |
-| Format | [oxfmt](../oxfmt/SKILL.md) |
-| Script runners | [npm-run-all2](../npm-run-all2/SKILL.md) |
-| TS config loader | [jiti](../jiti/SKILL.md) |
+| Concern            | Skill                                                                    |
+| ------------------ | ------------------------------------------------------------------------ |
+| Dev server / build | [vite](../vite/SKILL.md)                                                 |
+| Vue SFC plugin     | [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md)                       |
+| DevTools plugin    | [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md)         |
+| TS compiler        | [typescript](../typescript/SKILL.md)                                     |
+| SFC typecheck      | [vue-tsc](../vue-tsc/SKILL.md)                                           |
+| App tsconfig       | [vue-tsconfig](../vue-tsconfig/SKILL.md)                                 |
+| Node tsconfig      | [tsconfig-node24](../tsconfig-node24/SKILL.md)                           |
+| Node types         | [types-node](../types-node/SKILL.md)                                     |
+| ESLint             | [eslint](../eslint/SKILL.md)                                             |
+| Vue ESLint         | [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md)                       |
+| Vue+TS ESLint      | [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) |
+| Vue parser         | [vue-eslint-parser](../vue-eslint-parser/SKILL.md)                       |
+| Prettier skip      | [eslint-config-prettier](../eslint-config-prettier/SKILL.md)             |
+| Oxlint bridge      | [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md)                 |
+| Oxlint             | [oxlint](../oxlint/SKILL.md)                                             |
+| Format             | [oxfmt](../oxfmt/SKILL.md)                                               |
+| Script runners     | [npm-run-all2](../npm-run-all2/SKILL.md)                                 |
+| TS config loader   | [jiti](../jiti/SKILL.md)                                                 |
 
 Load **only** skills relevant to the current task after the product + typing baseline.
 
@@ -128,6 +128,7 @@ Load **only** skills relevant to the current task after the product + typing bas
 9. Phase done → load keep-a-changelog (SemVer + CHANGELOG.md)
 10. Ask before next file/phase
 ```
+
 ## Full-safe type contracts
 
 ### Forbidden
@@ -193,13 +194,13 @@ if (!first) return
 
 ### Domain type ownership
 
-| Layer | Owns |
-|-------|------|
-| `src/types/` or next to feature | Domain interfaces (`Persona`, `Project`, …) |
-| Pinia store | State + actions typed against domain |
-| View / component | `defineProps` / `defineEmits` only |
-| composables | Generic inputs/outputs; no untyped returns |
-| utils | Pure functions with explicit signatures + type guards |
+| Layer                           | Owns                                                  |
+| ------------------------------- | ----------------------------------------------------- |
+| `src/types/` or next to feature | Domain interfaces (`Persona`, `Project`, …)           |
+| Pinia store                     | State + actions typed against domain                  |
+| View / component                | `defineProps` / `defineEmits` only                    |
+| composables                     | Generic inputs/outputs; no untyped returns            |
+| utils                           | Pure functions with explicit signatures + type guards |
 
 More examples: [type-safe-patterns.md](type-safe-patterns.md). Full npm-interface policy: [package-interfaces.md](package-interfaces.md).
 

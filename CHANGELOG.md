@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-08-11
+
+### Added
+
+- یکپارچه‌سازی Groq Cloud (`groq-sdk`) با مدل پیش‌فرض `groq/compound-mini`
+- composable `useGroq` با استریم پاسخ و ابزارهای compound (web_search، code_interpreter، visit_website)
+- پیکربندی کلید API از `.env.local` با `VITE_GROQ_API_KEY` و فایل `.env.example`
+
+### Changed
+
+- پنل AI از WebLLM به Groq Cloud منتقل شد (بدون بارگذاری مدل محلی)
+
 ## [0.9.1] - 2026-08-11
 
 ### Added

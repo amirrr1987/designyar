@@ -1,11 +1,12 @@
 # دیزاین‌یار (UX Flow)
 
-اپلیکیشن کلاینت‌ساید برای کمک به فرآیند Design Thinking — Vue 3، Pinia، Ant Design Vue (RTL فارسی)، VueUse و WebLLM.
+اپلیکیشن کلاینت‌ساید برای کمک به فرآیند Design Thinking — Vue 3، Pinia، Ant Design Vue (RTL فارسی)، VueUse و Groq Cloud.
 
 ## راه‌اندازی
 
 ```sh
 pnpm install
+cp .env.example .env.local   # سپس VITE_GROQ_API_KEY را از https://console.groq.com/keys پر کنید
 pnpm dev
 ```
 
@@ -38,6 +39,8 @@ pnpm build
 2. بعد از `pnpm build`، محتویات `dist/` را به branch `gh-pages` بفرستید (یا از Action استفاده کنید).
 3. برای fallback، یک `404.html` کپی از `index.html` در `dist/` رایج است، یا از Actionهای SPA استفاده کنید.
 
-## یادداشت WebLLM
+## یادداشت Groq AI
 
-مدل‌ها داخل مرورگر دانلود/اجرا می‌شوند؛ برای دمو روی شبکهٔ کند اولین بارگذاری زمان‌بر است. HTTPS برای WebGPU/WASM در پروداکشن توصیه می‌شود.
+کلید API از [Groq Console](https://console.groq.com/keys) در `.env.local` با نام `VITE_GROQ_API_KEY` قرار می‌گیرد. مدل پیش‌فرض `groq/compound-mini` است (جست‌وجوی وب و ابزارهای compound).
+
+**هشدار:** کلید در باندل فرانت قرار می‌گیرد — فقط برای ابزار داخلی/دمو مناسب است؛ برای پروداکشن عمومی بهتر است پروکسی سرور-side داشته باشید.
