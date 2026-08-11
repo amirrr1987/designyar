@@ -1,0 +1,82 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import {
+  Card,
+  Checkbox,
+  Col,
+  Row,
+  Space,
+  Typography,
+} from 'ant-design-vue'
+import { useStorage } from '@vueuse/core'
+
+const { Text, Paragraph } = Typography
+
+export interface WireframeBlock {
+  id: string
+  label: string
+  description: string
+}
+
+const BLOCKS: readonly WireframeBlock[] = [
+  { id: 'header', label: 'هدر', description: 'لوگو، ناوبری، جستجو' },
+  { id: 'nav', label: 'ناوبری جانبی', description: 'منوی مراحل یا بخش‌ها' },
+  { id: 'hero', label: 'هیرو', description: 'معرفی و CTA اصلی' },
+  { id: 'content', label: 'محتوا', description: 'بدنه اصلی صفحه' },
+  { id: 'form', label: 'فرم', description: 'ورود داده کاربر' },
+  { id: 'list', label: 'لیست/جدول', description: 'نمایش مجموعه‌ای از آیتم‌ها' },
+  { id: 'footer', label: 'فوتر', description: 'لینک‌ها و اطلاعات تماس' },
+] as const
+
+const selected = useStorage<string[]>('ux-flow-wireframe-blocks', ['header', 'content', 'footer'])
+
+const selectedSet = computed(() => new Set(selected.value))
+
+function isSelected(id: string): boolean {
+  return selectedSet.value.has(id)
+}
+
+function onToggle(id: string, checked: boolean | string | number): void {
+  const on = checked === true
+  if (on) {
+    if (!selected.value.includes(id)) selected.value = [...selected.value, id]
+    return
+  }
+  selected.value = selected.value.filter((x) => x !== id)
+}
+</script>
+
+<template>
+  <Space direction="vertical" size="middle">
+    <Paragraph type="secondary">
+      بلوک‌های ساختاری وایر فریم را انتخاب کنید (فقط ساختار — بدون استایل سفارشی).
+    </Paragraph>
+
+    <Row :gutter="[16, 16]">
+      <Col v-for="block in BLOCKS" :key="block.id" :xs="24" :sm="12" :md="8">
+        <Card size="small" :title="block.label">
+          <Checkbox
+            :checked="isSelected(block.id)"
+            @update:checked="(v) => onToggle(block.id, v)"
+          >
+            {{ block.description }}
+          </Checkbox>
+        </Card>
+      </Col>
+    </Row>
+
+    <Card size="small" title="چینش انتخاب‌شده">
+      <Space direction="vertical">
+        <Card
+          v-for="block in BLOCKS.filter((b) => isSelected(b.id))"
+          :key="`sel-${block.id}`"
+          size="small"
+        >
+          <Text strong>{{ block.label }}</Text>
+          — {{ block.description }}
+        </Card>
+        <Text v-if="selected.length === 0" type="secondary">هیچ بلوکی انتخاب نشده</Text>
+      </Space>
+    </Card>
+  </Space>
+</template>
