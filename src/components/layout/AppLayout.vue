@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Layout, Space } from 'ant-design-vue'
+import { Layout } from 'ant-design-vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppSider from '@/components/layout/AppSider.vue'
 import StepProgress from '@/components/shared/StepProgress.vue'

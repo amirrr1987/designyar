@@ -1,12 +1,25 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Layout, Input, Row, Col, Typography, Button, Drawer, Space, message } from 'ant-design-vue'
-import { DownloadOutlined, RobotOutlined } from '@ant-design/icons-vue'
+import {
+  Layout,
+  Input,
+  Row,
+  Col,
+  Typography,
+  Button,
+  Drawer,
+  Space,
+  Upload,
+  message,
+} from 'ant-design-vue'
+import type { UploadProps } from 'ant-design-vue'
+import { DownloadOutlined, RobotOutlined, UploadOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
 import AIPanel from '@/components/shared/AIPanel.vue'
 import { useAiStore } from '@/stores/ai'
 import { useProjectStore } from '@/stores/project'
 import { downloadUxFlowExport } from '@/utils/project-export'
+import { importUxFlowFromFile } from '@/utils/project-import'
 
 const Header = Layout.Header
 const { Text } = Typography
@@ -33,6 +46,21 @@ function onExport(): void {
   downloadUxFlowExport(`${safeName}-export.json`)
   message.success('خروجی JSON دانلود شد')
 }
+
+const beforeUpload: UploadProps['beforeUpload'] = (file) => {
+  void (async () => {
+    const result = await importUxFlowFromFile(file)
+    if (!result.ok) {
+      message.error(result.error)
+      return
+    }
+    message.success(`ورود موفق (${result.exportedAt}) — در حال بازنشانی…`)
+    window.setTimeout(() => {
+      window.location.reload()
+    }, 600)
+  })()
+  return false
+}
 </script>
 
 <template>
@@ -49,7 +77,13 @@ function onExport(): void {
         </Row>
       </Col>
       <Col>
-        <Space>
+        <Space wrap>
+          <Upload :before-upload="beforeUpload" :show-upload-list="false" accept=".json,application/json">
+            <Button>
+              <template #icon><UploadOutlined /></template>
+              ورود JSON
+            </Button>
+          </Upload>
           <Button @click="onExport">
             <template #icon><DownloadOutlined /></template>
             خروجی JSON
