@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - نقشه همدلی ۲×۲ با ذخیره `ux-flow-empathy-maps` در `EmpathyMap.vue`
 - یادداشت تحقیق با auto-save در `ResearchNotes.vue` (`ux-flow-research-notes`)
 - جدول رقبا با CRUD و `TableColumnsType` در `CompetitorTable.vue` (`ux-flow-competitors`)
+- ترکیب Empathize با Tabs: پرسونا | نقشه همدلی | یادداشت | رقبا
 
 ## [0.2.0] - 2026-08-11
 
