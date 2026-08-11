@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - پیش‌نمایش و ذخیره پالت رنگ در `ColorPalette.vue`
 - مقیاس تایپوگرافی با Slider/InputNumber در `TypographyScale.vue`
 - ماشین‌حساب گرید + `GridConfigurator.vue` و composable `useGrid`
+- مقیاس فاصله ۸pt و نمایش توکن‌ها در `SpacingScale.vue`
 
 ## [0.5.0] - 2026-08-11
 
