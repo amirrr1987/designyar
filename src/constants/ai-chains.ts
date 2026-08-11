@@ -26,6 +26,12 @@ export const AI_CHAINS: readonly AiChainDef[] = [
     description: 'طوفان ایده → جریان کاربر → نقشه سایت → card sort',
     steps: ['brainstorm-ideas', 'suggest-userflow', 'suggest-sitemap', 'suggest-card-sort'],
   },
+  {
+    id: 'prototype-starter',
+    label: 'شروع Prototype',
+    description: 'چیدمان وایرفریم → میکروکپی',
+    steps: ['suggest-wireframe-blocks', 'microcopy'],
+  },
 ] as const
 
 export type AiChainId = (typeof AI_CHAINS)[number]['id']

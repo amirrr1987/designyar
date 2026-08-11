@@ -6,6 +6,7 @@ import type { AiHistoryDiffLine, AiHistoryEntry } from '@/types/ai-history'
 import { assemblePOVSentence, assembleProblemSentence } from '@/types/define'
 import type { ProblemStatement, POV } from '@/types/define'
 import type { SitemapNode } from '@/types/ideate'
+import { summarizeWireframeBlocks } from '@/constants/wireframe-blocks'
 import { MICROCOPY_CATEGORY_LABELS } from '@/types/microcopy'
 
 const TRUNCATE = 160
@@ -43,6 +44,7 @@ export interface AiApplyBeforeState {
   testSummary?: string
   sitemapNodeCount?: number
   sitemapTitles?: string[]
+  wireframeBlocks?: string[]
 }
 
 export function captureApplyBeforeState(
@@ -55,6 +57,7 @@ export function captureApplyBeforeState(
     researchNotes: string
     testSummary: string
     sitemap: SitemapNode[]
+    wireframeBlocks: string[]
   },
 ): AiApplyBeforeState {
   switch (payload.type) {
@@ -76,6 +79,8 @@ export function captureApplyBeforeState(
         sitemapNodeCount: countSitemapNodes(current.sitemap),
         sitemapTitles: flattenSitemapTitles(current.sitemap),
       }
+    case 'wireframeBlocks':
+      return { wireframeBlocks: [...current.wireframeBlocks] }
     default:
       return {}
   }
@@ -178,6 +183,16 @@ function buildDiff(payload: AiApplyPayload, before: AiApplyBeforeState): AiHisto
         label: MICROCOPY_CATEGORY_LABELS[item.category],
         after: truncate(item.text),
       }))
+    case 'wireframeBlocks': {
+      const beforeLayout = summarizeWireframeBlocks(before.wireframeBlocks ?? []) ?? '(خالی)'
+      const afterLayout = summarizeWireframeBlocks(payload.items) ?? '(خالی)'
+      return [{ label: 'چیدمان وایرفریم', before: beforeLayout, after: afterLayout }]
+    }
+    case 'competitors':
+      return payload.items.map((c) => ({
+        label: 'رقیب',
+        after: c.name.trim(),
+      }))
     default: {
       const _exhaustive: never = payload
       return _exhaustive
@@ -214,6 +229,10 @@ function buildSummary(actionId: AiActionId, payload: AiApplyPayload, count: numb
       return `${actionLabel}: ${count} کارت`
     case 'microcopy':
       return `${actionLabel}: ${count} میکروکپی`
+    case 'wireframeBlocks':
+      return `${actionLabel}: ${count} بلوک وایرفریم`
+    case 'competitors':
+      return `${actionLabel}: ${count} رقیب`
     default: {
       const _exhaustive: never = payload
       return _exhaustive

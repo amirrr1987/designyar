@@ -52,6 +52,13 @@ export interface AiSitemapNodeDraft {
   children?: AiSitemapNodeDraft[]
 }
 
+export interface AiCompetitorDraft {
+  name: string
+  strength: string
+  weakness: string
+  url?: string
+}
+
 export type AiApplyPayload =
   | { type: 'personas'; items: AiPersonaDraft[] }
   | { type: 'hmw'; items: string[] }
@@ -66,6 +73,8 @@ export type AiApplyPayload =
   | { type: 'sitemap'; items: AiSitemapNodeDraft[] }
   | { type: 'sortCards'; items: string[] }
   | { type: 'microcopy'; items: AiMicrocopyDraft[] }
+  | { type: 'wireframeBlocks'; items: string[] }
+  | { type: 'competitors'; items: AiCompetitorDraft[] }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
@@ -133,6 +142,17 @@ export function isAiSitemapNodeDraftArray(value: unknown): value is AiSitemapNod
   return Array.isArray(value) && value.every(isAiSitemapNodeDraft)
 }
 
+export function isAiCompetitorDraft(value: unknown): value is AiCompetitorDraft {
+  if (!isRecord(value)) return false
+  const urlOk = value.url === undefined || typeof value.url === 'string'
+  return (
+    typeof value.name === 'string' &&
+    typeof value.strength === 'string' &&
+    typeof value.weakness === 'string' &&
+    urlOk
+  )
+}
+
 export interface AiStructuredJson {
   personas?: unknown
   hmwQuestions?: unknown
@@ -148,6 +168,8 @@ export interface AiStructuredJson {
   sitemapNodes?: unknown
   sortCards?: unknown
   microcopyItems?: unknown
+  wireframeBlocks?: unknown
+  competitors?: unknown
 }
 
 export function isAiStructuredJson(value: unknown): value is AiStructuredJson {

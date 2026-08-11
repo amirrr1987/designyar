@@ -4,6 +4,7 @@ export interface PhaseCoachSnapshot {
   hasBrief: boolean
   hasResearchNotes: boolean
   personaCount: number
+  competitorCount: number
   hasEmpathy: boolean
   hasProblem: boolean
   hasPov: boolean
@@ -13,6 +14,7 @@ export interface PhaseCoachSnapshot {
   sitemapCount: number
   cardSortCount: number
   hasTestSummary: boolean
+  wireframeBlockCount: number
   microcopyCount: number
   wcagProgress: number
 }
@@ -39,6 +41,7 @@ export function buildPhaseCoachSnapshot(input: {
   briefDescription: string
   researchNotes: string
   personaCount: number
+  competitorCount: number
   empathyMapCount: number
   problemFilled: boolean
   povFilled: boolean
@@ -48,6 +51,7 @@ export function buildPhaseCoachSnapshot(input: {
   sitemap: { children?: unknown[] }[]
   cardSortCardCount: number
   testSummary: string
+  wireframeBlockCount: number
   microcopyCount: number
   wcagProgress: number
 }): PhaseCoachSnapshot {
@@ -55,6 +59,7 @@ export function buildPhaseCoachSnapshot(input: {
     hasBrief: Boolean(input.briefTitle.trim() || input.briefDescription.trim()),
     hasResearchNotes: Boolean(input.researchNotes.trim()),
     personaCount: input.personaCount,
+    competitorCount: input.competitorCount,
     hasEmpathy: input.empathyMapCount > 0,
     hasProblem: input.problemFilled,
     hasPov: input.povFilled,
@@ -64,6 +69,7 @@ export function buildPhaseCoachSnapshot(input: {
     sitemapCount: countSitemapNodes(input.sitemap),
     cardSortCount: input.cardSortCardCount,
     hasTestSummary: Boolean(input.testSummary.trim()),
+    wireframeBlockCount: input.wireframeBlockCount,
     microcopyCount: input.microcopyCount,
     wcagProgress: input.wcagProgress,
   }
@@ -110,6 +116,13 @@ export function getPhaseCoachHint(
           hint: 'نقشه همدلی را از پرسوناها سنتز کنید.',
           actionLabel: 'سنتز empathy',
           actionId: 'synthesize-empathy',
+        }
+      }
+      if (snapshot.competitorCount === 0) {
+        return {
+          hint: 'جدول رقبا خالی است — از شرح پروژه رقیب پیشنهاد بگیرید.',
+          actionLabel: 'پیشنهاد رقبا',
+          actionId: 'suggest-competitors',
         }
       }
       return {
@@ -179,6 +192,13 @@ export function getPhaseCoachHint(
         actionId: 'review-design-system',
       }
     case 'prototype':
+      if (snapshot.wireframeBlockCount <= 1) {
+        return {
+          hint: 'چیدمان وایرفریم را از userflow و IA پیشنهاد دهید.',
+          actionLabel: 'پیشنهاد wireframe',
+          actionId: 'suggest-wireframe-blocks',
+        }
+      }
       if (snapshot.microcopyCount === 0) {
         return {
           hint: 'میکروکپی UI را با AI تولید و در بانک ذخیره کنید.',

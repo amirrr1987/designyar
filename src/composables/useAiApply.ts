@@ -10,6 +10,7 @@ import type { AiChainId } from '@/constants/ai-chains'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
 import type { AiApplyPayload, AiSitemapNodeDraft } from '@/types/ai-response'
 import type { MicrocopyEntry } from '@/types/microcopy'
+import type { CompetitorRow } from '@/types/competitor'
 import type { SitemapNode } from '@/types/ideate'
 import type { AiActionId } from '@/utils/ai-prompts'
 import {
@@ -58,6 +59,12 @@ export function useAiApply() {
   const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
   const empathySelectedPersona = useStorage<string>(STORAGE_KEYS.empathySelectedPersona, 'general')
   const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
+  const wireframeBlocks = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
+    'header',
+    'content',
+    'footer',
+  ])
+  const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
 
   function applyPayload(payload: AiApplyPayload, audit?: AiApplyAudit): number {
     const before = audit
@@ -69,6 +76,7 @@ export function useAiApply() {
           researchNotes: researchNotes.value,
           testSummary: usabilityReportSummary.value,
           sitemap: sitemap.value,
+          wireframeBlocks: wireframeBlocks.value,
         })
       : null
 
@@ -224,6 +232,28 @@ export function useAiApply() {
           added += 1
         }
         microcopyBank.value = next
+        return added
+      }
+      case 'wireframeBlocks': {
+        if (payload.items.length === 0) return 0
+        wireframeBlocks.value = [...payload.items]
+        return payload.items.length
+      }
+      case 'competitors': {
+        let added = 0
+        const next = [...competitors.value]
+        for (const draft of payload.items) {
+          if (!draft.name.trim() || !draft.strength.trim() || !draft.weakness.trim()) continue
+          next.push({
+            id: crypto.randomUUID(),
+            name: draft.name.trim(),
+            strength: draft.strength.trim(),
+            weakness: draft.weakness.trim(),
+            url: draft.url?.trim() || undefined,
+          })
+          added += 1
+        }
+        competitors.value = next
         return added
       }
       default: {

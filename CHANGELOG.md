@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-08-11
+
+### Added
+
+- **`suggest-wireframe-blocks`** — اعمال چیدمان بلوک وایرفریم از userflow/IA
+- **`suggest-competitors`** — پیشنهاد و اعمال رقبا از شرح پروژه
+- زنجیره **Prototype** (wireframe → microcopy)
+- **`hmwTopSummary`** — HMWهای دارای رأی در context Ideate
+
+### Changed
+
+- `WireframeBuilder` و `constants/wireframe-blocks.ts` — منبع مشترک بلوک‌ها
+- Phase Coach: راهنمای رقبا (Empathize) و wireframe (Prototype)
+
 ## [0.16.0] - 2026-08-11
 
 ### Added

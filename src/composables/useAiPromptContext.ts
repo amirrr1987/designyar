@@ -5,6 +5,7 @@ import { usePersona } from '@/composables/usePersona'
 import { useWCAG } from '@/composables/useWCAG'
 import { HEURISTIC_RULES, type HeuristicEvalMap } from '@/constants/heuristic-rules'
 import { summarizeComponentChecklist } from '@/constants/component-checklist'
+import { summarizeWireframeBlocks } from '@/constants/wireframe-blocks'
 import { WCAG_CHECKLIST } from '@/constants/wcag-checklist'
 import { useDefineStore } from '@/stores/define'
 import { useDesignSystemStore } from '@/stores/designSystem'
@@ -24,16 +25,6 @@ function formatProjectBrief(title: string, description: string): string | undefi
   if (!t && !d) return undefined
   if (t && d) return `عنوان: ${t}\n\n${d}`
   return t || d
-}
-
-const WIREFRAME_LABELS: Record<string, string> = {
-  header: 'هدر',
-  nav: 'ناوبری جانبی',
-  hero: 'هیرو',
-  content: 'محتوا',
-  form: 'فرم',
-  list: 'لیست/جدول',
-  footer: 'فوتر',
 }
 
 function flattenSitemap(nodes: SitemapNode[], depth = 0): string[] {
@@ -96,6 +87,14 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
 
     const hmwSummary = hmw.value.map((item) => `- ${item.question} (${item.votes} رأی)`).join('\n')
 
+    const votedHmw = hmw.value
+      .filter((item) => item.votes > 0)
+      .sort((a, b) => b.votes - a.votes)
+    const hmwTopSummary =
+      votedHmw.length > 0
+        ? votedHmw.map((item) => `- ${item.question} (${item.votes} رأی)`).join('\n')
+        : undefined
+
     const ideasSummary = ideas.value
       .slice(0, 12)
       .map((i) => `- ${i.title}: ${i.detail}`)
@@ -129,9 +128,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
       )
       .join('\n')
 
-    const wireframeSummary = wireframeBlockIds.value
-      .map((id) => WIREFRAME_LABELS[id] ?? id)
-      .join(' → ')
+    const wireframeSummary = summarizeWireframeBlocks(wireframeBlockIds.value)
 
     const designSystemSummary = [
       `رنگ seed: ${palette.value.seed}; primary[5]: ${palette.value.primary[5] ?? '—'}`,
@@ -202,6 +199,7 @@ export function useAiPromptContext(): { buildContext: (userHint?: string) => AiP
       problemSentence: problemSentence.value,
       povSentence: povSentence.value,
       hmwSummary: hmwSummary || undefined,
+      hmwTopSummary,
       ideasSummary: ideasSummary || undefined,
       userflowSummary: userflowSummary || undefined,
       sitemapSummary,

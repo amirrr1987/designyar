@@ -8,9 +8,11 @@ import {
   isAiStructuredJson,
   isAiSitemapNodeDraftArray,
   isAiMicrocopyDraft,
+  isAiCompetitorDraft,
   type AiApplyPayload,
   type AiStructuredJson,
 } from '@/types/ai-response'
+import { isWireframeBlockIdArray } from '@/constants/wireframe-blocks'
 
 const JSON_FENCE = /```(?:json)?\s*([\s\S]*?)```/i
 
@@ -158,6 +160,19 @@ function parseMicrocopyItems(value: unknown): AiApplyPayload | null {
   return { type: 'microcopy', items }
 }
 
+function parseWireframeBlocks(value: unknown): AiApplyPayload | null {
+  if (!isWireframeBlockIdArray(value)) return null
+  if (value.length === 0) return null
+  return { type: 'wireframeBlocks', items: [...value] }
+}
+
+function parseCompetitors(value: unknown): AiApplyPayload | null {
+  if (!Array.isArray(value)) return null
+  const items = value.filter(isAiCompetitorDraft).filter((c) => c.name.trim().length > 0)
+  if (items.length === 0) return null
+  return { type: 'competitors', items }
+}
+
 export function parseApplyPayload(action: AiActionId, responseText: string): AiApplyPayload | null {
   const parsed = extractJsonCandidate(responseText)
   const root = normalizeStructuredRoot(parsed)
@@ -187,6 +202,10 @@ export function parseApplyPayload(action: AiActionId, responseText: string): AiA
       return parseIdeas(root.ideas)
     case 'microcopy':
       return parseMicrocopyItems(root.microcopyItems)
+    case 'suggest-wireframe-blocks':
+      return parseWireframeBlocks(root.wireframeBlocks)
+    case 'suggest-competitors':
+      return parseCompetitors(root.competitors)
     case 'refine-problem':
       return parseProblem(root.problem)
     case 'refine-pov':
@@ -215,6 +234,8 @@ export function supportsApply(action: AiActionId): boolean {
     action === 'test-to-hmw' ||
     action === 'test-to-ideas' ||
     action === 'microcopy' ||
+    action === 'suggest-wireframe-blocks' ||
+    action === 'suggest-competitors' ||
     action === 'refine-problem' ||
     action === 'refine-pov' ||
     action === 'improve-project-brief' ||

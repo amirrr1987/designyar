@@ -9,6 +9,7 @@ import SpacingScale from '@/components/prototype/SpacingScale.vue'
 import TypographyScale from '@/components/prototype/TypographyScale.vue'
 import WireframeBuilder from '@/components/prototype/WireframeBuilder.vue'
 import AiAssistButton from '@/components/shared/AiAssistButton.vue'
+import AiChainButton from '@/components/shared/AiChainButton.vue'
 import { getStepByKey } from '@/constants/design-thinking-steps'
 
 type PrototypeTabKey = 'color' | 'type' | 'grid' | 'spacing' | 'wireframe' | 'checklist' | 'microcopy'
@@ -24,6 +25,7 @@ const activeKey = ref<PrototypeTabKey>('color')
       <Title :level="3">{{ step.title }}</Title>
       <Paragraph>{{ step.description }}</Paragraph>
       <Space wrap>
+        <AiChainButton chain="prototype-starter" label="زنجیره Prototype (wireframe→microcopy)" />
         <AiAssistButton action="review-design-system" label="بازبینی Design System" />
         <AiAssistButton action="wireframe-critique" label="نقد وایرفریم" />
         <AiAssistButton action="microcopy" label="تولید میکروکپی" />

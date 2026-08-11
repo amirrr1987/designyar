@@ -73,6 +73,7 @@ function onRemove(id: string): void {
 
 <template>
   <Space direction="vertical" size="large">
+    <AiAssistButton action="suggest-competitors" label="پیشنهاد رقبا با AI" />
     <AiAssistButton action="analyze-competitors" label="تحلیل رقبا با AI" />
     <Form ref="formRef" layout="vertical" :model="model" :rules="rules" @finish="onAdd">
       <FormItem label="نام رقیب" name="name">

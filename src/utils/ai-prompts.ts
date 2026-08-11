@@ -10,6 +10,7 @@ export type AiActionId =
   | 'synthesize-empathy'
   | 'analyze-notes'
   | 'analyze-competitors'
+  | 'suggest-competitors'
   | 'generate-hmw'
   | 'refine-problem'
   | 'refine-pov'
@@ -21,6 +22,7 @@ export type AiActionId =
   | 'suggest-card-sort'
   | 'review-design-system'
   | 'wireframe-critique'
+  | 'suggest-wireframe-blocks'
   | 'summarize-test'
   | 'test-to-hmw'
   | 'test-to-ideas'
@@ -81,6 +83,14 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     description: 'مقایسه نقاط قوت/ضعف و فرصت تمایز',
     phase: 'empathize',
     structured: false,
+  },
+  {
+    id: 'suggest-competitors',
+    label: 'پیشنهاد رقبا',
+    description: '۳–۵ رقیب محتمل از شرح پروژه',
+    phase: 'empathize',
+    structured: true,
+    applyLabel: 'افزودن به جدول رقبا',
   },
   {
     id: 'generate-hmw',
@@ -168,6 +178,14 @@ export const AI_ACTIONS: readonly AiActionDef[] = [
     structured: false,
   },
   {
+    id: 'suggest-wireframe-blocks',
+    label: 'پیشنهاد بلوک وایرفریم',
+    description: 'چیدمان بلوک‌ها از userflow و IA',
+    phase: 'prototype',
+    structured: true,
+    applyLabel: 'اعمال چیدمان وایرفریم',
+  },
+  {
     id: 'summarize-test',
     label: 'خلاصه یافته‌های تست',
     description: 'جمع‌بندی WCAG، کنتراست و هیوریستیک',
@@ -213,6 +231,7 @@ export interface AiPromptContext {
   problemSentence?: string
   povSentence?: string
   hmwSummary?: string
+  hmwTopSummary?: string
   ideasSummary?: string
   userflowSummary?: string
   sitemapSummary?: string
@@ -316,9 +335,19 @@ const JSON_FOOTER: Record<AiActionId, string | undefined> = {
   ].join('\n'),
   'analyze-notes': undefined,
   'analyze-competitors': undefined,
+  'suggest-competitors': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"competitors":[{"name":"","strength":"","weakness":"","url":""}]}',
+    '۳ تا ۵ رقیب؛ url اختیاری؛ فقط JSON معتبر.',
+  ].join('\n'),
   'ux-improve': undefined,
   'review-design-system': undefined,
   'wireframe-critique': undefined,
+  'suggest-wireframe-blocks': [
+    'در انتهای پاسخ حتماً یک بلوک ```json با این ساختار بده:',
+    '{"wireframeBlocks":["header","hero","content","footer"]}',
+    'فقط idهای مجاز: header, nav, hero, content, form, list, footer — ۳ تا ۷ بلوک به ترتیب چیدمان؛ فقط JSON معتبر.',
+  ].join('\n'),
 }
 
 export function buildSystemPrompt(action: AiActionId): string {
@@ -332,6 +361,7 @@ export function buildSystemPrompt(action: AiActionId): string {
     'analyze-notes': 'خروجی: تم‌های کلیدی، نقل‌قول‌ها، فرصت‌های طراحی، سوالات باز.',
     'synthesize-empathy': 'ابتدا ۱ جمله خلاصه. سپس JSON empathyMaps.',
     'analyze-competitors': 'خروجی: الگوهای مشترک، شکاف بازار، ۳ فرصت تمایز، ۲ تهدید.',
+    'suggest-competitors': 'ابتدا ۱ جمله خلاصه. سپس JSON competitors.',
     'generate-hmw': 'ابتدا ۱ جمله چارچوب. سپس JSON سوالات HMW.',
     'refine-problem': 'ابتدا یک جمله پیش‌نمایش مسئله. سپس JSON problem.',
     'refine-pov': 'ابتدا یک جمله پیش‌نمایش POV. سپس JSON pov.',
@@ -345,6 +375,8 @@ export function buildSystemPrompt(action: AiActionId): string {
       'خروجی: نقاط قوت، ۳–۵ پیشنهاد بهبود توکن (رنگ/تایپ/فاصله/گرید)، ریسک a11y.',
     'wireframe-critique':
       'خروجی: ارزیابی چیدمان، جاهای خالی/شلوغ، ۳ پیشنهاد بهبود ساختار صفحه.',
+    'suggest-wireframe-blocks':
+      'ابتدا ۱ جمله هدف صفحه. سپس JSON wireframeBlocks.',
     'summarize-test':
       'خروجی: وضعیت کنتراست/WCAG/هیوریستیک، ۳ ریسک، ۳ اقدام بعدی؛ سپس JSON testSummary.',
     'test-to-hmw':
@@ -396,6 +428,11 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       if (ctx.researchNotes?.trim()) parts.push(`زمینه تحقیق:\n${ctx.researchNotes}`)
       parts.push('رقبا را تحلیل و فرصت تمایز بده.')
       break
+    case 'suggest-competitors':
+      if (ctx.competitorsSummary?.trim()) parts.push(`رقبای فعلی:\n${ctx.competitorsSummary}`)
+      if (ctx.researchNotes?.trim()) parts.push(`یادداشت تحقیق:\n${ctx.researchNotes}`)
+      parts.push('رقبای محتمل با قوت/ضعف پیشنهاد بده.')
+      break
     case 'generate-hmw':
       if (ctx.problemSentence?.trim()) parts.push(`بیان مسئله: ${ctx.problemSentence}`)
       if (ctx.povSentence?.trim()) parts.push(`POV: ${ctx.povSentence}`)
@@ -431,7 +468,11 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       break
     case 'brainstorm-ideas':
       if (ctx.povSentence?.trim()) parts.push(`POV: ${ctx.povSentence}`)
-      if (ctx.hmwSummary?.trim()) parts.push(`HMW:\n${ctx.hmwSummary}`)
+      if (ctx.hmwTopSummary?.trim()) {
+        parts.push(`HMW برتر (با رأی):\n${ctx.hmwTopSummary}`)
+      } else if (ctx.hmwSummary?.trim()) {
+        parts.push(`HMW:\n${ctx.hmwSummary}`)
+      }
       if (ctx.personasSummary?.trim()) parts.push(`پرسوناها:\n${ctx.personasSummary}`)
       if (ctx.ideasSummary?.trim()) parts.push(`ایده‌های فعلی:\n${ctx.ideasSummary}`)
       parts.push('ایده‌های جدید و متنوع پیشنهاد بده.')
@@ -469,6 +510,13 @@ export function buildUserPrompt(action: AiActionId, ctx: AiPromptContext): strin
       if (ctx.componentChecklistSummary?.trim())
         parts.push(`کامپوننت‌های انتخاب‌شده:\n${ctx.componentChecklistSummary}`)
       parts.push('وایرفریم را نقد کن.')
+      break
+    case 'suggest-wireframe-blocks':
+      if (ctx.userflowSummary?.trim()) parts.push(`جریان کاربر:\n${ctx.userflowSummary}`)
+      if (ctx.sitemapSummary?.trim()) parts.push(`IA:\n${ctx.sitemapSummary}`)
+      if (ctx.wireframeSummary?.trim()) parts.push(`چیدمان فعلی: ${ctx.wireframeSummary}`)
+      if (ctx.problemSentence?.trim()) parts.push(`مسئله: ${ctx.problemSentence}`)
+      parts.push('بلوک‌های وایرفریم را به ترتیب منطقی پیشنهاد بده.')
       break
     case 'summarize-test':
       if (ctx.contrastSummary?.trim()) parts.push(`کنتراست: ${ctx.contrastSummary}`)
@@ -534,6 +582,11 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         hints.push('حداقل یک رقیب در جدول رقبا ثبت کنید.')
       }
       break
+    case 'suggest-competitors':
+      if (!ctx.projectBrief?.trim()) {
+        hints.push('شرح پروژه را در خانه بنویسید.')
+      }
+      break
     case 'generate-hmw':
     case 'refine-problem':
     case 'refine-pov':
@@ -543,8 +596,11 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
       }
       break
     case 'brainstorm-ideas':
-      if (!ctx.hmwSummary?.trim() && !ctx.povSentence?.trim()) {
+      if (!ctx.hmwTopSummary?.trim() && !ctx.hmwSummary?.trim() && !ctx.povSentence?.trim()) {
         hints.push('HMW یا POV را در Define پر کنید.')
+      }
+      if (!ctx.hmwTopSummary?.trim() && ctx.hmwSummary?.trim()) {
+        hints.push('به HMWهای برتر در Define رأی بدهید تا Ideate دقیق‌تر شود.')
       }
       break
     case 'suggest-userflow':
@@ -572,9 +628,14 @@ export function getContextHints(action: AiActionId, ctx: AiPromptContext): strin
         hints.push('بلوک‌های وایرفریم را در Prototype انتخاب کنید.')
       }
       break
+    case 'suggest-wireframe-blocks':
+      if (!ctx.userflowSummary?.trim() && !ctx.sitemapSummary?.trim()) {
+        hints.push('جریان کاربر یا نقشه سایت را در Ideate پر کنید.')
+      }
+      break
     case 'microcopy':
       if (!ctx.problemSentence?.trim() && !ctx.wireframeSummary?.trim()) {
-        hints.push('بیان مسئله یا وایرفریم به میکروکopi کمک می‌کند.')
+        hints.push('بیان مسئله یا وایرفریم به میکروکپی کمک می‌کند.')
       }
       break
     case 'summarize-test':

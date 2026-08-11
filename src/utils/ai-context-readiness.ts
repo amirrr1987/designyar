@@ -142,12 +142,36 @@ function checksFor(action: AiActionId): CheckDef[] {
     case 'brainstorm-ideas':
       return [
         {
+          id: 'hmw-voted',
+          label: 'HMW با رأی',
+          essential: false,
+          test: (ctx) => hasText(ctx.hmwTopSummary),
+        },
+        {
           id: 'hmw',
           label: 'سوالات HMW',
           essential: true,
-          test: (ctx) => hasText(ctx.hmwSummary),
+          test: (ctx) => hasText(ctx.hmwTopSummary) || hasText(ctx.hmwSummary),
         },
         { ...brief, essential: false },
+      ]
+    case 'suggest-competitors':
+      return [brief]
+    case 'suggest-wireframe-blocks':
+      return [
+        {
+          id: 'userflow',
+          label: 'جریان کاربر',
+          essential: false,
+          test: (ctx) => hasText(ctx.userflowSummary),
+        },
+        {
+          id: 'sitemap',
+          label: 'نقشه سایت',
+          essential: false,
+          test: (ctx) => hasText(ctx.sitemapSummary),
+        },
+        brief,
       ]
     case 'suggest-userflow':
       return [

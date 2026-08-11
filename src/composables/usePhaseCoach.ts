@@ -11,6 +11,7 @@ import { useIdeateStore } from '@/stores/ideate'
 import { useProjectStore } from '@/stores/project'
 import { useAiStore } from '@/stores/ai'
 import type { EmpathyMapsByPersona } from '@/types/empathy-map'
+import type { CompetitorRow } from '@/types/competitor'
 import type { MicrocopyEntry } from '@/types/microcopy'
 import type { DesignStepKey } from '@/types/project'
 import { isAiActionId } from '@/utils/ai-prompts'
@@ -48,6 +49,12 @@ export function usePhaseCoach(): {
   const empathyMaps = useStorage<EmpathyMapsByPersona>(STORAGE_KEYS.empathyMaps, {})
   const testSummary = useStorage<string>(STORAGE_KEYS.usabilityReportSummary, '')
   const microcopyBank = useStorage<MicrocopyEntry[]>(STORAGE_KEYS.microcopyBank, [])
+  const competitors = useStorage<CompetitorRow[]>(STORAGE_KEYS.competitors, [])
+  const wireframeBlocks = useStorage<string[]>(STORAGE_KEYS.wireframeBlocks, [
+    'header',
+    'content',
+    'footer',
+  ])
 
   const stepKey = computed((): DesignStepKey | 'home' => {
     const name = route.name
@@ -63,6 +70,7 @@ export function usePhaseCoach(): {
       briefDescription: projectStore.briefDescription,
       researchNotes: researchNotes.value,
       personaCount: personaCount.value,
+      competitorCount: competitors.value.length,
       empathyMapCount: Object.keys(empathyMaps.value).length,
       problemFilled:
         Boolean(problem.value.user.trim()) &&
@@ -78,6 +86,7 @@ export function usePhaseCoach(): {
       sitemap: sitemap.value,
       cardSortCardCount: cardSort.value.cards.length,
       testSummary: testSummary.value,
+      wireframeBlockCount: wireframeBlocks.value.length,
       microcopyCount: microcopyBank.value.length,
       wcagProgress: wcagProgress.value,
     })
