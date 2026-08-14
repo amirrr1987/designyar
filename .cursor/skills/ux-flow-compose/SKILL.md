@@ -87,7 +87,10 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 | UI components | [ant-design-vue](../ant-design-vue/SKILL.md) |
 | Icons | [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) |
 | Color ramps | [ant-design-colors](../ant-design-colors/SKILL.md) |
-| In-browser AI | [web-llm](../web-llm/SKILL.md) |
+| Utility classes | [tailwindcss](../tailwindcss/SKILL.md) |
+| AI SDK core | [ai](../ai/SKILL.md) |
+| Groq provider | [ai-sdk-groq](../ai-sdk-groq/SKILL.md) |
+| AI Vue composables | [ai-sdk-vue](../ai-sdk-vue/SKILL.md) |
 
 ### C. Tooling (config / scripts / CI quality)
 
@@ -95,6 +98,7 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 |---------|--------|
 | Dev server / build | [vite](../vite/SKILL.md) |
 | Vue SFC plugin | [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) |
+| Tailwind Vite plugin | [tailwindcss-vite](../tailwindcss-vite/SKILL.md) |
 | DevTools plugin | [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) |
 | TS compiler | [typescript](../typescript/SKILL.md) |
 | SFC typecheck | [vue-tsc](../vue-tsc/SKILL.md) |
@@ -212,7 +216,7 @@ Before calling a step done:
 - [ ] `noUncheckedIndexedAccess` handled
 - [ ] Package interfaces used (see [package-interfaces.md](package-interfaces.md)) — no hand-rolled twins of antdv/Vue/Pinia/…
 - [ ] antdv named imports + PascalCase
-- [ ] No `<style>` / custom CSS
+- [ ] No `<style>` — Tailwind utilities only via [tailwindcss](../tailwindcss/SKILL.md)
 - [ ] Persistence typed via `useStorage<T>`
 - [ ] Would pass `vue-tsc --build`, `lint`, `oxfmt` (ask before running)
 - [ ] Phase end: [keep-a-changelog](../keep-a-changelog/SKILL.md) applied if closing a phase
@@ -223,5 +227,5 @@ Before calling a step done:
 - Global `app.use(Antd)` + `a-*` tags (forbidden here)
 - Hand-rolled props/config that duplicate npm package types
 - Hand-rolled `localStorage` instead of VueUse
-- Remote LLM API instead of WebLLM
+- `groq-sdk` / WebLLM / Next.js `app/api/chat` instead of `ai` + `@ai-sdk/groq`
 - Disabling strictness in tsconfig to silence errors

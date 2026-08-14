@@ -41,7 +41,7 @@ export default defineConfig({
 ## Rules
 
 1. Keep for **local `vite` dev** — it should not affect production bundle meaningfully; do not rely on it in prod code.
-2. Register **after** `vue()` plugin.
+2. Register **after** `vue()` (and after `tailwindcss()` when present — see [tailwindcss-vite](../tailwindcss-vite/SKILL.md)).
 3. If DevTools cause issues, remove/comment `vueDevTools()` only after user confirmation.
 4. Not a substitute for Pinia/Vue Router debugging knowledge — complements them.
 
