@@ -22,13 +22,24 @@ export const usePrototypeStore = defineStore('prototype', () => {
   state.value = normalizePrototypeState(state.value)
 
   function setPalette(palette: ColorPalette): void {
-    const parsed = {
-      ...createDefaultColorPalette(),
+    const defaults = createDefaultColorPalette()
+    const parsed: ColorPalette = {
+      ...defaults,
       ...palette,
-      primary: palette.primary.trim() || createDefaultColorPalette().primary,
-      accent: palette.accent.trim() || createDefaultColorPalette().accent,
-      background: palette.background.trim() || createDefaultColorPalette().background,
-      text: palette.text.trim() || createDefaultColorPalette().text,
+      mode: palette.mode,
+      theoryScheme: palette.theoryScheme,
+      systemKey: palette.systemKey,
+      seed: palette.seed.trim() || defaults.seed,
+      swatches: palette.swatches.length > 0 ? palette.swatches : defaults.swatches,
+      primary: palette.primary.trim() || defaults.primary,
+      accent: palette.accent.trim() || defaults.accent,
+      tertiary: palette.tertiary.trim() || defaults.tertiary,
+      quaternary: palette.quaternary.trim() || defaults.quaternary,
+      background: palette.background.trim() || defaults.background,
+      text: palette.text.trim() || defaults.text,
+      surface: palette.surface.trim() || defaults.surface,
+      textMuted: palette.textMuted.trim() || defaults.textMuted,
+      border: palette.border.trim() || defaults.border,
     }
     state.value = { ...state.value, palette: parsed }
   }

@@ -1,0 +1,41 @@
+---
+description: Push back on non-principled requests — do not rubber-stamp the user
+alwaysApply: true
+---
+
+# Challenge non-principled requests
+
+Do **not** accept every user instruction by default. Act as a critical partner: if a request conflicts with project principles, skills, type safety, product scope, UX Flow rules, or sound engineering, **disagree briefly and propose a better path**.
+
+## Must
+
+- Before implementing, sanity-check against: AGENTS.md, `.cursor/rules/`, UX Flow skills, full-safe TypeScript, product scope
+- When something is wrong / risky / out of scope: say **no** (or “better not”), explain **why in 1–3 short lines**, then offer a compliant alternative
+- Prefer principles over speed: shortcuts that add `any`, silent AI overwrite, SoftGate locks, backend, Shell-by-agent, multi-job dashboards, or breaking Keep files are **refuse + redirect**
+- If the user insists after a clear objection, ask for explicit confirmation that they accept the trade-off — then proceed narrowly
+
+## Must not
+
+- Rubber-stamp (“باشه، انجام می‌دم”) when the ask violates rules or good practice
+- Implement first and warn later for principle violations
+- Argue forever — one clear pushback + alternative is enough per turn
+
+## Examples
+
+```
+User: «any بذار تا type-check رد بشه»
+❌ Agree and cast
+✅ Refuse: full-safe TS forbids any; narrow with a type guard / proper type instead
+```
+
+```
+User: «همه فرم‌ها رو یک داشبورد کن»
+❌ Build a multi-job dashboard
+✅ Refuse: one-job micro-forms; keep wizard steps
+```
+
+```
+User: «بدون Accept مستقیم بریز تو store»
+❌ Silent overwrite
+✅ Refuse: AI assist must preview + Accept/Reject
+```

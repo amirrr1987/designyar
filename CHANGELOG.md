@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.36.0] - 2026-08-15
+
+### Changed
+
+- Theory color schemes aligned with Paletton: Monochromatic / Adjacent / Triad / Tetrad (with quaternary for 4-color)
+
+## [0.35.1] - 2026-08-15
+
+### Added
+
+- Full Design System catalog (30+) for palette starters with Vue-recommended group + searchable Select
+
+## [0.35.0] - 2026-08-15
+
+### Changed
+
+- Colors form: three modes — custom (label/value), color theory (mono/duotone/tricolor), design system (Ant / Material by framework)
+- AI palette schema matches new enums; Persian harmony labels normalized; text & background always separate
+
+### Removed
+
+- Legacy multi-harmony wheel modes (complementary/analogous/triadic jargon) from the primary UI
+
+## [0.34.0] - 2026-08-15
+
+### Added
+
+- Soft product-type palette starters (Accept/Reject only)
+- Color presets via propose → Accept
+- Advanced roles: Surface / Muted text / Border (collapsed)
+- Primary ramp hover/active hints; next-step tip for type & spacing
+
 ## [0.33.0] - 2026-08-15
 
 ### Added

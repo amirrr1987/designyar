@@ -56,7 +56,7 @@ export const FORM_REGISTRY: Record<DesignThinkingStepKey, readonly MicroFormMeta
     form(
       'colors',
       'پالت رنگ',
-      'چهار نقش اصلی، تاکیدی، پس‌زمینه و متن را تنظیم کن؛ هارمونی فقط با پذیرش اعمال می‌شود.',
+      'سه حالت ساخت پالت؛ در اصول رنگ مثل Paletton: تک‌رنگ، مجاور، سه‌تایی، چهارتایی.',
     ),
     form(
       'typography',
