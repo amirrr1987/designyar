@@ -21,7 +21,7 @@ watch(
 const formCountLabel = computed(() => {
   if (!phase.value || formIndex.value < 0) return ''
   const total = getFormsForPhase(phase.value).length
-  return `فرم ${formIndex.value + 1} از ${total}`
+  return `گام ${formIndex.value + 1} از ${total}`
 })
 
 const phaseTitle = computed(() => {
@@ -32,18 +32,28 @@ const phaseTitle = computed(() => {
 
 <template>
   <Space direction="vertical" size="large" class="w-full">
-    <div class="flex flex-wrap items-center justify-between gap-3">
+    <header class="flex flex-wrap items-center justify-between gap-3">
       <div>
         <Typography.Text type="secondary">دیزاین یار</Typography.Text>
-        <Typography.Title :level="4" class="!mb-0 !mt-1">
+        <Typography.Title :level="4" class="mb-0! mt-1!">
           {{ phaseTitle }}
         </Typography.Title>
-        <Typography.Text type="secondary">{{ formCountLabel }}</Typography.Text>
+        <Typography.Text type="secondary" aria-live="polite">
+          {{ formCountLabel }}
+        </Typography.Text>
       </div>
-      <Button type="link" @click="router.push({ name: 'home' })">خانه</Button>
-    </div>
+      <Button
+        type="link"
+        aria-label="بازگشت به صفحهٔ خانه"
+        @click="router.push({ name: 'home' })"
+      >
+        خانه
+      </Button>
+    </header>
 
-    <StepProgress :current-phase-index="phaseIndex" />
+    <nav aria-label="پیشرفت فازهای طراحی">
+      <StepProgress :current-phase-index="phaseIndex" />
+    </nav>
 
     <RouterView />
   </Space>

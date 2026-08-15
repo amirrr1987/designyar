@@ -18,7 +18,7 @@ const draft = computed({
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: userflowAiSchema,
-  formTitle: 'جریان کاربر',
+  formTitle: 'مسیر کاربر',
   phase: 'ideate',
   getCurrentValue: () => ({ userflow: store.state.userflow }),
   extraContext: () => JSON.stringify({ ideas: store.state.ideas }),

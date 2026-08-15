@@ -2,24 +2,15 @@
 
 ## وضعیت
 
-**v0.31.0** — micro-form + AI در هر فرم落地 شد.
-
-JSON export/import = بکاپ کلاینت تا وقتی backend بیاید.
+**v0.31.1** — polish کپی + a11y پایه.
 
 ## انجام‌شده
 
-- [x] Phase 0–8 اسکلت محصول (فرم‌ها + AI + persistence + export)
-- [x] type-check fix (`useAiFormAssist` safeParse)
-- [x] SemVer `0.31.0` + CHANGELOG
+- [x] Micro-form rebuild (`0.31.0`)
+- [x] UX Writer + a11y chrome (`0.31.1`)
 
-## بعدی (پیشنهاد)
+## بعدی
 
-- [ ] polish UX Writer / a11y
-- [ ] commit در صورت تأیید کاربر
-- [ ] بعداً: sync/auth با backend به‌جای/کنار JSON
-
-## فایل‌های کلیدی
-
-- `src/constants/form-registry.ts`
-- `src/composables/useMicroFormAi.ts`
-- `CHANGELOG.md`
+- [ ] تست دستی با `pnpm run dev`
+- [ ] commit در صورت تأیید
+- [ ] بعداً backend sync

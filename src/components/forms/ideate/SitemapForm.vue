@@ -18,7 +18,7 @@ const draft = computed({
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: sitemapAiSchema,
-  formTitle: 'سایت‌مپ',
+  formTitle: 'نقشهٔ سایت',
   phase: 'ideate',
   getCurrentValue: () => ({ sitemap: store.state.sitemap }),
 })

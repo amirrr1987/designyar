@@ -32,15 +32,20 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <Space direction="vertical" size="large" class="w-full">
-    <div>
+  <Space direction="vertical" size="large" class="w-full" role="main">
+    <header>
       <Typography.Title :level="3" class="mb-1!">{{ props.title }}</Typography.Title>
       <Typography.Paragraph type="secondary" class="mb-0!">
         {{ props.hint }}
       </Typography.Paragraph>
-    </div>
+      <Typography.Text type="secondary" class="text-xs">
+        اگر هنوز آماده نیستی، می‌توانی با «بعدی» رد شوی.
+      </Typography.Text>
+    </header>
 
-    <slot />
+    <section :aria-label="props.title">
+      <slot />
+    </section>
 
     <AiFormAssist
       :improve-label="props.aiImproveLabel"
@@ -58,6 +63,8 @@ const emit = defineEmits<{
       v-if="props.errorMessage"
       type="error"
       show-icon
+      role="alert"
+      aria-live="assertive"
       :message="props.errorMessage"
     />
 

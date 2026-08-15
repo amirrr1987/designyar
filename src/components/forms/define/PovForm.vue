@@ -20,7 +20,7 @@ const draft = computed({
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: povAiSchema,
-  formTitle: 'نقطه نظر (POV)',
+  formTitle: 'جملهٔ دیدگاه',
   phase: 'define',
   getCurrentValue: () => ({ pov: store.state.pov }),
   extraContext: () =>
@@ -61,7 +61,7 @@ function onAccept(): void {
     @prev="goPrev()"
   >
     <Form layout="vertical">
-      <FormItem label="POV">
+      <FormItem label="جملهٔ دیدگاه">
         <Input.TextArea
           v-model:value="draft"
           :rows="4"

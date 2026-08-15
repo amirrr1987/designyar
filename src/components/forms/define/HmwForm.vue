@@ -38,7 +38,7 @@ function removeItem(index: number): void {
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: hmwAiSchema,
-  formTitle: 'سؤالات HMW',
+  formTitle: 'سؤال‌های چطور می‌توانیم',
   phase: 'define',
   getCurrentValue: () => ({ hmw: items.value }),
   extraContext: () =>
@@ -79,7 +79,7 @@ function onAccept(): void {
   >
     <Space direction="vertical" class="w-full">
       <Form v-for="(item, index) in items" :key="index" layout="vertical">
-        <FormItem :label="`HMW ${index + 1}`">
+        <FormItem :label="`سؤال ${index + 1}`">
           <Space class="w-full" align="start">
             <Input
               :value="item"

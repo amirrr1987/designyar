@@ -47,7 +47,7 @@ function saveName(): void {
 async function startWizard(): Promise<void> {
   saveName()
   if (!canContinue.value) {
-    message.warning('نام پروژه را وارد کن')
+    message.warning('اول یک نام برای پروژه بنویس')
     return
   }
   const phase = project.value.currentPhase
@@ -79,7 +79,7 @@ function exportJson(): void {
   anchor.download = `designyar-${project.value.name || 'project'}.json`
   anchor.click()
   URL.revokeObjectURL(url)
-  message.success('خروجی گرفته شد')
+  message.success('فایل پشتیبان ذخیره شد')
 }
 
 function applySnapshot(snapshot: ProjectSnapshot): void {
@@ -98,11 +98,11 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
     const text = typeof reader.result === 'string' ? reader.result : ''
     const snapshot = parseSnapshotJson(text)
     if (!snapshot) {
-      message.error('فایل نامعتبر است')
+      message.error('این فایل پشتیبان معتبر نیست')
       return
     }
     applySnapshot(snapshot)
-    message.success('وارد شد')
+    message.success('پروژه از فایل بازیابی شد')
   }
   reader.readAsText(file as File)
   return false
@@ -111,35 +111,57 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
 
 <template>
   <Space direction="vertical" size="large" class="w-full">
-    <div>
-      <Typography.Title :level="2" class="!mb-1">دیزاین یار</Typography.Title>
-      <Typography.Paragraph type="secondary" class="!mb-0">
-        روند Design Thinking را قدم‌به‌قدم، با فرم‌های تک‌کاره و کمک AI پیش ببر.
+    <header>
+      <Typography.Title :level="2" class="mb-1!">دیزاین یار</Typography.Title>
+      <Typography.Paragraph type="secondary" class="mb-0!">
+        طراحی کاربرمحور را قدم‌به‌قدم، با فرم‌های کوتاه و کمک هوش مصنوعی پیش ببر.
       </Typography.Paragraph>
-    </div>
+    </header>
 
-    <Card title="شروع پروژه">
+    <Card title="پروژهٔ تو">
       <Form layout="vertical" @finish="startWizard">
-        <FormItem label="نام پروژه" required>
+        <FormItem label="نام پروژه" name="projectName" required>
           <Input
             v-model:value="nameDraft"
             placeholder="مثلاً اپ سفارش غذا"
+            aria-required="true"
             @blur="saveName"
           />
         </FormItem>
         <Space wrap>
-          <Button v-bind="primaryBtn" html-type="submit">شروع / ادامه</Button>
-          <Button v-bind="defaultBtn" @click="exportJson">خروجی JSON</Button>
-          <Upload :before-upload="beforeUpload" :show-upload-list="false" accept="application/json">
-            <Button v-bind="defaultBtn">ورود JSON</Button>
+          <Button v-bind="primaryBtn" html-type="submit">
+            شروع یا ادامه
+          </Button>
+          <Button
+            v-bind="defaultBtn"
+            aria-label="دانلود پشتیبان پروژه به‌صورت فایل"
+            @click="exportJson"
+          >
+            پشتیبان‌گیری
+          </Button>
+          <Upload
+            :before-upload="beforeUpload"
+            :show-upload-list="false"
+            accept="application/json,.json"
+          >
+            <Button
+              v-bind="defaultBtn"
+              aria-label="بازیابی پروژه از فایل پشتیبان"
+            >
+              بازیابی از فایل
+            </Button>
           </Upload>
         </Space>
       </Form>
     </Card>
 
-    <Card title="فازها" size="small">
-      <Space direction="vertical" class="w-full">
-        <Typography.Text v-for="step in DESIGN_THINKING_STEPS" :key="step.key">
+    <Card title="مسیر کار" size="small">
+      <Space direction="vertical" class="w-full" role="list">
+        <Typography.Text
+          v-for="step in DESIGN_THINKING_STEPS"
+          :key="step.key"
+          role="listitem"
+        >
           {{ step.title }} — {{ step.description }}
         </Typography.Text>
       </Space>

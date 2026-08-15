@@ -27,37 +27,60 @@ const acceptBtn: ButtonProps = { type: 'primary' }
 </script>
 
 <template>
-  <Card size="small" title="دستیار AI">
+  <Card size="small" title="پیشنهاد هوش مصنوعی">
     <Space direction="vertical" class="w-full" size="middle">
+      <Typography.Text type="secondary">
+        پیشنهاد می‌دهد؛ تا وقتی نپذیری چیزی عوض نمی‌شود.
+      </Typography.Text>
+
       <Space wrap>
         <Button
           v-bind="improveBtn"
           :loading="props.loading"
+          :aria-busy="props.loading"
+          :aria-label="props.improveLabel"
           @click="emit('assist', 'improve')"
         >
-          <template #icon><ThunderboltOutlined /></template>
+          <template #icon>
+            <ThunderboltOutlined aria-hidden="true" />
+          </template>
           {{ props.improveLabel }}
         </Button>
         <Button
           v-bind="completeBtn"
           :loading="props.loading"
+          :aria-busy="props.loading"
+          :aria-label="props.completeLabel"
           @click="emit('assist', 'complete')"
         >
-          <template #icon><ThunderboltOutlined /></template>
+          <template #icon>
+            <ThunderboltOutlined aria-hidden="true" />
+          </template>
           {{ props.completeLabel }}
         </Button>
       </Space>
 
-      <template v-if="props.hasPreview">
-        <Typography.Text type="secondary">پیش‌نمایش پیشنهاد:</Typography.Text>
-        <Typography.Paragraph class="whitespace-pre-wrap !mb-0">
+      <div
+        v-if="props.hasPreview"
+        role="region"
+        aria-label="پیش‌نمایش پیشنهاد هوش مصنوعی"
+        aria-live="polite"
+      >
+        <Typography.Text type="secondary">پیش‌نمایش پیشنهاد</Typography.Text>
+        <Typography.Paragraph class="whitespace-pre-wrap mb-0!">
           {{ props.previewText }}
         </Typography.Paragraph>
-        <Space>
-          <Button v-bind="acceptBtn" @click="emit('accept')">پذیرش</Button>
-          <Button @click="emit('reject')">رد</Button>
+        <Space class="mt-2">
+          <Button
+            v-bind="acceptBtn"
+            aria-label="پذیرش پیشنهاد و اعمال روی فرم"
+            @click="emit('accept')"
+          >
+            پذیرش پیشنهاد
+          </Button>
+          <Button aria-label="رد پیشنهاد" @click="emit('reject')">رد پیشنهاد</Button>
         </Space>
-      </template>
+      </div>
     </Space>
   </Card>
 </template>

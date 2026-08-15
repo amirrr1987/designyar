@@ -39,7 +39,7 @@ function removeGroup(index: number): void {
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: cardSortAiSchema,
-  formTitle: 'کارت‌سورت',
+  formTitle: 'مرتب‌سازی کارت‌ها',
   phase: 'ideate',
   getCurrentValue: () => ({ cardSort: groups.value }),
 })

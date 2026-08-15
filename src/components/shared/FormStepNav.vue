@@ -13,14 +13,28 @@ const nextBtn: ButtonProps = { type: 'primary' }
 </script>
 
 <template>
-  <Space class="w-full justify-between">
-    <Button v-bind="prevBtn" @click="emit('prev')">
-      <template #icon><ArrowRightOutlined /></template>
-      قبلی
-    </Button>
-    <Button v-bind="nextBtn" @click="emit('next')">
-      بعدی
-      <template #icon><ArrowLeftOutlined /></template>
-    </Button>
-  </Space>
+  <nav aria-label="جابه‌جایی بین فرم‌ها">
+    <Space class="w-full justify-between">
+      <Button
+        v-bind="prevBtn"
+        aria-label="رفتن به فرم قبلی"
+        @click="emit('prev')"
+      >
+        <template #icon>
+          <ArrowRightOutlined aria-hidden="true" />
+        </template>
+        قبلی
+      </Button>
+      <Button
+        v-bind="nextBtn"
+        aria-label="رفتن به فرم بعدی"
+        @click="emit('next')"
+      >
+        بعدی
+        <template #icon>
+          <ArrowLeftOutlined aria-hidden="true" />
+        </template>
+      </Button>
+    </Space>
+  </nav>
 </template>

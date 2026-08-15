@@ -36,7 +36,7 @@ function persist(): void {
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: wcagAiSchema,
-  formTitle: 'چک‌لیست WCAG',
+  formTitle: 'چک‌لیست دسترس‌پذیری',
   phase: 'test',
   getCurrentValue: () => ({ wcag: { ...draft } }),
 })
