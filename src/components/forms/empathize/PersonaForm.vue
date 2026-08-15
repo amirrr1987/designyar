@@ -1,51 +1,88 @@
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue'
-import { Form, FormItem, Input } from 'ant-design-vue'
+import { computed, ref } from 'vue'
+import { Button, Card, Form, FormItem, Input, Space } from 'ant-design-vue'
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useEmpathizeStore } from '@/stores/empathize'
-import { personaAiSchema, type Persona } from '@/types/empathize'
-import type { AiAssistMode } from '@/types/ai'
+import {
+  createEmptyPersona,
+  personasAiSchema,
+  type Persona,
+} from '@/types/empathize'
 
 const store = useEmpathizeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
-
-const draft = reactive<Persona>({ ...store.state.persona })
-
-watch(
-  () => store.state.persona,
-  (value) => {
-    Object.assign(draft, value)
-  },
+const items = ref<Persona[]>(
+  store.state.personas.length > 0
+    ? store.state.personas.map((item) => ({ ...item }))
+    : [createEmptyPersona()],
 )
 
 function persist(): void {
-  store.setPersona({ ...draft })
+  store.setPersonas(items.value.map((item) => ({ ...item })))
+}
+
+function persistClean(): void {
+  const cleaned = items.value.filter(
+    (item) =>
+      item.name.trim().length > 0 ||
+      item.role.trim().length > 0 ||
+      item.goals.trim().length > 0 ||
+      item.pains.trim().length > 0,
+  )
+  const next = cleaned.length > 0 ? cleaned : [createEmptyPersona()]
+  store.setPersonas(next.map((item) => ({ ...item })))
+  items.value = next.map((item) => ({ ...item }))
+}
+
+function addItem(): void {
+  items.value = [...items.value, createEmptyPersona()]
+  persist()
+}
+
+function removeItem(index: number): void {
+  const next = items.value.filter((_, i) => i !== index)
+  items.value = next.length > 0 ? next : [createEmptyPersona()]
+  persist()
 }
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
-  schema: personaAiSchema,
+  schema: personasAiSchema,
   formTitle: 'پرسونا',
   phase: 'empathize',
-  getCurrentValue: () => ({ ...draft }),
+  getCurrentValue: () => ({ personas: items.value }),
+  extraContext: () => JSON.stringify({ researchGoal: store.state.researchGoal }),
 })
 
 const previewText = computed(() =>
   preview.value
-    ? `${preview.value.name} — ${preview.value.role}\nهدف: ${preview.value.goals}\nدرد: ${preview.value.pains}`
+    ? preview.value.personas
+        .map(
+          (p, i) =>
+            `${i + 1}. ${p.name || 'بدون نام'} — ${p.role}\nهدف: ${p.goals}\nدرد: ${p.pains}`,
+        )
+        .join('\n\n')
     : '',
 )
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
+async function onAssist(): Promise<void> {
   persist()
-  await requestAssist(mode)
+  await requestAssist()
 }
 
 function onAccept(): void {
   if (!preview.value) return
-  store.setPersona({ ...preview.value })
-  Object.assign(draft, preview.value)
+  const next =
+    preview.value.personas.length > 0
+      ? preview.value.personas.map((item) => ({
+          ...item,
+          id: item.id || createEmptyPersona().id,
+        }))
+      : [createEmptyPersona()]
+  store.setPersonas(next)
+  items.value = next.map((item) => ({ ...item }))
   clearPreview()
 }
 </script>
@@ -55,8 +92,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"
@@ -64,22 +100,48 @@ function onAccept(): void {
     @assist="onAssist"
     @accept="onAccept"
     @reject="clearPreview"
-    @next="persist(); goNext()"
-    @prev="persist(); goPrev()"
+    @next="persistClean(); goNext()"
+    @prev="persistClean(); goPrev()"
   >
-    <Form layout="vertical">
-      <FormItem label="نام">
-        <Input v-model:value="draft.name" placeholder="مثلاً سارا" @blur="persist" />
-      </FormItem>
-      <FormItem label="نقش">
-        <Input v-model:value="draft.role" placeholder="طراح جونیور" @blur="persist" />
-      </FormItem>
-      <FormItem label="اهداف">
-        <Input.TextArea v-model:value="draft.goals" :rows="2" @blur="persist" />
-      </FormItem>
-      <FormItem label="دردها / موانع">
-        <Input.TextArea v-model:value="draft.pains" :rows="2" @blur="persist" />
-      </FormItem>
-    </Form>
+    <Space direction="vertical" class="w-full" size="middle">
+      <Card
+        v-for="(item, index) in items"
+        :key="item.id"
+        size="small"
+        class="ring-1 ring-stone-100"
+      >
+        <template #title>پرسونا {{ index + 1 }}</template>
+        <template #extra>
+          <Button
+            danger
+            type="text"
+            html-type="button"
+            aria-label="حذف پرسونا"
+            @click="removeItem(index)"
+          >
+            <template #icon><DeleteOutlined /></template>
+          </Button>
+        </template>
+        <Form layout="vertical">
+          <FormItem label="نام">
+            <Input v-model:value="item.name" placeholder="مثلاً سارا" @blur="persist" />
+          </FormItem>
+          <FormItem label="نقش">
+            <Input v-model:value="item.role" placeholder="طراح جونیور" @blur="persist" />
+          </FormItem>
+          <FormItem label="اهداف">
+            <Input.TextArea v-model:value="item.goals" :rows="2" @blur="persist" />
+          </FormItem>
+          <FormItem label="دردها / موانع">
+            <Input.TextArea v-model:value="item.pains" :rows="2" @blur="persist" />
+          </FormItem>
+        </Form>
+      </Card>
+
+      <Button type="dashed" block html-type="button" @click="addItem">
+        <template #icon><PlusOutlined /></template>
+        افزودن پرسونا
+      </Button>
+    </Space>
   </MicroFormShell>
 </template>

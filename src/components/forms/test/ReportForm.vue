@@ -6,8 +6,6 @@ import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useTestStore } from '@/stores/test'
 import { reportAiSchema } from '@/types/test'
-import type { AiAssistMode } from '@/types/ai'
-
 const store = useTestStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 
@@ -31,8 +29,8 @@ const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicro
 
 const previewText = computed(() => (preview.value ? preview.value.report : ''))
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
-  await requestAssist(mode)
+async function onAssist(): Promise<void> {
+  await requestAssist()
 }
 
 function onAccept(): void {
@@ -47,8 +45,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"

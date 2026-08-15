@@ -19,7 +19,6 @@ const emit = defineEmits<{
 const items = computed(() =>
   DESIGN_THINKING_STEPS.map((step) => ({
     title: step.title,
-    description: step.description,
   })),
 )
 
@@ -35,7 +34,7 @@ function onChange(index: number): void {
     size="small"
     :current="Math.max(props.currentPhaseIndex, 0)"
     :items="items"
-    label-placement="vertical"
+    responsive
     class="w-full cursor-pointer"
     @change="onChange"
   />

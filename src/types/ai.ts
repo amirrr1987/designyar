@@ -13,5 +13,3 @@ export function createDefaultAiPrefs(): AiPrefs {
     lastError: '',
   }
 }
-
-export type AiAssistMode = 'improve' | 'complete'

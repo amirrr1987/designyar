@@ -3,10 +3,12 @@ import { useStorage } from '@vueuse/core'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   createDefaultEmpathizeState,
+  normalizeEmpathizeState,
   type Competitor,
-  type EmpathyMap,
+  type EmpathyMapEntry,
   type EmpathizeState,
   type Persona,
+  type ResearchNote,
 } from '@/types/empathize'
 
 export const useEmpathizeStore = defineStore('empathize', () => {
@@ -15,35 +17,56 @@ export const useEmpathizeStore = defineStore('empathize', () => {
     createDefaultEmpathizeState(),
   )
 
+  state.value = normalizeEmpathizeState(state.value)
+
   function setResearchGoal(value: string): void {
     state.value = { ...state.value, researchGoal: value }
   }
 
-  function setPersona(persona: Persona): void {
-    state.value = { ...state.value, persona }
+  function setPersonas(personas: Persona[]): void {
+    state.value = {
+      ...state.value,
+      personas: personas.length > 0 ? personas : createDefaultEmpathizeState().personas,
+    }
   }
 
-  function setEmpathyMap(empathyMap: EmpathyMap): void {
-    state.value = { ...state.value, empathyMap }
+  function setEmpathyMaps(empathyMaps: EmpathyMapEntry[]): void {
+    state.value = {
+      ...state.value,
+      empathyMaps:
+        empathyMaps.length > 0 ? empathyMaps : createDefaultEmpathizeState().empathyMaps,
+    }
   }
 
-  function setResearchNotes(value: string): void {
-    state.value = { ...state.value, researchNotes: value }
+  function setResearchNotes(researchNotes: ResearchNote[]): void {
+    state.value = {
+      ...state.value,
+      researchNotes:
+        researchNotes.length > 0
+          ? researchNotes
+          : createDefaultEmpathizeState().researchNotes,
+    }
   }
 
   function setCompetitors(competitors: Competitor[]): void {
-    state.value = { ...state.value, competitors }
+    state.value = {
+      ...state.value,
+      competitors:
+        competitors.length > 0
+          ? competitors
+          : createDefaultEmpathizeState().competitors,
+    }
   }
 
   function hydrate(next: EmpathizeState): void {
-    state.value = next
+    state.value = normalizeEmpathizeState(next)
   }
 
   return {
     state,
     setResearchGoal,
-    setPersona,
-    setEmpathyMap,
+    setPersonas,
+    setEmpathyMaps,
     setResearchNotes,
     setCompetitors,
     hydrate,

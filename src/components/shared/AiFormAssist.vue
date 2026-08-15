@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { Button, Card, Space, Typography } from 'ant-design-vue'
-import type { ButtonProps } from 'ant-design-vue'
-import { ThunderboltOutlined } from '@ant-design/icons-vue'
-import type { AiAssistMode } from '@/types/ai'
+import type { ButtonProps, CardProps } from 'ant-design-vue'
+import { ThunderboltOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 
 interface Props {
-  improveLabel: string
-  completeLabel: string
+  assistLabel: string
   loading: boolean
   errorMessage: string
   previewText: string
@@ -16,69 +14,81 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  assist: [mode: AiAssistMode]
+  assist: []
   accept: []
   reject: []
 }>()
 
-const improveBtn: ButtonProps = { type: 'default' }
-const completeBtn: ButtonProps = { type: 'dashed' }
+const cardProps: CardProps = {
+  size: 'small',
+  bordered: true,
+}
+
+const assistBtn: ButtonProps = { type: 'primary' }
 const acceptBtn: ButtonProps = { type: 'primary' }
 </script>
 
 <template>
-  <Card size="small" title="پیشنهاد هوش مصنوعی">
+  <Card
+    v-bind="cardProps"
+    class="overflow-hidden shadow-sm ring-1 ring-teal-100/80"
+    :head-style="{ background: 'rgba(240, 253, 250, 0.9)', borderBottom: '1px solid #ccfbf1' }"
+  >
+    <template #title>
+      <Space size="small">
+        <ThunderboltOutlined class="text-teal-700" aria-hidden="true" />
+        <span>پیشنهاد هوش مصنوعی</span>
+      </Space>
+    </template>
+
     <Space direction="vertical" class="w-full" size="middle">
-      <Typography.Text type="secondary">
-        پیشنهاد می‌دهد؛ تا وقتی نپذیری چیزی عوض نمی‌شود.
+      <Typography.Text class="text-stone-500">
+        خالی‌ها را پر می‌کند و متن‌های موجود را هم بهتر می‌کند. تا وقتی نپذیری فرم عوض نمی‌شود.
       </Typography.Text>
 
-      <Space wrap>
-        <Button
-          v-bind="improveBtn"
-          :loading="props.loading"
-          :aria-busy="props.loading"
-          :aria-label="props.improveLabel"
-          @click="emit('assist', 'improve')"
-        >
-          <template #icon>
-            <ThunderboltOutlined aria-hidden="true" />
-          </template>
-          {{ props.improveLabel }}
-        </Button>
-        <Button
-          v-bind="completeBtn"
-          :loading="props.loading"
-          :aria-busy="props.loading"
-          :aria-label="props.completeLabel"
-          @click="emit('assist', 'complete')"
-        >
-          <template #icon>
-            <ThunderboltOutlined aria-hidden="true" />
-          </template>
-          {{ props.completeLabel }}
-        </Button>
-      </Space>
+      <Button
+        v-bind="assistBtn"
+        :loading="props.loading"
+        :aria-busy="props.loading"
+        :aria-label="props.assistLabel"
+        @click="emit('assist')"
+      >
+        <template #icon>
+          <ThunderboltOutlined aria-hidden="true" />
+        </template>
+        {{ props.assistLabel }}
+      </Button>
 
       <div
         v-if="props.hasPreview"
         role="region"
         aria-label="پیش‌نمایش پیشنهاد هوش مصنوعی"
         aria-live="polite"
+        class="rounded-xl bg-teal-50/70 p-4 ring-1 ring-teal-100"
       >
-        <Typography.Text type="secondary">پیش‌نمایش پیشنهاد</Typography.Text>
-        <Typography.Paragraph class="whitespace-pre-wrap mb-0!">
+        <Typography.Text class="mb-2 block font-medium text-teal-900">
+          پیش‌نمایش پیشنهاد
+        </Typography.Text>
+        <Typography.Paragraph class="mb-3! whitespace-pre-wrap text-stone-700">
           {{ props.previewText }}
         </Typography.Paragraph>
-        <Space class="mt-2">
+        <Space wrap>
           <Button
             v-bind="acceptBtn"
             aria-label="پذیرش پیشنهاد و اعمال روی فرم"
             @click="emit('accept')"
           >
-            پذیرش پیشنهاد
+            <template #icon>
+              <CheckOutlined aria-hidden="true" />
+            </template>
+            پذیرش
           </Button>
-          <Button aria-label="رد پیشنهاد" @click="emit('reject')">رد پیشنهاد</Button>
+          <Button aria-label="رد پیشنهاد" @click="emit('reject')">
+            <template #icon>
+              <CloseOutlined aria-hidden="true" />
+            </template>
+            رد
+          </Button>
         </Space>
       </div>
     </Space>

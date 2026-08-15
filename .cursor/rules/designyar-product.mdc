@@ -6,7 +6,8 @@ alwaysApply: true
 # Designyar product
 
 - Design Thinking → **one-job micro-forms** (wizard), not multi-tool dashboards
-- Every form: **بهبود / تکمیل با AI** + Accept / Edit / Reject (no silent overwrite)
+- Every form: one **کمک هوش مصنوعی** action (improve+complete together) + Accept / Reject (no silent overwrite)
+- AI text values must be **Persian** unless a specific technical term needs English
 - Persian RTL UI; soft guidance only — **no SoftGate / PhaseShell locks**
 - **Keep:** `App.vue`, `AppLayout.vue`, `configProvider.store.ts`
 - **Out of scope:** native mobile, backend/sync API, WebLLM, Next.js chat API, server DevOps beyond static SPA

@@ -6,8 +6,6 @@ import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useTestStore } from '@/stores/test'
 import { DEFAULT_WCAG_KEYS, wcagAiSchema } from '@/types/test'
-import type { AiAssistMode } from '@/types/ai'
-
 const LABELS: Record<(typeof DEFAULT_WCAG_KEYS)[number], string> = {
   'alt-text': 'متن جایگزین تصاویر',
   keyboard: 'قابل استفاده با صفحه‌کلید',
@@ -49,9 +47,9 @@ const previewText = computed(() =>
     : '',
 )
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
+async function onAssist(): Promise<void> {
   persist()
-  await requestAssist(mode)
+  await requestAssist()
 }
 
 function onAccept(): void {
@@ -70,8 +68,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"

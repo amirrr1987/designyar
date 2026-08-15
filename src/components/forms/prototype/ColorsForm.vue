@@ -7,8 +7,6 @@ import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { usePrototypeStore } from '@/stores/prototype'
 import { colorsAiSchema } from '@/types/prototype'
-import type { AiAssistMode } from '@/types/ai'
-
 const store = usePrototypeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 const colors = ref<string[]>([...store.state.colors])
@@ -44,9 +42,9 @@ const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicro
 
 const previewText = computed(() => (preview.value ? preview.value.colors.join('، ') : ''))
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
+async function onAssist(): Promise<void> {
   persist()
-  await requestAssist(mode)
+  await requestAssist()
 }
 
 function onAccept(): void {
@@ -62,8 +60,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"

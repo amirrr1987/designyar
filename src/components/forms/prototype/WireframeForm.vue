@@ -7,8 +7,6 @@ import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { usePrototypeStore } from '@/stores/prototype'
 import { useIdeateStore } from '@/stores/ideate'
 import { wireframeAiSchema } from '@/types/prototype'
-import type { AiAssistMode } from '@/types/ai'
-
 const store = usePrototypeStore()
 const ideate = useIdeateStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
@@ -32,8 +30,8 @@ const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicro
 
 const previewText = computed(() => (preview.value ? preview.value.wireframeNotes : ''))
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
-  await requestAssist(mode)
+async function onAssist(): Promise<void> {
+  await requestAssist()
 }
 
 function onAccept(): void {
@@ -48,8 +46,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"

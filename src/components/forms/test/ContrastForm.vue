@@ -7,8 +7,6 @@ import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useTestStore } from '@/stores/test'
 import { contrastAiSchema, type ContrastPair } from '@/types/test'
 import { contrastRatio, meetsWcagAa } from '@/utils/contrast'
-import type { AiAssistMode } from '@/types/ai'
-
 const store = useTestStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 const draft = reactive<ContrastPair>({ ...store.state.contrast })
@@ -36,9 +34,9 @@ const previewText = computed(() =>
   preview.value ? `متن ${preview.value.foreground} روی ${preview.value.background}` : '',
 )
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
+async function onAssist(): Promise<void> {
   persist()
-  await requestAssist(mode)
+  await requestAssist()
 }
 
 function onAccept(): void {
@@ -54,8 +52,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"

@@ -7,8 +7,6 @@ import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useEmpathizeStore } from '@/stores/empathize'
 import { researchGoalAiSchema } from '@/types/empathize'
-import type { AiAssistMode } from '@/types/ai'
-
 const store = useEmpathizeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 
@@ -28,8 +26,8 @@ const rules: Rule[] = [{ required: true, message: 'هدف پژوهش را بنو
 
 const previewText = computed(() => (preview.value ? preview.value.researchGoal : ''))
 
-async function onAssist(mode: AiAssistMode): Promise<void> {
-  await requestAssist(mode)
+async function onAssist(): Promise<void> {
+  await requestAssist()
 }
 
 function onAccept(): void {
@@ -44,8 +42,7 @@ function onAccept(): void {
     v-if="currentMeta"
     :title="currentMeta.title"
     :hint="currentMeta.hint"
-    :ai-improve-label="currentMeta.aiImproveLabel"
-    :ai-complete-label="currentMeta.aiCompleteLabel"
+    :ai-assist-label="currentMeta.aiAssistLabel"
     :loading="loading"
     :error-message="errorMessage"
     :preview-text="previewText"

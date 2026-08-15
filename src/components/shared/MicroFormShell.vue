@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { Alert, Space, Typography } from 'ant-design-vue'
+import { Alert, Card, Divider, Space, Typography } from 'ant-design-vue'
+import type { CardProps } from 'ant-design-vue'
 import AiFormAssist from '@/components/shared/AiFormAssist.vue'
 import FormStepNav from '@/components/shared/FormStepNav.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
-import type { AiAssistMode } from '@/types/ai'
 
 interface Props {
   title: string
   hint: string
-  aiImproveLabel: string
-  aiCompleteLabel: string
+  aiAssistLabel: string
   loading?: boolean
   errorMessage?: string
   previewText?: string
@@ -24,7 +23,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<{
-  assist: [mode: AiAssistMode]
+  assist: []
   accept: []
   reject: []
   next: []
@@ -32,32 +31,37 @@ const emit = defineEmits<{
 }>()
 
 const { isFirstStep, isLastStep } = useFormWizard()
+
+const formCard: CardProps = {
+  bordered: true,
+}
 </script>
 
 <template>
-  <Space direction="vertical" size="large" class="w-full" role="main">
-    <header>
-      <Typography.Title :level="3" class="mb-1!">{{ props.title }}</Typography.Title>
-      <Typography.Paragraph type="secondary" class="mb-0!">
+  <Space direction="vertical" size="middle" class="w-full" role="main">
+    <header class="rounded-2xl bg-white/80 px-5 py-4 shadow-sm ring-1 ring-stone-200/80 backdrop-blur">
+      <Typography.Title :level="3" class="mb-2! text-stone-800">
+        {{ props.title }}
+      </Typography.Title>
+      <Typography.Paragraph class="mb-2! text-base text-stone-600">
         {{ props.hint }}
       </Typography.Paragraph>
-      <Typography.Text type="secondary" class="text-xs">
-        اگر هنوز آماده نیستی، می‌توانی با «{{ isLastStep ? 'پایان' : 'بعدی' }}» رد شوی.
+      <Typography.Text class="text-sm text-stone-500">
+        اجباری نیست — می‌توانی با «{{ isLastStep ? 'پایان' : 'بعدی' }}» رد شوی.
       </Typography.Text>
     </header>
 
-    <section :aria-label="props.title">
+    <Card v-bind="formCard" class="shadow-sm ring-1 ring-stone-200/60" :aria-label="props.title">
       <slot />
-    </section>
+    </Card>
 
     <AiFormAssist
-      :improve-label="props.aiImproveLabel"
-      :complete-label="props.aiCompleteLabel"
+      :assist-label="props.aiAssistLabel"
       :loading="props.loading"
       :error-message="props.errorMessage"
       :preview-text="props.previewText"
       :has-preview="props.hasPreview"
-      @assist="emit('assist', $event)"
+      @assist="emit('assist')"
       @accept="emit('accept')"
       @reject="emit('reject')"
     />
@@ -68,8 +72,11 @@ const { isFirstStep, isLastStep } = useFormWizard()
       show-icon
       role="alert"
       aria-live="assertive"
+      class="rounded-xl"
       :message="props.errorMessage"
     />
+
+    <Divider class="my-1!" />
 
     <FormStepNav
       :is-first="isFirstStep"

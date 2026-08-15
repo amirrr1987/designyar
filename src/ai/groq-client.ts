@@ -1,5 +1,6 @@
 import { createGroq } from '@ai-sdk/groq'
 
+/** Default chat model — JSON via prompt+Zod (not Groq json_schema). */
 const DEFAULT_MODEL_ID = 'llama-3.3-70b-versatile'
 
 export function getGroqApiKey(): string | undefined {

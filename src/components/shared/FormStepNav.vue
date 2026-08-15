@@ -18,12 +18,15 @@ const emit = defineEmits<{
   next: []
 }>()
 
-const prevBtn: ButtonProps = {}
-const nextBtn: ButtonProps = { type: 'primary' }
+const prevBtn: ButtonProps = { size: 'large' }
+const nextBtn: ButtonProps = { type: 'primary', size: 'large' }
 </script>
 
 <template>
-  <nav aria-label="جابه‌جایی بین فرم‌ها">
+  <nav
+    aria-label="جابه‌جایی بین فرم‌ها"
+    class="sticky bottom-0 z-10 -mx-1 rounded-2xl bg-white/95 px-3 py-3 shadow-md ring-1 ring-stone-200/80 backdrop-blur"
+  >
     <Space class="w-full justify-between">
       <Button
         v-bind="prevBtn"
@@ -37,6 +40,7 @@ const nextBtn: ButtonProps = { type: 'primary' }
       </Button>
       <Button
         v-bind="nextBtn"
+        class="min-w-28"
         :aria-label="props.isLast ? 'پایان مسیر و مشاهده جمع‌بندی' : 'رفتن به فرم بعدی'"
         @click="emit('next')"
       >

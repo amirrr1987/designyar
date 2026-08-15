@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.4] - 2026-08-15
+
+### Fixed
+
+- AI responses: enforce Persian-only text and reject/retry on Cyrillic (Russian) characters
+
+### Changed
+
+- Empathize & Define: multi-item forms (personas, empathy maps, research notes, problem statements, POVs) per Design Thinking practice
+- Snapshot import: migrate legacy single-item define/empathize shapes via normalize
+
+## [0.31.3] - 2026-08-15
+
+### Added
+
+- Home resume progress (phase/form + overall bar)
+- In-phase form step dots with jump
+- Scrollable wider shell (`max-w-3xl`) for wizard readability
+
 ## [0.31.2] - 2026-08-15
 
 ### Added

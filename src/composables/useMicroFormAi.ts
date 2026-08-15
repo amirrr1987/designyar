@@ -3,7 +3,6 @@ import type { z } from 'zod'
 import { runAiFormAssist } from '@/composables/useAiFormAssist'
 import { useAiStore } from '@/stores/ai'
 import { useProjectStore } from '@/stores/project'
-import type { AiAssistMode } from '@/types/ai'
 import type { DesignThinkingStepKey } from '@/constants/design-thinking-steps'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
 
@@ -30,7 +29,7 @@ export function useMicroFormAi<TSchema extends z.ZodType>(
     return step?.title ?? options.phase
   })
 
-  async function requestAssist(mode: AiAssistMode): Promise<void> {
+  async function requestAssist(): Promise<void> {
     loading.value = true
     errorMessage.value = ''
     preview.value = null
@@ -40,7 +39,6 @@ export function useMicroFormAi<TSchema extends z.ZodType>(
       const current = options.getCurrentValue()
       const { data } = await runAiFormAssist({
         schema: options.schema,
-        mode,
         formTitle: options.formTitle,
         phaseTitle: phaseTitle.value,
         projectName: projectStore.project.name,
@@ -49,7 +47,11 @@ export function useMicroFormAi<TSchema extends z.ZodType>(
       })
       preview.value = data
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : String(e)
+      let message = e instanceof Error ? e.message : String(e)
+      if (message.includes('json_schema') || message.includes('Structured Outputs')) {
+        message =
+          'مدل فعلی Groq از خروجی ساخت‌یافتهٔ سخت پشتیبانی نمی‌کند. صفحه را سخت‌رفرش کن (Ctrl+Shift+R) یا dev server را یک‌بار ری‌استارت کن.'
+      }
       errorMessage.value = message
       aiStore.setLastError(message)
     } finally {
