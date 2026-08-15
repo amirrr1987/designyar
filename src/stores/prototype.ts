@@ -3,9 +3,12 @@ import { useStorage } from '@vueuse/core'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   createDefaultPrototypeState,
+  normalizePrototypeState,
+  wireframeBlocksToNotes,
   type GridConfig,
   type PrototypeState,
   type TypographyScale,
+  type WireframeBlock,
 } from '@/types/prototype'
 
 export const usePrototypeStore = defineStore('prototype', () => {
@@ -14,8 +17,13 @@ export const usePrototypeStore = defineStore('prototype', () => {
     createDefaultPrototypeState(),
   )
 
+  state.value = normalizePrototypeState(state.value)
+
   function setColors(colors: string[]): void {
-    state.value = { ...state.value, colors }
+    state.value = {
+      ...state.value,
+      colors: colors.length > 0 ? colors : createDefaultPrototypeState().colors,
+    }
   }
 
   function setTypography(typography: TypographyScale): void {
@@ -30,12 +38,24 @@ export const usePrototypeStore = defineStore('prototype', () => {
     state.value = { ...state.value, spacingBase }
   }
 
+  function setWireframeBlocks(wireframeBlocks: WireframeBlock[]): void {
+    const blocks =
+      wireframeBlocks.length > 0
+        ? wireframeBlocks
+        : createDefaultPrototypeState().wireframeBlocks
+    state.value = {
+      ...state.value,
+      wireframeBlocks: blocks,
+      wireframeNotes: wireframeBlocksToNotes(blocks),
+    }
+  }
+
   function setWireframeNotes(wireframeNotes: string): void {
     state.value = { ...state.value, wireframeNotes }
   }
 
   function hydrate(next: PrototypeState): void {
-    state.value = next
+    state.value = normalizePrototypeState(next)
   }
 
   return {
@@ -44,6 +64,7 @@ export const usePrototypeStore = defineStore('prototype', () => {
     setTypography,
     setGrid,
     setSpacingBase,
+    setWireframeBlocks,
     setWireframeNotes,
     hydrate,
   }

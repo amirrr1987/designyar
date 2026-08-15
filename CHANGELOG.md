@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.32.0] - 2026-08-15
+
+### Added
+
+- Prototype studio: live previews for colors, type scale, grid, spacing, and wireframe blocks
+- Wireframe as composable page blocks (header/hero/content/cta/…) with visual sketch
+- Color presets via `@ant-design/colors` + native color picker
+
+### Changed
+
+- Prototype forms redesigned as visual micro-studio (not bare number fields)
+
 ## [0.31.4] - 2026-08-15
 
 ### Fixed

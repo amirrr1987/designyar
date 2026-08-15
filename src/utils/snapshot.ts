@@ -13,7 +13,7 @@ import { createDefaultIdeateState, ideateStateSchema, type IdeateState } from '@
 import { createDefaultProject, isProjectState, projectSchema, type ProjectState } from '@/types/project'
 import {
   createDefaultPrototypeState,
-  prototypeStateSchema,
+  normalizePrototypeState,
   type PrototypeState,
 } from '@/types/prototype'
 import { createDefaultTestState, testStateSchema, type TestState } from '@/types/test'
@@ -55,12 +55,9 @@ export function parseSnapshot(data: unknown): ProjectSnapshot | null {
   if (!projectParsed.success) return null
 
   const ideateParsed = ideateStateSchema.safeParse(data.ideate ?? createDefaultIdeateState())
-  const prototypeParsed = prototypeStateSchema.safeParse(
-    data.prototype ?? createDefaultPrototypeState(),
-  )
   const testParsed = testStateSchema.safeParse(data.test ?? createDefaultTestState())
 
-  if (!ideateParsed.success || !prototypeParsed.success || !testParsed.success) {
+  if (!ideateParsed.success || !testParsed.success) {
     return null
   }
 
@@ -71,7 +68,7 @@ export function parseSnapshot(data: unknown): ProjectSnapshot | null {
     empathize: normalizeEmpathizeState(data.empathize),
     define: normalizeDefineState(data.define),
     ideate: ideateParsed.data,
-    prototype: prototypeParsed.data,
+    prototype: normalizePrototypeState(data.prototype),
     test: testParsed.data,
   }
 }
@@ -93,7 +90,7 @@ export const snapshotSchema = z.object({
   empathize: z.unknown(),
   define: z.unknown(),
   ideate: ideateStateSchema,
-  prototype: prototypeStateSchema,
+  prototype: z.unknown(),
   test: testStateSchema,
 })
 
