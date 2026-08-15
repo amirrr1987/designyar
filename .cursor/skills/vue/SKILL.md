@@ -2,13 +2,13 @@
 name: vue
 description: >
   Guides Vue 3.5+ conventions for UX Flow — script setup, Composition API, TypeScript,
-  and SFC structure without custom CSS. Use when writing Vue SFCs, composables, refs,
+  and SFC structure without `<style>` blocks (antdv + Tailwind utilities). Use when writing Vue SFCs, composables, refs,
   props/emits, or vue core patterns in this project.
 ---
 
 # Vue 3 (UX Flow)
 
-Package: `vue` ^3.5. All components: **`<script setup lang="ts">`** + Composition API. UI via [ant-design-vue](../ant-design-vue/SKILL.md) — **no `<style>` blocks**.
+Package: `vue` ^3.5. All components: **`<script setup lang="ts">`** + Composition API. UI via [ant-design-vue](../ant-design-vue/SKILL.md). Layout extras via [tailwindcss](../tailwindcss/SKILL.md) `class` — **no `<style>` blocks**.
 
 ## SFC template
 
@@ -49,7 +49,7 @@ No second `<script>` or Options API components unless migrating legacy (there sh
 2. **Persian** user-facing strings in templates.
 3. Composables in `src/composables/` named `useX.ts`.
 4. Prefer `ref` / `computed` / lifecycle hooks from `vue`; shared browser logic from `@vueuse/core`.
-5. Do not add custom CSS scoped/modules — antdv props + `Space`/`Row`/`Col` only.
+5. Do not add `<style>` scoped/modules — antdv props + `Space`/`Row`/`Col`, plus Tailwind utilities ([tailwindcss](../tailwindcss/SKILL.md)).
 6. Dynamic color only via `:style` bindings when required (contrast/palette).
 
 ## Imports
@@ -90,6 +90,6 @@ When wrapping antdv, still use **antdv** props types (`ButtonProps`), not a cust
 - [ ] `<script setup lang="ts">`
 - [ ] Typed props/emits
 - [ ] Vue package types (`Ref`, `ComputedRef`, `CSSProperties`, …) at boundaries
-- [ ] No `<style>` 
+- [ ] No `<style>` — Tailwind `class` utilities only when needed 
 - [ ] antdv PascalCase components + antdv `*Props` where relevant
 - [ ] Persian UI copy

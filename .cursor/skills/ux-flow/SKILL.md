@@ -11,17 +11,17 @@ description: >
 
 Client-only Vue app for Design Thinking. Package name: `ui-ux-ai`.
 
-Stack skills (read as needed): [vue](../vue/SKILL.md) · [ant-design-vue](../ant-design-vue/SKILL.md) · [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) · [ant-design-colors](../ant-design-colors/SKILL.md) · [vueuse-core](../vueuse-core/SKILL.md) · [pinia](../pinia/SKILL.md) · [vue-router](../vue-router/SKILL.md) · [web-llm](../web-llm/SKILL.md).
+Stack skills (read as needed): [vue](../vue/SKILL.md) · [ant-design-vue](../ant-design-vue/SKILL.md) · [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) · [ant-design-colors](../ant-design-colors/SKILL.md) · [tailwindcss](../tailwindcss/SKILL.md) · [vueuse-core](../vueuse-core/SKILL.md) · [pinia](../pinia/SKILL.md) · [vue-router](../vue-router/SKILL.md) · [ai](../ai/SKILL.md) · [ai-sdk-groq](../ai-sdk-groq/SKILL.md) · [ai-sdk-vue](../ai-sdk-vue/SKILL.md).
 
 **Compose / full-safe TS:** start with [ux-flow-compose](../ux-flow-compose/SKILL.md) (skill load map + typing contracts). Project role rule: `.cursor/rules/full-safe-type-ts.mdc`.
 
-Tooling skills: [vite](../vite/SKILL.md) · [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) · [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) · [typescript](../typescript/SKILL.md) · [vue-tsc](../vue-tsc/SKILL.md) · [vue-tsconfig](../vue-tsconfig/SKILL.md) · [tsconfig-node24](../tsconfig-node24/SKILL.md) · [types-node](../types-node/SKILL.md) · [eslint](../eslint/SKILL.md) · [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md) · [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) · [vue-eslint-parser](../vue-eslint-parser/SKILL.md) · [eslint-config-prettier](../eslint-config-prettier/SKILL.md) · [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) · [oxlint](../oxlint/SKILL.md) · [oxfmt](../oxfmt/SKILL.md) · [npm-run-all2](../npm-run-all2/SKILL.md) · [jiti](../jiti/SKILL.md).
+Tooling skills: [vite](../vite/SKILL.md) · [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) · [tailwindcss-vite](../tailwindcss-vite/SKILL.md) · [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) · [typescript](../typescript/SKILL.md) · [vue-tsc](../vue-tsc/SKILL.md) · [vue-tsconfig](../vue-tsconfig/SKILL.md) · [tsconfig-node24](../tsconfig-node24/SKILL.md) · [types-node](../types-node/SKILL.md) · [eslint](../eslint/SKILL.md) · [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md) · [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) · [vue-eslint-parser](../vue-eslint-parser/SKILL.md) · [eslint-config-prettier](../eslint-config-prettier/SKILL.md) · [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) · [oxlint](../oxlint/SKILL.md) · [oxfmt](../oxfmt/SKILL.md) · [npm-run-all2](../npm-run-all2/SKILL.md) · [jiti](../jiti/SKILL.md).
 
 **Phase end:** always run [keep-a-changelog](../keep-a-changelog/SKILL.md) — SemVer `package.json` + Keep a Changelog `CHANGELOG.md`.
 
 ## Critical behavior
 
-1. **No custom CSS** — only Ant Design Vue (see antdv skill).
+1. **No SFC `<style>`** — antdv components + Tailwind utilities ([tailwindcss](../tailwindcss/SKILL.md); skip Preflight).
 2. **Command confirmation** — before any terminal command (`npm`, `pnpm`, git network, etc.), show the exact command and **wait** for user `✅` / confirmation. Do not run it first.
 3. **Step-by-step** — finish one module/phase before the next; announce what you build; ask before continuing.
 4. **No backend** — browser only; LocalStorage + WebLLM.
@@ -52,7 +52,11 @@ From `package.json` — do **not** re-scaffold with `npm create` unless the user
 | `@vueuse/core` | Composables / `useStorage` |
 | `pinia` | State |
 | `vue-router` | Routes |
-| `@mlc-ai/web-llm` | In-browser AI |
+| `tailwindcss` | Utility classes (v4 CSS-first) |
+| `@tailwindcss/vite` | Vite plugin for Tailwind |
+| `ai` | Vercel AI SDK core |
+| `@ai-sdk/groq` | Groq provider |
+| `@ai-sdk/vue` | `useChat` / Vue composables |
 
 Phase 0 = configure existing project files, not a new Vite app.
 

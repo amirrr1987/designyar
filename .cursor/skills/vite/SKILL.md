@@ -1,8 +1,8 @@
 ---
 name: vite
 description: >
-  Guides Vite 8 for UX Flow — dev/build/preview scripts, defineConfig, @ alias, Vue plugins.
-  Use when editing vite.config.ts, running the dev server, building, or vite package.
+  Guides Vite 8 for UX Flow — dev/build/preview scripts, defineConfig, @ alias, Vue and
+  Tailwind plugins. Use when editing vite.config.ts, running the dev server, building, or vite package.
 ---
 
 # vite (UX Flow)
@@ -28,10 +28,11 @@ Confirm commands with the user before running (UX Flow).
 import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig({
-  plugins: [vue(), vueDevTools()],
+  plugins: [vue(), tailwindcss(), vueDevTools()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
@@ -46,7 +47,7 @@ Use Vite’s typed config API — do not leave `vite.config.ts` as an untyped ob
 |------|---------------------|
 | Config | `defineConfig`, `UserConfig`, `UserConfigFn` |
 | Env | `ImportMetaEnv` / `ImportMeta` (app), Vite client types |
-| Plugins | plugin return types from `@vitejs/plugin-vue` etc. |
+| Plugins | plugin return types from `@vitejs/plugin-vue`, `@tailwindcss/vite` (`PluginOptions`), etc. |
 
 ```ts
 import { defineConfig, type UserConfig } from 'vite'
@@ -66,14 +67,16 @@ export default defineConfig(config)
 
 1. Keep `@` → `./src` alias in sync with `tsconfig.app.json` paths.
 2. Always include [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md).
-3. Static deploy: default SPA build output `dist/` — no SSR required for MVP.
-4. Client-only app — do not add a Vite SSR setup unless asked.
-5. Related: [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md).
-6. Prefer `defineConfig` so options are checked against Vite’s `UserConfig`.
+3. Register [tailwindcss-vite](../tailwindcss-vite/SKILL.md) after `vue()` — no PostCSS Tailwind pipeline.
+4. Static deploy: default SPA build output `dist/` — no SSR required for MVP.
+5. Client-only app — do not add a Vite SSR setup unless asked.
+6. Related: [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md).
+7. Prefer `defineConfig` so options are checked against Vite’s `UserConfig`.
 
 ## Checklist
 
 - [ ] `dev` / `build-only` / `preview` intact
 - [ ] `@` alias works in imports
 - [ ] Vue plugin registered
+- [ ] `@tailwindcss/vite` registered after `vue()`
 - [ ] Config typed via `defineConfig` / `UserConfig`

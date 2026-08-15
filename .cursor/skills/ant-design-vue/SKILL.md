@@ -3,7 +3,7 @@ name: ant-design-vue
 description: >
   Guides Ant Design Vue (antdv) v4 UI for this UX Flow project — named imports from
   ant-design-vue, PascalCase tags like Button, full use of package props/types
-  (ButtonProps, MenuProps, ThemeConfig, …), no custom CSS, ConfigProvider RTL/fa_IR,
+  (ButtonProps, MenuProps, ThemeConfig, …), no SFC `<style>`, ConfigProvider RTL/fa_IR,
   @ant-design/icons-vue, and @ant-design/colors. Use when building or debugging UI with
   ant-design-vue, antdv, Button, Form, Layout, ConfigProvider, icons-vue, or Persian RTL.
 ---
@@ -18,9 +18,9 @@ Policy: [package-interfaces.md](../ux-flow-compose/package-interfaces.md) — **
 
 ## Hard rules (no custom CSS)
 
-1. **NEVER** write `<style>` blocks, custom CSS classes, or external CSS libraries.
-2. Style only via antdv props (`type`, `size`, `variant`, `layout`, `gutter`, etc.).
-3. Spacing/layout: `Space`, `Row`/`Col`, `Divider` — not custom margins.
+1. **NEVER** write SFC `<style>` blocks or ad-hoc CSS files. Utility classes only via [tailwindcss](../tailwindcss/SKILL.md) (skip Preflight).
+2. Style components via antdv props (`type`, `size`, `variant`, `layout`, `gutter`, etc.).
+3. Spacing/layout: prefer `Space`, `Row`/`Col`, `Divider`; Tailwind utilities when those are not enough. Do not override `.ant-*`.
 4. Exception: `:style` **only** for dynamic color bindings (e.g. contrast preview `{ backgroundColor: color }`).
 5. Icons from `@ant-design/icons-vue` only — no emoji as UI icons.
 6. Prefer antdv components from the allowed list before inventing custom UI.
@@ -140,6 +140,8 @@ const columns: TableColumnsType<PersonaRow> = [
   <Button type="primary" html-type="submit">ثبت</Button>
 </Form>
 ```
+
+**Zod is not form validation.** antdv `Rule` / `FormInstance.validate()` stay for persona, POV, HMW, etc. Zod (if installed) is only for AI structured output schemas (`Output.object`) — do not replace `:rules` with Zod.
 
 ### Extending (only for domain extras)
 

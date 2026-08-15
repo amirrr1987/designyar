@@ -78,6 +78,45 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 
 ### B. App runtime (feature code)
 
+
+| Concern | Skill |
+|---------|--------|
+| SFC / Composition API | [vue](../vue/SKILL.md) |
+| Routes / Menu sync | [vue-router](../vue-router/SKILL.md) |
+| Stores | [pinia](../pinia/SKILL.md) |
+| LocalStorage / browser utils | [vueuse-core](../vueuse-core/SKILL.md) |
+| UI components | [ant-design-vue](../ant-design-vue/SKILL.md) |
+| Icons | [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) |
+| Color ramps | [ant-design-colors](../ant-design-colors/SKILL.md) |
+| Utility classes | [tailwindcss](../tailwindcss/SKILL.md) |
+| AI SDK core | [ai](../ai/SKILL.md) |
+| Groq provider | [ai-sdk-groq](../ai-sdk-groq/SKILL.md) |
+| AI Vue composables | [ai-sdk-vue](../ai-sdk-vue/SKILL.md) |
+
+### C. Tooling (config / scripts / CI quality)
+
+| Concern | Skill |
+|---------|--------|
+| Dev server / build | [vite](../vite/SKILL.md) |
+| Vue SFC plugin | [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) |
+| Tailwind Vite plugin | [tailwindcss-vite](../tailwindcss-vite/SKILL.md) |
+| DevTools plugin | [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) |
+| TS compiler | [typescript](../typescript/SKILL.md) |
+| SFC typecheck | [vue-tsc](../vue-tsc/SKILL.md) |
+| App tsconfig | [vue-tsconfig](../vue-tsconfig/SKILL.md) |
+| Node tsconfig | [tsconfig-node24](../tsconfig-node24/SKILL.md) |
+| Node types | [types-node](../types-node/SKILL.md) |
+| ESLint | [eslint](../eslint/SKILL.md) |
+| Vue ESLint | [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md) |
+| Vue+TS ESLint | [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) |
+| Vue parser | [vue-eslint-parser](../vue-eslint-parser/SKILL.md) |
+| Prettier skip | [eslint-config-prettier](../eslint-config-prettier/SKILL.md) |
+| Oxlint bridge | [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) |
+| Oxlint | [oxlint](../oxlint/SKILL.md) |
+| Format | [oxfmt](../oxfmt/SKILL.md) |
+| Script runners | [npm-run-all2](../npm-run-all2/SKILL.md) |
+| TS config loader | [jiti](../jiti/SKILL.md) |
+=======
 | Concern                      | Skill                                                    |
 | ---------------------------- | -------------------------------------------------------- |
 | SFC / Composition API        | [vue](../vue/SKILL.md)                                   |
@@ -111,6 +150,7 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 | Format             | [oxfmt](../oxfmt/SKILL.md)                                               |
 | Script runners     | [npm-run-all2](../npm-run-all2/SKILL.md)                                 |
 | TS config loader   | [jiti](../jiti/SKILL.md)                                                 |
+
 
 Load **only** skills relevant to the current task after the product + typing baseline.
 
@@ -213,7 +253,7 @@ Before calling a step done:
 - [ ] `noUncheckedIndexedAccess` handled
 - [ ] Package interfaces used (see [package-interfaces.md](package-interfaces.md)) — no hand-rolled twins of antdv/Vue/Pinia/…
 - [ ] antdv named imports + PascalCase
-- [ ] No `<style>` / custom CSS
+- [ ] No `<style>` — Tailwind utilities only via [tailwindcss](../tailwindcss/SKILL.md)
 - [ ] Persistence typed via `useStorage<T>`
 - [ ] Would pass `vue-tsc --build`, `lint`, `oxfmt` (ask before running)
 - [ ] Phase end: [keep-a-changelog](../keep-a-changelog/SKILL.md) applied if closing a phase
@@ -224,5 +264,5 @@ Before calling a step done:
 - Global `app.use(Antd)` + `a-*` tags (forbidden here)
 - Hand-rolled props/config that duplicate npm package types
 - Hand-rolled `localStorage` instead of VueUse
-- Remote LLM API instead of WebLLM
+- `groq-sdk` / WebLLM / Next.js `app/api/chat` instead of `ai` + `@ai-sdk/groq`
 - Disabling strictness in tsconfig to silence errors
