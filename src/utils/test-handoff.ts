@@ -72,6 +72,13 @@ export function buildHandoffMarkdown(payload: HandoffPayload): string {
     lines.push(`- ${item.title}: ${item.score}/۵${item.note ? ` — ${item.note}` : ''}`)
   }
 
+  if (test.feedback) {
+    lines.push('', '## بازخورد تست (I like / wish / give)')
+    if (test.feedback.like.trim()) lines.push(`- دوست داشتم: ${test.feedback.like.trim()}`)
+    if (test.feedback.wish.trim()) lines.push(`- ای کاش: ${test.feedback.wish.trim()}`)
+    if (test.feedback.give.trim()) lines.push(`- پیشنهاد: ${test.feedback.give.trim()}`)
+  }
+
   if (paletteTokens) {
     lines.push('', '## توکن رنگ (پروتوتایپ)')
     for (const [key, value] of Object.entries(paletteTokens)) {

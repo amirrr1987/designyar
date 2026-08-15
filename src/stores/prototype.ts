@@ -8,6 +8,7 @@ import {
   wireframeBlocksToNotes,
   type ColorPalette,
   type GridConfig,
+  type ProtoChecklist,
   type PrototypeState,
   type TypographyScale,
   type WireframeBlock,
@@ -56,6 +57,10 @@ export const usePrototypeStore = defineStore('prototype', () => {
     state.value = { ...state.value, spacingBase }
   }
 
+  function setProtoChecklist(protoChecklist: ProtoChecklist): void {
+    state.value = { ...state.value, protoChecklist: { ...protoChecklist } }
+  }
+
   function setWireframeBlocks(wireframeBlocks: WireframeBlock[]): void {
     const blocks =
       wireframeBlocks.length > 0
@@ -82,6 +87,7 @@ export const usePrototypeStore = defineStore('prototype', () => {
     setTypography,
     setGrid,
     setSpacingBase,
+    setProtoChecklist,
     setWireframeBlocks,
     setWireframeNotes,
     hydrate,

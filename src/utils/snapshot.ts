@@ -9,14 +9,19 @@ import {
   normalizeEmpathizeState,
   type EmpathizeState,
 } from '@/types/empathize'
-import { createDefaultIdeateState, ideateStateSchema, type IdeateState } from '@/types/ideate'
+import { createDefaultIdeateState, ideateStateSchema, normalizeIdeateState, type IdeateState } from '@/types/ideate'
 import { createDefaultProject, isProjectState, projectSchema, type ProjectState } from '@/types/project'
 import {
   createDefaultPrototypeState,
   normalizePrototypeState,
   type PrototypeState,
 } from '@/types/prototype'
-import { createDefaultTestState, testStateSchema, type TestState } from '@/types/test'
+import {
+  createDefaultTestState,
+  normalizeTestState,
+  testStateSchema,
+  type TestState,
+} from '@/types/test'
 
 export interface ProjectSnapshot {
   version: 1
@@ -54,22 +59,15 @@ export function parseSnapshot(data: unknown): ProjectSnapshot | null {
   const projectParsed = projectSchema.safeParse(data.project)
   if (!projectParsed.success) return null
 
-  const ideateParsed = ideateStateSchema.safeParse(data.ideate ?? createDefaultIdeateState())
-  const testParsed = testStateSchema.safeParse(data.test ?? createDefaultTestState())
-
-  if (!ideateParsed.success || !testParsed.success) {
-    return null
-  }
-
   return {
     version: 1,
     exportedAt: data.exportedAt,
     project: projectParsed.data,
     empathize: normalizeEmpathizeState(data.empathize),
     define: normalizeDefineState(data.define),
-    ideate: ideateParsed.data,
+    ideate: normalizeIdeateState(data.ideate),
     prototype: normalizePrototypeState(data.prototype),
-    test: testParsed.data,
+    test: normalizeTestState(data.test),
   }
 }
 

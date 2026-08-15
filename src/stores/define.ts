@@ -4,6 +4,7 @@ import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   createDefaultDefineState,
   normalizeDefineState,
+  type ChallengeDefinition,
   type DefineState,
 } from '@/types/define'
 
@@ -11,6 +12,10 @@ export const useDefineStore = defineStore('define', () => {
   const state = useStorage<DefineState>(STORAGE_KEYS.define, createDefaultDefineState())
 
   state.value = normalizeDefineState(state.value)
+
+  function setChallenge(challenge: ChallengeDefinition): void {
+    state.value = { ...state.value, challenge: { ...challenge } }
+  }
 
   function setProblems(problems: string[]): void {
     state.value = {
@@ -37,5 +42,5 @@ export const useDefineStore = defineStore('define', () => {
     state.value = normalizeDefineState(next)
   }
 
-  return { state, setProblems, setPovs, setHmw, hydrate }
+  return { state, setChallenge, setProblems, setPovs, setHmw, hydrate }
 })

@@ -13,6 +13,7 @@ import {
   personasAiSchema,
   type Persona,
 } from '@/types/empathize'
+import { personaAiExtraContext } from '@/constants/dt-ai-prompts'
 
 const store = useEmpathizeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
@@ -31,7 +32,10 @@ const filledCount = computed(
         item.name.trim().length > 0 ||
         item.role.trim().length > 0 ||
         item.goals.trim().length > 0 ||
-        item.pains.trim().length > 0,
+        item.pains.trim().length > 0 ||
+        item.loves.trim().length > 0 ||
+        item.fears.trim().length > 0 ||
+        item.dailyJobs.trim().length > 0,
     ).length,
 )
 
@@ -51,7 +55,10 @@ function persistClean(): void {
       item.name.trim().length > 0 ||
       item.role.trim().length > 0 ||
       item.goals.trim().length > 0 ||
-      item.pains.trim().length > 0,
+      item.pains.trim().length > 0 ||
+      item.loves.trim().length > 0 ||
+      item.fears.trim().length > 0 ||
+      item.dailyJobs.trim().length > 0,
   )
   const next = cleaned.length > 0 ? cleaned : [createEmptyPersona()]
   store.setPersonas(next.map((item) => ({ ...item })))
@@ -74,7 +81,7 @@ const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicro
   formTitle: 'پرسونا',
   phase: 'empathize',
   getCurrentValue: () => ({ personas: items.value }),
-  extraContext: () => JSON.stringify({ researchGoal: store.state.researchGoal }),
+  extraContext: () => personaAiExtraContext(store.state.researchGoal),
 })
 
 const previewText = computed(() =>
@@ -82,7 +89,7 @@ const previewText = computed(() =>
     ? preview.value.personas
         .map(
           (p, i) =>
-            `${i + 1}. ${p.name || 'بدون نام'} — ${p.role}\nهدف: ${p.goals}\nدرد: ${p.pains}`,
+            `${i + 1}. ${p.name || 'بدون نام'} — ${p.role}\nهدف: ${p.goals}\nدرد: ${p.pains}\nعلاقه: ${p.loves}\nترس: ${p.fears}\nکار روزانه: ${p.dailyJobs}`,
         )
         .join('\n\n')
     : '',
@@ -149,7 +156,7 @@ function onAccept(): void {
           <FormItem label="نام">
             <Input v-model:value="item.name" placeholder="مثلاً سارا" @blur="persist" />
           </FormItem>
-          <FormItem label="نقش">
+          <FormItem label="نقش / شغل">
             <Input v-model:value="item.role" placeholder="طراح جونیور" @blur="persist" />
           </FormItem>
           <FormItem label="اهداف">
@@ -157,6 +164,30 @@ function onAccept(): void {
           </FormItem>
           <FormItem label="دردها / موانع">
             <Input.TextArea v-model:value="item.pains" :rows="2" @blur="persist" />
+          </FormItem>
+          <FormItem label="چه چیزی دوست دارم؟">
+            <Input.TextArea
+              v-model:value="item.loves"
+              :rows="2"
+              placeholder="علاقه‌ها، چیزهایی که انرژی می‌دهد"
+              @blur="persist"
+            />
+          </FormItem>
+          <FormItem label="از چه می‌ترسم؟">
+            <Input.TextArea
+              v-model:value="item.fears"
+              :rows="2"
+              placeholder="ترس‌ها و نگرانی‌ها"
+              @blur="persist"
+            />
+          </FormItem>
+          <FormItem label="کارهای روزمره دربارهٔ مسئله">
+            <Input.TextArea
+              v-model:value="item.dailyJobs"
+              :rows="2"
+              placeholder="وظایف روزانه مرتبط با موضوع"
+              @blur="persist"
+            />
           </FormItem>
         </Form>
       </Card>

@@ -13,6 +13,7 @@ import CompetitorsForm from '@/components/forms/empathize/CompetitorsForm.vue'
 import ProblemForm from '@/components/forms/define/ProblemForm.vue'
 import PovForm from '@/components/forms/define/PovForm.vue'
 import HmwForm from '@/components/forms/define/HmwForm.vue'
+import ChallengeForm from '@/components/forms/define/ChallengeForm.vue'
 
 import BrainstormForm from '@/components/forms/ideate/BrainstormForm.vue'
 import UserflowForm from '@/components/forms/ideate/UserflowForm.vue'
@@ -23,11 +24,13 @@ import ColorsForm from '@/components/forms/prototype/ColorsForm.vue'
 import TypographyForm from '@/components/forms/prototype/TypographyForm.vue'
 import GridForm from '@/components/forms/prototype/GridForm.vue'
 import SpacingForm from '@/components/forms/prototype/SpacingForm.vue'
+import ProtoChecklistForm from '@/components/forms/prototype/ProtoChecklistForm.vue'
 import WireframeForm from '@/components/forms/prototype/WireframeForm.vue'
 
 import ContrastForm from '@/components/forms/test/ContrastForm.vue'
 import WcagForm from '@/components/forms/test/WcagForm.vue'
 import HeuristicsForm from '@/components/forms/test/HeuristicsForm.vue'
+import FeedbackForm from '@/components/forms/test/FeedbackForm.vue'
 import ReportForm from '@/components/forms/test/ReportForm.vue'
 
 const FORM_MAP: Record<DesignThinkingStepKey, Record<string, Component>> = {
@@ -39,6 +42,7 @@ const FORM_MAP: Record<DesignThinkingStepKey, Record<string, Component>> = {
     competitors: CompetitorsForm,
   },
   define: {
+    challenge: ChallengeForm,
     problem: ProblemForm,
     pov: PovForm,
     hmw: HmwForm,
@@ -54,12 +58,14 @@ const FORM_MAP: Record<DesignThinkingStepKey, Record<string, Component>> = {
     typography: TypographyForm,
     grid: GridForm,
     spacing: SpacingForm,
+    'proto-checklist': ProtoChecklistForm,
     wireframe: WireframeForm,
   },
   test: {
     contrast: ContrastForm,
     wcag: WcagForm,
     heuristics: HeuristicsForm,
+    feedback: FeedbackForm,
     report: ReportForm,
   },
 }

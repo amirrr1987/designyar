@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button, Card, Form, FormItem, Input, Space } from 'ant-design-vue'
+import { Alert, Button, Card, Form, FormItem, Input, Space, Tag } from 'ant-design-vue'
 import type { CardProps } from 'ant-design-vue'
-import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, DeleteOutlined, CheckOutlined } from '@ant-design/icons-vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
@@ -10,11 +10,13 @@ import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useIdeateStore } from '@/stores/ideate'
 import { useDefineStore } from '@/stores/define'
 import { brainstormAiSchema } from '@/types/ideate'
+import { brainstormAiExtraContext } from '@/constants/dt-ai-prompts'
 
 const store = useIdeateStore()
 const defineStore = useDefineStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 const items = ref<string[]>(store.state.ideas.length > 0 ? [...store.state.ideas] : [''])
+const selectedIndex = ref(store.state.selectedIdeaIndex)
 
 const cardProps: CardProps = {
   size: 'small',
@@ -33,18 +35,23 @@ const pulsePercent = computed(() =>
 
 const pulseSummary = computed(() =>
   filledCount.value === 0
-    ? 'هنوز ایده‌ای ثبت نشده — آزاد بنویس؛ بعداً می‌توانی پالایش کنی.'
-    : `${filledCount.value} از ${totalCount.value} ایده پر شده.`,
+    ? 'اول کمیت — بعد با سه سؤال انتخاب کن.'
+    : selectedIndex.value >= 0 && items.value[selectedIndex.value]?.trim()
+      ? `${filledCount.value} ایده · منتخب: «${items.value[selectedIndex.value]}»`
+      : `${filledCount.value} از ${totalCount.value} ایده — هنوز منتخب نداری.`,
 )
 
 function persist(): void {
   store.setIdeas(items.value.length > 0 ? [...items.value] : [''])
+  store.setSelectedIdeaIndex(selectedIndex.value)
 }
 
 function persistClean(): void {
   const cleaned = items.value.map((item) => item.trim()).filter((item) => item.length > 0)
   const next = cleaned.length > 0 ? cleaned : ['']
+  if (selectedIndex.value >= next.length) selectedIndex.value = -1
   store.setIdeas(next)
+  store.setSelectedIdeaIndex(selectedIndex.value)
   items.value = [...next]
 }
 
@@ -56,6 +63,8 @@ function addItem(): void {
 function removeItem(index: number): void {
   const next = items.value.filter((_, i) => i !== index)
   items.value = next.length > 0 ? next : ['']
+  if (selectedIndex.value === index) selectedIndex.value = -1
+  else if (selectedIndex.value > index) selectedIndex.value -= 1
   persist()
 }
 
@@ -65,14 +74,20 @@ function updateItem(index: number, value: string): void {
   items.value = next
 }
 
+function selectIdea(index: number): void {
+  selectedIndex.value = selectedIndex.value === index ? -1 : index
+  persist()
+}
+
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: brainstormAiSchema,
   formTitle: 'طوفان فکری',
   phase: 'ideate',
   getCurrentValue: () => ({
     ideas: items.value.map((item) => item.trim()).filter((item) => item.length > 0),
+    selectedIdeaIndex: selectedIndex.value,
   }),
-  extraContext: () => JSON.stringify(defineStore.state),
+  extraContext: () => brainstormAiExtraContext(JSON.stringify(defineStore.state)),
 })
 
 const previewText = computed(() => (preview.value ? preview.value.ideas.join('\n') : ''))
@@ -87,6 +102,14 @@ function onAccept(): void {
   const next = preview.value.ideas.length > 0 ? [...preview.value.ideas] : ['']
   store.setIdeas(next)
   items.value = [...next]
+  if (
+    typeof preview.value.selectedIdeaIndex === 'number' &&
+    preview.value.selectedIdeaIndex >= 0 &&
+    preview.value.selectedIdeaIndex < next.length
+  ) {
+    selectedIndex.value = preview.value.selectedIdeaIndex
+    store.setSelectedIdeaIndex(selectedIndex.value)
+  }
   clearPreview()
 }
 </script>
@@ -113,25 +136,44 @@ function onAccept(): void {
         show-progress
         :percent="pulsePercent"
       />
+
+      <Alert
+        type="info"
+        show-icon
+        class="rounded-xl"
+        message="انتخاب ساخت‌یافته"
+        description="کدام ایده اثرگذارتر است؟ کدام زودتر قابل اجراست؟ کدام در سازمانت شانس بیشتری دارد؟ بعد یکی را به‌عنوان منتخب علامت بزن."
+      />
+
       <Card
         v-for="(item, index) in items"
         :key="index"
         v-bind="cardProps"
         class="rounded-2xl ring-1 ring-stone-100"
+        :class="selectedIndex === index ? 'ring-2! ring-teal-400!' : ''"
       >
         <Form layout="vertical">
           <FormItem :label="`ایده ${index + 1}`" class="mb-0!">
-            <Space class="w-full">
+            <Space class="w-full" align="start">
               <Input
                 :value="item"
                 class="flex-1"
                 @update:value="updateItem(index, $event)"
                 @blur="persist"
               />
+              <Button
+                :type="selectedIndex === index ? 'primary' : 'default'"
+                html-type="button"
+                aria-label="انتخاب به‌عنوان ایده منتخب"
+                @click="selectIdea(index)"
+              >
+                <template #icon><CheckOutlined /></template>
+              </Button>
               <Button danger html-type="button" aria-label="حذف ایده" @click="removeItem(index)">
                 <template #icon><DeleteOutlined /></template>
               </Button>
             </Space>
+            <Tag v-if="selectedIndex === index" color="success" class="mt-2">ایدهٔ منتخب</Tag>
           </FormItem>
         </Form>
       </Card>

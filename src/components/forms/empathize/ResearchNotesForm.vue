@@ -13,6 +13,7 @@ import {
   researchNotesAiSchema,
   type ResearchNote,
 } from '@/types/empathize'
+import { researchNotesAiExtraContext } from '@/constants/dt-ai-prompts'
 
 const store = useEmpathizeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
@@ -24,24 +25,42 @@ const items = ref<ResearchNote[]>(
 
 const cardProps: CardProps = { size: 'small', bordered: true }
 
-const filledCount = computed(
-  () => items.value.filter((item) => item.text.trim().length > 0).length,
-)
+function noteHasContent(item: ResearchNote): boolean {
+  return (
+    item.who.trim().length > 0 ||
+    item.question.trim().length > 0 ||
+    item.answer.trim().length > 0 ||
+    item.insight.trim().length > 0 ||
+    item.text.trim().length > 0
+  )
+}
+
+const filledCount = computed(() => items.value.filter((item) => noteHasContent(item)).length)
 
 const pulseSummary = computed(() =>
   filledCount.value === 0
-    ? 'هنوز یادداشتی نوشته نشده'
-    : `${filledCount.value} یادداشت پرشده`,
+    ? 'هنوز برگهٔ مصاحبه‌ای پر نشده — سؤال، پاسخ، بینش.'
+    : `${filledCount.value} برگهٔ مصاحبه با محتوا`,
 )
 
 function persist(): void {
-  store.setResearchNotes(items.value.map((item) => ({ ...item })))
+  store.setResearchNotes(
+    items.value.map((item) => ({
+      ...item,
+      text: item.text.trim() || item.insight.trim() || item.answer.trim(),
+    })),
+  )
 }
 
 function persistClean(): void {
-  const cleaned = items.value.filter((item) => item.text.trim().length > 0)
+  const cleaned = items.value.filter((item) => noteHasContent(item))
   const next = cleaned.length > 0 ? cleaned : [createEmptyResearchNote()]
-  store.setResearchNotes(next.map((item) => ({ ...item })))
+  store.setResearchNotes(
+    next.map((item) => ({
+      ...item,
+      text: item.text.trim() || item.insight.trim() || item.answer.trim(),
+    })),
+  )
   items.value = next.map((item) => ({ ...item }))
 }
 
@@ -62,15 +81,22 @@ const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicro
   phase: 'empathize',
   getCurrentValue: () => ({ researchNotes: items.value }),
   extraContext: () =>
-    JSON.stringify({
-      researchGoal: store.state.researchGoal,
-      personas: store.state.personas,
-    }),
+    researchNotesAiExtraContext(
+      JSON.stringify({
+        researchGoal: store.state.researchGoal,
+        personas: store.state.personas,
+      }),
+    ),
 })
 
 const previewText = computed(() =>
   preview.value
-    ? preview.value.researchNotes.map((n, i) => `${i + 1}. ${n.text}`).join('\n\n')
+    ? preview.value.researchNotes
+        .map(
+          (n, i) =>
+            `${i + 1}. ${n.who || 'مصاحبه‌شونده'}\nس: ${n.question}\nج: ${n.answer}\nبینش: ${n.insight}`,
+        )
+        .join('\n\n')
     : '',
 )
 
@@ -119,7 +145,7 @@ function onAccept(): void {
         v-bind="cardProps"
         class="rounded-2xl ring-1 ring-stone-100"
       >
-        <template #title>یادداشت {{ index + 1 }}</template>
+        <template #title>مصاحبه {{ index + 1 }}</template>
         <template #extra>
           <Button
             danger
@@ -132,11 +158,34 @@ function onAccept(): void {
           </Button>
         </template>
         <Form layout="vertical">
-          <FormItem label="متن">
+          <FormItem label="چه کسی؟ (Who)">
+            <Input
+              v-model:value="item.who"
+              placeholder="نام / نقش مصاحبه‌شونده"
+              @blur="persist"
+            />
+          </FormItem>
+          <FormItem label="سؤال">
             <Input.TextArea
-              v-model:value="item.text"
+              v-model:value="item.question"
+              :rows="2"
+              placeholder="سؤال اصلی مصاحبه"
+              @blur="persist"
+            />
+          </FormItem>
+          <FormItem label="پاسخ و مشاهده">
+            <Input.TextArea
+              v-model:value="item.answer"
               :rows="3"
-              placeholder="نکات مصاحبه، مشاهده، نقل‌قول…"
+              placeholder="جواب، نقل‌قول، زبان بدن…"
+              @blur="persist"
+            />
+          </FormItem>
+          <FormItem label="بینش کلیدی (Key Insight)">
+            <Input.TextArea
+              v-model:value="item.insight"
+              :rows="2"
+              placeholder="چیزی که قبلاً نمی‌دانستی"
               @blur="persist"
             />
           </FormItem>
@@ -145,7 +194,7 @@ function onAccept(): void {
 
       <Button type="dashed" block html-type="button" @click="addItem">
         <template #icon><PlusOutlined /></template>
-        افزودن یادداشت
+        افزودن برگهٔ مصاحبه
       </Button>
     </Space>
   </MicroFormShell>

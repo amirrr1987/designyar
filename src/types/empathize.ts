@@ -13,11 +13,16 @@ export const personaSchema = z.object({
   role: z.string(),
   goals: z.string(),
   pains: z.string(),
+  /** Mini Persona — what I love */
+  loves: z.string().default(''),
+  /** Mini Persona — what I fear */
+  fears: z.string().default(''),
+  /** Mini Persona — daily jobs related to the problem */
+  dailyJobs: z.string().default(''),
 })
 
 export const empathyMapEntrySchema = z.object({
   id: z.string(),
-  /** Display label — usually persona name */
   label: z.string(),
   personaId: z.string().optional(),
   says: z.string(),
@@ -26,9 +31,14 @@ export const empathyMapEntrySchema = z.object({
   feels: z.string(),
 })
 
+/** Interview sheet → key insights (legacy `text` kept for migration). */
 export const researchNoteSchema = z.object({
   id: z.string(),
-  text: z.string(),
+  who: z.string().default(''),
+  question: z.string().default(''),
+  answer: z.string().default(''),
+  insight: z.string().default(''),
+  text: z.string().default(''),
 })
 
 export const competitorSchema = z.object({
@@ -58,6 +68,9 @@ export function createEmptyPersona(): Persona {
     role: '',
     goals: '',
     pains: '',
+    loves: '',
+    fears: '',
+    dailyJobs: '',
   }
 }
 
@@ -75,7 +88,38 @@ export function createEmptyEmpathyMap(label = ''): EmpathyMapEntry {
 export function createEmptyResearchNote(): ResearchNote {
   return {
     id: createEntityId(),
+    who: '',
+    question: '',
+    answer: '',
+    insight: '',
     text: '',
+  }
+}
+
+function padPersona(raw: Persona): Persona {
+  return {
+    ...createEmptyPersona(),
+    ...raw,
+    id: raw.id || createEntityId(),
+    loves: raw.loves ?? '',
+    fears: raw.fears ?? '',
+    dailyJobs: raw.dailyJobs ?? '',
+  }
+}
+
+function padResearchNote(raw: ResearchNote): ResearchNote {
+  const text = raw.text ?? ''
+  const insight = (raw.insight ?? '').trim().length > 0 ? raw.insight : text
+  const answer = (raw.answer ?? '').trim().length > 0 ? raw.answer : text
+  return {
+    ...createEmptyResearchNote(),
+    ...raw,
+    id: raw.id || createEntityId(),
+    who: raw.who ?? '',
+    question: raw.question ?? '',
+    answer: answer ?? '',
+    insight: insight ?? '',
+    text,
   }
 }
 
@@ -89,20 +133,22 @@ export function createDefaultEmpathizeState(): EmpathizeState {
   }
 }
 
-/** Migrate legacy single-persona / single-map / string notes shapes. */
 export function normalizeEmpathizeState(raw: unknown): EmpathizeState {
   const parsed = empathizeStateSchema.safeParse(raw)
   if (parsed.success) {
     return {
       ...parsed.data,
-      personas: parsed.data.personas.length > 0 ? parsed.data.personas : [createEmptyPersona()],
+      personas:
+        parsed.data.personas.length > 0
+          ? parsed.data.personas.map(padPersona)
+          : [createEmptyPersona()],
       empathyMaps:
         parsed.data.empathyMaps.length > 0
           ? parsed.data.empathyMaps
           : [createEmptyEmpathyMap()],
       researchNotes:
         parsed.data.researchNotes.length > 0
-          ? parsed.data.researchNotes
+          ? parsed.data.researchNotes.map(padResearchNote)
           : [createEmptyResearchNote()],
       competitors:
         parsed.data.competitors.length > 0
@@ -127,26 +173,32 @@ export function normalizeEmpathizeState(raw: unknown): EmpathizeState {
       .map((item) => {
         if (!item || typeof item !== 'object') return null
         const p = item as Record<string, unknown>
-        return {
+        return padPersona({
           id: typeof p.id === 'string' ? p.id : createEntityId(),
           name: typeof p.name === 'string' ? p.name : '',
           role: typeof p.role === 'string' ? p.role : '',
           goals: typeof p.goals === 'string' ? p.goals : '',
           pains: typeof p.pains === 'string' ? p.pains : '',
-        } satisfies Persona
+          loves: typeof p.loves === 'string' ? p.loves : '',
+          fears: typeof p.fears === 'string' ? p.fears : '',
+          dailyJobs: typeof p.dailyJobs === 'string' ? p.dailyJobs : '',
+        })
       })
       .filter((item): item is Persona => item !== null)
     if (list.length > 0) personas = list
   } else if (record.persona && typeof record.persona === 'object') {
     const p = record.persona as Record<string, unknown>
     personas = [
-      {
+      padPersona({
         id: createEntityId(),
         name: typeof p.name === 'string' ? p.name : '',
         role: typeof p.role === 'string' ? p.role : '',
         goals: typeof p.goals === 'string' ? p.goals : '',
         pains: typeof p.pains === 'string' ? p.pains : '',
-      },
+        loves: '',
+        fears: '',
+        dailyJobs: '',
+      }),
     ]
   }
 
@@ -192,19 +244,40 @@ export function normalizeEmpathizeState(raw: unknown): EmpathizeState {
     const list = record.researchNotes
       .map((item) => {
         if (typeof item === 'string') {
-          return { id: createEntityId(), text: item } satisfies ResearchNote
+          return padResearchNote({
+            id: createEntityId(),
+            who: '',
+            question: '',
+            answer: item,
+            insight: item,
+            text: item,
+          })
         }
         if (!item || typeof item !== 'object') return null
         const n = item as Record<string, unknown>
-        return {
+        const text = typeof n.text === 'string' ? n.text : ''
+        return padResearchNote({
           id: typeof n.id === 'string' ? n.id : createEntityId(),
-          text: typeof n.text === 'string' ? n.text : '',
-        } satisfies ResearchNote
+          who: typeof n.who === 'string' ? n.who : '',
+          question: typeof n.question === 'string' ? n.question : '',
+          answer: typeof n.answer === 'string' ? n.answer : '',
+          insight: typeof n.insight === 'string' ? n.insight : '',
+          text,
+        })
       })
       .filter((item): item is ResearchNote => item !== null)
     if (list.length > 0) researchNotes = list
   } else if (typeof record.researchNotes === 'string') {
-    researchNotes = [{ id: createEntityId(), text: record.researchNotes }]
+    researchNotes = [
+      padResearchNote({
+        id: createEntityId(),
+        who: '',
+        question: '',
+        answer: record.researchNotes,
+        insight: record.researchNotes,
+        text: record.researchNotes,
+      }),
+    ]
   }
 
   let competitors = defaults.competitors
@@ -236,7 +309,6 @@ export const researchGoalAiSchema = z.object({
   researchGoal: z.string(),
 })
 
-/** AI often omits ids — fill them on parse. */
 const personaAiItemSchema = z
   .object({
     id: z.string().optional(),
@@ -244,6 +316,9 @@ const personaAiItemSchema = z
     role: z.string(),
     goals: z.string(),
     pains: z.string(),
+    loves: z.string().optional(),
+    fears: z.string().optional(),
+    dailyJobs: z.string().optional(),
   })
   .transform(
     (item): Persona => ({
@@ -252,6 +327,9 @@ const personaAiItemSchema = z
       role: item.role,
       goals: item.goals,
       pains: item.pains,
+      loves: item.loves ?? '',
+      fears: item.fears ?? '',
+      dailyJobs: item.dailyJobs ?? '',
     }),
   )
 
@@ -280,14 +358,25 @@ const empathyMapAiItemSchema = z
 const researchNoteAiItemSchema = z
   .object({
     id: z.string().optional(),
-    text: z.string(),
+    who: z.string().optional(),
+    question: z.string().optional(),
+    answer: z.string().optional(),
+    insight: z.string().optional(),
+    text: z.string().optional(),
   })
-  .transform(
-    (item): ResearchNote => ({
+  .transform((item): ResearchNote => {
+    const text = item.text ?? ''
+    const answer = item.answer ?? text
+    const insight = item.insight ?? text
+    return {
       id: item.id && item.id.trim().length > 0 ? item.id : createEntityId(),
-      text: item.text,
-    }),
-  )
+      who: item.who ?? '',
+      question: item.question ?? '',
+      answer,
+      insight,
+      text: text || answer || insight,
+    }
+  })
 
 export const personasAiSchema = z.object({
   personas: z.array(personaAiItemSchema).min(1),

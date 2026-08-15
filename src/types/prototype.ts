@@ -73,11 +73,35 @@ export const wireframeBlockSchema = z.object({
 
 export type WireframeBlock = z.infer<typeof wireframeBlockSchema>
 
+export const protoChecklistSchema = z.object({
+  mainFunction: z.string(),
+  audience: z.string(),
+  mainAssumption: z.string(),
+  testIdea: z.string(),
+})
+
+export type ProtoChecklist = z.infer<typeof protoChecklistSchema>
+
+export function createEmptyProtoChecklist(): ProtoChecklist {
+  return {
+    mainFunction: '',
+    audience: '',
+    mainAssumption: '',
+    testIdea: '',
+  }
+}
+
 export const prototypeStateSchema = z.object({
   palette: colorPaletteSchema,
   typography: typographySchema,
   grid: gridSchema,
   spacingBase: z.number(),
+  protoChecklist: protoChecklistSchema.default({
+    mainFunction: '',
+    audience: '',
+    mainAssumption: '',
+    testIdea: '',
+  }),
   wireframeNotes: z.string(),
   wireframeBlocks: z.array(wireframeBlockSchema),
 })
@@ -361,6 +385,7 @@ export function createDefaultPrototypeState(): PrototypeState {
     typography: { baseSize: 16, scale: 1.25 },
     grid: { columns: 12, gutter: 16 },
     spacingBase: 8,
+    protoChecklist: createEmptyProtoChecklist(),
     wireframeBlocks: blocks,
     wireframeNotes: wireframeBlocksToNotes(blocks),
   }
@@ -530,11 +555,23 @@ export function normalizePrototypeState(raw: unknown): PrototypeState {
       ? record.wireframeNotes
       : wireframeBlocksToNotes(wireframeBlocks)
 
+  let protoChecklist = defaults.protoChecklist
+  if (record.protoChecklist && typeof record.protoChecklist === 'object') {
+    const c = record.protoChecklist as Record<string, unknown>
+    protoChecklist = {
+      mainFunction: typeof c.mainFunction === 'string' ? c.mainFunction : '',
+      audience: typeof c.audience === 'string' ? c.audience : '',
+      mainAssumption: typeof c.mainAssumption === 'string' ? c.mainAssumption : '',
+      testIdea: typeof c.testIdea === 'string' ? c.testIdea : '',
+    }
+  }
+
   return {
     palette,
     typography,
     grid,
     spacingBase,
+    protoChecklist,
     wireframeBlocks,
     wireframeNotes,
   }
@@ -611,6 +648,10 @@ export const gridAiSchema = gridSchema
 
 export const spacingAiSchema = z.object({
   spacingBase: z.number(),
+})
+
+export const protoChecklistAiSchema = z.object({
+  protoChecklist: protoChecklistSchema,
 })
 
 const wireframeBlockAiItemSchema = z

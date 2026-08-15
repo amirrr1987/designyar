@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.39.1] - 2026-08-15
+
+### Changed
+
+- DT-aligned AI extraContext for challenge, persona, research notes, proto-checklist, feedback, brainstorm (`dt-ai-prompts.ts`)
+
+### Chore
+
+- Ignore `*.pdf` local reference booklets in `.gitignore`
+
+## [0.39.0] - 2026-08-15
+
+### Added
+
+- Challenge Definition form (define) with HMW handoff
+- Mini Persona fields: loves / fears / dailyJobs
+- Research notes as interview sheet (who / question / answer / insight)
+- Prototype checklist micro-form before wireframe
+- Test feedback form: I like / I wish / I give
+- Brainstorm structured selection + selected idea mark
+
+### Changed
+
+- Form registry hints aligned with DT booklet mindsets
+
 ## [0.38.2] - 2026-08-15
 
 ### Changed
