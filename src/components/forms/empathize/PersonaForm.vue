@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Button, Card, Form, FormItem, Input, Space } from 'ant-design-vue'
+import type { CardProps } from 'ant-design-vue'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
@@ -18,6 +20,25 @@ const items = ref<Persona[]>(
   store.state.personas.length > 0
     ? store.state.personas.map((item) => ({ ...item }))
     : [createEmptyPersona()],
+)
+
+const cardProps: CardProps = { size: 'small', bordered: true }
+
+const filledCount = computed(
+  () =>
+    items.value.filter(
+      (item) =>
+        item.name.trim().length > 0 ||
+        item.role.trim().length > 0 ||
+        item.goals.trim().length > 0 ||
+        item.pains.trim().length > 0,
+    ).length,
+)
+
+const pulseSummary = computed(() =>
+  filledCount.value === 0
+    ? 'هنوز پرسونایی پر نشده'
+    : `${filledCount.value} پرسونا با محتوا`,
 )
 
 function persist(): void {
@@ -104,11 +125,13 @@ function onAccept(): void {
     @prev="persistClean(); goPrev()"
   >
     <Space direction="vertical" class="w-full" size="middle">
+      <FormPulseHeader :summary="pulseSummary" />
+
       <Card
         v-for="(item, index) in items"
         :key="item.id"
-        size="small"
-        class="ring-1 ring-stone-100"
+        v-bind="cardProps"
+        class="rounded-2xl ring-1 ring-stone-100"
       >
         <template #title>پرسونا {{ index + 1 }}</template>
         <template #extra>

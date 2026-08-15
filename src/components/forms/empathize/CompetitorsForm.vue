@@ -1,16 +1,37 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { Button, Form, FormItem, Input, Space } from 'ant-design-vue'
+import { Button, Card, Form, FormItem, Input, Space } from 'ant-design-vue'
+import type { CardProps } from 'ant-design-vue'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useEmpathizeStore } from '@/stores/empathize'
 import { competitorsAiSchema, type Competitor } from '@/types/empathize'
+
 const store = useEmpathizeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 
 const rows = ref<Competitor[]>(store.state.competitors.map((item) => ({ ...item })))
+
+const cardProps: CardProps = { size: 'small', bordered: true }
+
+const filledCount = computed(
+  () =>
+    rows.value.filter(
+      (row) =>
+        row.name.trim().length > 0 ||
+        row.strength.trim().length > 0 ||
+        row.weakness.trim().length > 0,
+    ).length,
+)
+
+const pulseSummary = computed(() =>
+  filledCount.value === 0
+    ? 'هنوز رقیبی ثبت نشده'
+    : `${filledCount.value} رقیب با محتوا`,
+)
 
 watch(
   () => store.state.competitors,
@@ -81,23 +102,40 @@ function onAccept(): void {
     @prev="persist(); goPrev()"
   >
     <Space direction="vertical" class="w-full" size="middle">
-      <Form v-for="(row, index) in rows" :key="index" layout="vertical">
-        <FormItem :label="`رقیب ${index + 1}`">
-          <Input v-model:value="row.name" placeholder="نام" @blur="persist" />
-        </FormItem>
-        <FormItem label="نقطه قوت">
-          <Input v-model:value="row.strength" @blur="persist" />
-        </FormItem>
-        <FormItem label="نقطه ضعف">
-          <Space class="w-full" align="start">
-            <Input v-model:value="row.weakness" class="flex-1" @blur="persist" />
-            <Button danger @click="removeRow(index)">
-              <template #icon><DeleteOutlined /></template>
-            </Button>
-          </Space>
-        </FormItem>
-      </Form>
-      <Button type="dashed" block @click="addRow">
+      <FormPulseHeader :summary="pulseSummary" />
+
+      <Card
+        v-for="(row, index) in rows"
+        :key="index"
+        v-bind="cardProps"
+        class="rounded-2xl ring-1 ring-stone-100"
+      >
+        <template #title>رقیب {{ index + 1 }}</template>
+        <template #extra>
+          <Button
+            danger
+            type="text"
+            html-type="button"
+            aria-label="حذف رقیب"
+            @click="removeRow(index)"
+          >
+            <template #icon><DeleteOutlined /></template>
+          </Button>
+        </template>
+        <Form layout="vertical">
+          <FormItem label="نام">
+            <Input v-model:value="row.name" placeholder="نام" @blur="persist" />
+          </FormItem>
+          <FormItem label="نقطه قوت">
+            <Input v-model:value="row.strength" @blur="persist" />
+          </FormItem>
+          <FormItem label="نقطه ضعف">
+            <Input v-model:value="row.weakness" @blur="persist" />
+          </FormItem>
+        </Form>
+      </Card>
+
+      <Button type="dashed" block html-type="button" @click="addRow">
         <template #icon><PlusOutlined /></template>
         افزودن رقیب
       </Button>

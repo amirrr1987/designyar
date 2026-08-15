@@ -55,6 +55,53 @@ export const heuristicsAiSchema = z.object({
   heuristics: z.array(heuristicItemSchema).min(1),
 })
 
-export const reportAiSchema = z.object({
-  report: z.string(),
+export const reportNextActionSchema = z.object({
+  title: z.string(),
+  reason: z.string(),
+  phase: z.string(),
+  formKey: z.string(),
 })
+
+export const reportAiSchema = z.preprocess((raw: unknown) => {
+  if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return raw
+  const record = raw as Record<string, unknown>
+  const reportValue = record.report
+  const report =
+    typeof reportValue === 'string'
+      ? reportValue
+      : reportValue === null || reportValue === undefined
+        ? ''
+        : String(reportValue)
+
+  const actionsRaw = record.nextActions
+  if (actionsRaw === null || actionsRaw === undefined) {
+    return { report }
+  }
+  if (!Array.isArray(actionsRaw)) {
+    return { report }
+  }
+
+  const nextActions = actionsRaw
+    .filter((item): item is Record<string, unknown> => typeof item === 'object' && item !== null)
+    .map((item) => ({
+      title: String(item.title ?? ''),
+      reason: String(item.reason ?? ''),
+      phase: String(item.phase ?? ''),
+      formKey: String(item.formKey ?? ''),
+    }))
+    .filter(
+      (item) =>
+        item.title.length > 0 &&
+        item.reason.length > 0 &&
+        item.phase.length > 0 &&
+        item.formKey.length > 0,
+    )
+    .slice(0, 5)
+
+  return nextActions.length > 0 ? { report, nextActions } : { report }
+}, z.object({
+  report: z.string(),
+  nextActions: z.array(reportNextActionSchema).max(5).optional(),
+}))
+
+export type ReportAiResult = z.infer<typeof reportAiSchema>

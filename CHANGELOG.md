@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.38.2] - 2026-08-15
+
+### Changed
+
+- AI assist preview opens in a Modal (Accept / Reject) instead of an inline card block
+
+## [0.38.1] - 2026-08-15
+
+### Fixed
+
+- AI form assist: omit null optional fields (e.g. `nextActions: null`) so Zod schemas match; report schema preprocesses partial actions; one retry on schema/JSON mismatch
+
+## [0.38.0] - 2026-08-15
+
+### Added
+
+- Test report soft loop: next-action links from contrast / WCAG / weak heuristics
+- Light handoff: copy Markdown + download JSON (with palette tokens)
+- Report AI can suggest structured nextActions (Accept/Reject)
+- Shared `FormPulseHeader` for micro-form pulse summaries
+
+### Changed
+
+- Contrast + WCAG forms polished (live preview, progress cards)
+- Empathize / Define / Ideate bare forms: pulse header + Card rows (simplicity kept)
+
 ## [0.37.0] - 2026-08-15
 
 ### Changed

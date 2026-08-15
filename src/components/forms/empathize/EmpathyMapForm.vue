@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { Button, Card, Form, FormItem, Input, Select, Space } from 'ant-design-vue'
-import type { SelectProps } from 'ant-design-vue'
+import type { CardProps, SelectProps } from 'ant-design-vue'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
@@ -19,6 +20,26 @@ const items = ref<EmpathyMapEntry[]>(
   store.state.empathyMaps.length > 0
     ? store.state.empathyMaps.map((item) => ({ ...item }))
     : [createEmptyEmpathyMap()],
+)
+
+const cardProps: CardProps = { size: 'small', bordered: true }
+
+const filledCount = computed(
+  () =>
+    items.value.filter(
+      (item) =>
+        item.label.trim().length > 0 ||
+        item.says.trim().length > 0 ||
+        item.thinks.trim().length > 0 ||
+        item.does.trim().length > 0 ||
+        item.feels.trim().length > 0,
+    ).length,
+)
+
+const pulseSummary = computed(() =>
+  filledCount.value === 0
+    ? 'هنوز نقشه همدلی پر نشده'
+    : `${filledCount.value} نقشه با محتوا`,
 )
 
 const personaOptions = computed<NonNullable<SelectProps['options']>>(() =>
@@ -150,11 +171,13 @@ function onAccept(): void {
     @prev="persistClean(); goPrev()"
   >
     <Space direction="vertical" class="w-full" size="middle">
+      <FormPulseHeader :summary="pulseSummary" />
+
       <Card
         v-for="(item, index) in items"
         :key="item.id"
-        size="small"
-        class="ring-1 ring-stone-100"
+        v-bind="cardProps"
+        class="rounded-2xl ring-1 ring-stone-100"
       >
         <template #title>نقشه {{ index + 1 }}</template>
         <template #extra>

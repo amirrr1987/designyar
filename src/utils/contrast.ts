@@ -36,3 +36,7 @@ export function contrastRatio(foreground: string, background: string): number | 
 export function meetsWcagAa(ratio: number, largeText = false): boolean {
   return largeText ? ratio >= 3 : ratio >= 4.5
 }
+
+export function meetsWcagAaa(ratio: number, largeText = false): boolean {
+  return largeText ? ratio >= 4.5 : ratio >= 7
+}

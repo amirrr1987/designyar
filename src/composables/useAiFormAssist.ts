@@ -26,6 +26,7 @@ function buildSystemPrompt(): string {
     'اگر فیلد mode هست فقط: custom | theory | system',
     'اگر فیلد theoryScheme هست فقط: monochromatic | adjacent | triad | tetrad',
     'اگر فیلد systemKey هست فقط کلید کاتالوگ Design System یا رشته خالی (مثل antd، material، element-plus).',
+    'اگر فیلد اختیاری نداری، کلید را حذف کن؛ null نگذار (مثلاً nextActions).',
     'هرگز حروف روسی/سیریلیک نگذار.',
   ].join(' ')
 }
@@ -88,13 +89,34 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
 }
 
+/** Drop null/undefined keys so optional Zod fields are not forced to null. */
+function omitNullishFields(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map(omitNullishFields)
+  }
+  if (isPlainObject(value)) {
+    const next: Record<string, unknown> = {}
+    for (const [key, nested] of Object.entries(value)) {
+      if (nested === null || nested === undefined) continue
+      next[key] = omitNullishFields(nested)
+    }
+    return next
+  }
+  return value
+}
+
+/**
+ * Soft string coercion for leaf scalars — never turn null into "".
+ * Nullish object keys are omitted (optional arrays/objects stay optional).
+ */
 function softCoerce(value: unknown): unknown {
-  if (value === null || value === undefined) return ''
+  if (value === null || value === undefined) return value
   if (typeof value === 'number' || typeof value === 'boolean') return String(value)
   if (Array.isArray(value)) return value.map(softCoerce)
   if (isPlainObject(value)) {
     const next: Record<string, unknown> = {}
     for (const [key, nested] of Object.entries(value)) {
+      if (nested === null || nested === undefined) continue
       next[key] = softCoerce(nested)
     }
     return next
@@ -103,21 +125,22 @@ function softCoerce(value: unknown): unknown {
 }
 
 function candidatePayloads(data: unknown): unknown[] {
-  const candidates: unknown[] = [data, softCoerce(data)]
+  const omitted = omitNullishFields(data)
+  const candidates: unknown[] = [data, omitted, softCoerce(data), softCoerce(omitted)]
 
   if (!isPlainObject(data)) return candidates
 
   const wrapperKeys = ['data', 'result', 'output', 'payload', 'persona', 'form', 'value']
   for (const key of wrapperKeys) {
     const nested = data[key]
-    if (nested !== undefined) {
-      candidates.push(nested, softCoerce(nested))
+    if (nested !== undefined && nested !== null) {
+      candidates.push(nested, omitNullishFields(nested), softCoerce(nested))
     }
   }
 
   for (const nested of Object.values(data)) {
     if (isPlainObject(nested)) {
-      candidates.push(nested, softCoerce(nested))
+      candidates.push(nested, omitNullishFields(nested), softCoerce(nested))
     }
   }
 
@@ -165,12 +188,23 @@ export async function runAiFormAssist<TSchema extends z.ZodType>(
     return { data }
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : String(e)
-    if (!message.includes('روسی') && !message.includes('سیریلیک')) {
-      throw e instanceof Error ? e : new Error(message)
+    if (message.includes('روسی') || message.includes('سیریلیک')) {
+      const data = await generateOnce(
+        'پاسخ قبلی حروف غیرمجاز (مثل روسی) داشت. دوباره فقط با فارسی بنویس؛ هیچ حرف سیریلیک نگذار.',
+      )
+      return { data }
     }
-    const data = await generateOnce(
-      'پاسخ قبلی حروف غیرمجاز (مثل روسی) داشت. دوباره فقط با فارسی بنویس؛ هیچ حرف سیریلیک نگذار.',
-    )
-    return { data }
+    if (message.includes('اسکیما هم‌خوان نیست') || message.includes('JSON معتبر نبود')) {
+      const data = await generateOnce(
+        [
+          'پاسخ قبلی نامعتبر بود. فقط JSON یک‌شیء برگردان.',
+          'کلیدهای اجباری را پر کن؛ کلید اختیاری را یا حذف کن یا آرایهٔ کامل بده — هرگز null نگذار.',
+          'برای گزارش: {"report":"...","nextActions":[{"title":"...","reason":"...","phase":"test","formKey":"contrast"}]}',
+          'phase فقط: empathize|define|ideate|prototype|test',
+        ].join(' '),
+      )
+      return { data }
+    }
+    throw e instanceof Error ? e : new Error(message)
   }
 }

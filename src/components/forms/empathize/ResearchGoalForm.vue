@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Form, FormItem, Input } from 'ant-design-vue'
+import { Form, FormItem, Input, Space } from 'ant-design-vue'
 import type { Rule } from 'ant-design-vue/es/form'
+import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useEmpathizeStore } from '@/stores/empathize'
 import { researchGoalAiSchema } from '@/types/empathize'
+
 const store = useEmpathizeStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
 
@@ -14,6 +16,12 @@ const draft = computed({
   get: () => store.state.researchGoal,
   set: (value: string) => store.setResearchGoal(value),
 })
+
+const pulseSummary = computed(() =>
+  draft.value.trim().length > 0
+    ? 'هدف پژوهش نوشته شده — آمادهٔ ادامه'
+    : 'هنوز هدف پژوهش خالی است',
+)
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: researchGoalAiSchema,
@@ -53,14 +61,17 @@ function onAccept(): void {
     @next="goNext()"
     @prev="goPrev()"
   >
-    <Form layout="vertical">
-      <FormItem label="هدف پژوهش" name="researchGoal" :rules="rules">
-        <Input.TextArea
-          v-model:value="draft"
-          :rows="4"
-          placeholder="مثلاً: می‌خواهم بفهمم مبتدی‌ها چطور ابزار را یاد می‌گیرند"
-        />
-      </FormItem>
-    </Form>
+    <Space direction="vertical" class="w-full" size="middle">
+      <FormPulseHeader :summary="pulseSummary" />
+      <Form layout="vertical">
+        <FormItem label="هدف پژوهش" name="researchGoal" :rules="rules">
+          <Input.TextArea
+            v-model:value="draft"
+            :rows="4"
+            placeholder="مثلاً: می‌خواهم بفهمم مبتدی‌ها چطور ابزار را یاد می‌گیرند"
+          />
+        </FormItem>
+      </Form>
+    </Space>
   </MicroFormShell>
 </template>

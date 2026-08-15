@@ -7,7 +7,7 @@ export interface MicroFormMeta {
   aiAssistLabel: string
 }
 
-const AI_ASSIST = 'کمک هوش مصنوعی'
+const AI_ASSIST = 'بهبود با AI'
 
 function form(
   key: string,

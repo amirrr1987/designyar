@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Button, Form, FormItem, Input, Space } from 'ant-design-vue'
+import { Button, Card, Form, FormItem, Input, Space } from 'ant-design-vue'
+import type { CardProps } from 'ant-design-vue'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
@@ -18,6 +20,18 @@ const items = ref<ResearchNote[]>(
   store.state.researchNotes.length > 0
     ? store.state.researchNotes.map((item) => ({ ...item }))
     : [createEmptyResearchNote()],
+)
+
+const cardProps: CardProps = { size: 'small', bordered: true }
+
+const filledCount = computed(
+  () => items.value.filter((item) => item.text.trim().length > 0).length,
+)
+
+const pulseSummary = computed(() =>
+  filledCount.value === 0
+    ? 'هنوز یادداشتی نوشته نشده'
+    : `${filledCount.value} یادداشت پرشده`,
 )
 
 function persist(): void {
@@ -97,27 +111,38 @@ function onAccept(): void {
     @prev="persistClean(); goPrev()"
   >
     <Space direction="vertical" class="w-full" size="middle">
-      <Form v-for="(item, index) in items" :key="item.id" layout="vertical">
-        <FormItem :label="`یادداشت ${index + 1}`">
-          <Space class="w-full" align="start">
+      <FormPulseHeader :summary="pulseSummary" />
+
+      <Card
+        v-for="(item, index) in items"
+        :key="item.id"
+        v-bind="cardProps"
+        class="rounded-2xl ring-1 ring-stone-100"
+      >
+        <template #title>یادداشت {{ index + 1 }}</template>
+        <template #extra>
+          <Button
+            danger
+            type="text"
+            html-type="button"
+            aria-label="حذف یادداشت"
+            @click="removeItem(index)"
+          >
+            <template #icon><DeleteOutlined /></template>
+          </Button>
+        </template>
+        <Form layout="vertical">
+          <FormItem label="متن">
             <Input.TextArea
               v-model:value="item.text"
-              class="flex-1"
               :rows="3"
               placeholder="نکات مصاحبه، مشاهده، نقل‌قول…"
               @blur="persist"
             />
-            <Button
-              danger
-              html-type="button"
-              aria-label="حذف یادداشت"
-              @click="removeItem(index)"
-            >
-              <template #icon><DeleteOutlined /></template>
-            </Button>
-          </Space>
-        </FormItem>
-      </Form>
+          </FormItem>
+        </Form>
+      </Card>
+
       <Button type="dashed" block html-type="button" @click="addItem">
         <template #icon><PlusOutlined /></template>
         افزودن یادداشت

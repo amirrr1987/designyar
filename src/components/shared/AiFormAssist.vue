@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Button, Card, Space, Typography } from 'ant-design-vue'
-import type { ButtonProps, CardProps } from 'ant-design-vue'
+import { computed } from 'vue'
+import { Button, Card, Modal, Space, Typography } from 'ant-design-vue'
+import type { ButtonProps, CardProps, ModalProps } from 'ant-design-vue'
 import { ThunderboltOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons-vue'
 
 interface Props {
@@ -26,6 +27,25 @@ const cardProps: CardProps = {
 
 const assistBtn: ButtonProps = { type: 'primary' }
 const acceptBtn: ButtonProps = { type: 'primary' }
+
+const modalOpen = computed(() => props.hasPreview && !props.loading)
+
+const modalProps: ModalProps = {
+  title: 'پیش‌نمایش پیشنهاد هوش مصنوعی',
+  width: 640,
+  centered: true,
+  destroyOnClose: true,
+  maskClosable: false,
+  keyboard: true,
+}
+
+function onAccept(): void {
+  emit('accept')
+}
+
+function onReject(): void {
+  emit('reject')
+}
 </script>
 
 <template>
@@ -43,7 +63,8 @@ const acceptBtn: ButtonProps = { type: 'primary' }
 
     <Space direction="vertical" class="w-full" size="middle">
       <Typography.Text class="text-stone-500">
-        خالی‌ها را پر می‌کند و متن‌های موجود را هم بهتر می‌کند. تا وقتی نپذیری فرم عوض نمی‌شود.
+        خالی‌ها را پر می‌کند و متن‌های موجود را هم بهتر می‌کند. نتیجه در پنجره باز می‌شود؛ تا وقتی
+        نپذیری فرم عوض نمی‌شود.
       </Typography.Text>
 
       <Button
@@ -59,38 +80,40 @@ const acceptBtn: ButtonProps = { type: 'primary' }
         {{ props.assistLabel }}
       </Button>
 
-      <div
-        v-if="props.hasPreview"
-        role="region"
-        aria-label="پیش‌نمایش پیشنهاد هوش مصنوعی"
-        aria-live="polite"
-        class="rounded-xl bg-teal-50/70 p-4 ring-1 ring-teal-100"
-      >
-        <Typography.Text class="mb-2 block font-medium text-teal-900">
-          پیش‌نمایش پیشنهاد
-        </Typography.Text>
-        <Typography.Paragraph class="mb-3! whitespace-pre-wrap text-stone-700">
-          {{ props.previewText }}
-        </Typography.Paragraph>
-        <Space wrap>
-          <Button
-            v-bind="acceptBtn"
-            aria-label="پذیرش پیشنهاد و اعمال روی فرم"
-            @click="emit('accept')"
-          >
-            <template #icon>
-              <CheckOutlined aria-hidden="true" />
-            </template>
-            پذیرش
-          </Button>
-          <Button aria-label="رد پیشنهاد" @click="emit('reject')">
-            <template #icon>
-              <CloseOutlined aria-hidden="true" />
-            </template>
-            رد
-          </Button>
-        </Space>
-      </div>
+      <Typography.Text v-if="props.loading" class="text-sm text-teal-700" aria-live="polite">
+        در حال دریافت پیشنهاد…
+      </Typography.Text>
     </Space>
   </Card>
+
+  <Modal
+    v-bind="modalProps"
+    :open="modalOpen"
+    :aria-label="modalProps.title"
+    @cancel="onReject"
+  >
+    <Typography.Paragraph
+      class="mb-0! max-h-[60vh] overflow-y-auto whitespace-pre-wrap text-stone-700"
+      aria-live="polite"
+    >
+      {{ props.previewText || 'پیشنهادی برای نمایش نیست.' }}
+    </Typography.Paragraph>
+
+    <template #footer>
+      <Space wrap>
+        <Button v-bind="acceptBtn" aria-label="پذیرش پیشنهاد و اعمال روی فرم" @click="onAccept">
+          <template #icon>
+            <CheckOutlined aria-hidden="true" />
+          </template>
+          پذیرش
+        </Button>
+        <Button aria-label="رد پیشنهاد" @click="onReject">
+          <template #icon>
+            <CloseOutlined aria-hidden="true" />
+          </template>
+          رد
+        </Button>
+      </Space>
+    </template>
+  </Modal>
 </template>

@@ -795,7 +795,7 @@ function onAcceptAi(): void {
         type="info"
         show-icon
         class="rounded-xl"
-        message="کمک هوش مصنوعی"
+        message="بهبود با AI"
         :description="`پیشنهاد AI فقط برای تب «${paletteModeLabel(draft.mode)}» است و تب را عوض نمی‌کند.`"
       />
     </Space>

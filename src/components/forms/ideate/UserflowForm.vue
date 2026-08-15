@@ -1,18 +1,36 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { Form, FormItem, Input } from 'ant-design-vue'
+import { Card, Form, FormItem, Input, Space } from 'ant-design-vue'
+import type { CardProps } from 'ant-design-vue'
 import MicroFormShell from '@/components/shared/MicroFormShell.vue'
+import FormPulseHeader from '@/components/shared/FormPulseHeader.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { useMicroFormAi } from '@/composables/useMicroFormAi'
 import { useIdeateStore } from '@/stores/ideate'
 import { userflowAiSchema } from '@/types/ideate'
+
 const store = useIdeateStore()
 const { currentMeta, goNext, goPrev } = useFormWizard()
+
+const cardProps: CardProps = {
+  size: 'small',
+  bordered: true,
+}
 
 const draft = computed({
   get: () => store.state.userflow,
   set: (value: string) => store.setUserflow(value),
 })
+
+const charCount = computed(() => draft.value.trim().length)
+
+const pulsePercent = computed(() => (charCount.value > 0 ? 100 : 0))
+
+const pulseSummary = computed(() =>
+  charCount.value === 0
+    ? 'هنوز مسیری ثبت نشده — مراحل را به ترتیب شماره بزن.'
+    : `مسیر نوشته شده (${charCount.value} نویسه).`,
+)
 
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: userflowAiSchema,
@@ -51,14 +69,23 @@ function onAccept(): void {
     @next="goNext()"
     @prev="goPrev()"
   >
-    <Form layout="vertical">
-      <FormItem label="مراحل جریان">
-        <Input.TextArea
-          v-model:value="draft"
-          :rows="6"
-          placeholder="۱. ورود&#10;۲. …"
-        />
-      </FormItem>
-    </Form>
+    <Space direction="vertical" class="w-full" size="middle">
+      <FormPulseHeader
+        :summary="pulseSummary"
+        show-progress
+        :percent="pulsePercent"
+      />
+      <Card v-bind="cardProps" class="rounded-2xl ring-1 ring-stone-100">
+        <Form layout="vertical">
+          <FormItem label="مراحل جریان" class="mb-0!">
+            <Input.TextArea
+              v-model:value="draft"
+              :rows="6"
+              placeholder="۱. ورود&#10;۲. …"
+            />
+          </FormItem>
+        </Form>
+      </Card>
+    </Space>
   </MicroFormShell>
 </template>
