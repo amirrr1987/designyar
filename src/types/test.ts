@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { createDefaultHeuristicItems } from '@/constants/heuristic-pulse'
 
 export const contrastPairSchema = z.object({
   foreground: z.string(),
@@ -39,26 +40,7 @@ export function createDefaultTestState(): TestState {
   return {
     contrast: { foreground: '#000000', background: '#ffffff' },
     wcag,
-    heuristics: [
-      {
-        id: 'visibility',
-        title: 'وضعیت سیستم قابل مشاهده است',
-        score: 0,
-        note: '',
-      },
-      {
-        id: 'match',
-        title: 'هم‌خوانی با دنیای واقعی',
-        score: 0,
-        note: '',
-      },
-      {
-        id: 'control',
-        title: 'کنترل و آزادی کاربر',
-        score: 0,
-        note: '',
-      },
-    ],
+    heuristics: createDefaultHeuristicItems(),
     report: '',
   }
 }

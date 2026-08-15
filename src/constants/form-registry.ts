@@ -56,7 +56,7 @@ export const FORM_REGISTRY: Record<DesignThinkingStepKey, readonly MicroFormMeta
     form(
       'colors',
       'پالت رنگ',
-      'سه حالت ساخت پالت؛ در اصول رنگ مثل Paletton: تک‌رنگ، مجاور، سه‌تایی، چهارتایی.',
+      'سه حالت ساخت پالت؛ در اصول رنگ فقط رنگ اصلی ویرایش می‌شود و با تعویض طرح، بقیه فوری ساخته می‌شوند.',
     ),
     form(
       'typography',
@@ -89,7 +89,7 @@ export const FORM_REGISTRY: Record<DesignThinkingStepKey, readonly MicroFormMeta
     form(
       'heuristics',
       'ارزیابی سریع کاربردپذیری',
-      'چند اصل رایج را امتیاز بده و یک یادداشت کوتاه بنویس.',
+      'ده نبض Nielsen را با سؤال سریع امتیاز بده؛ میانگین و نقاط ضعف را زنده ببین.',
     ),
     form('report', 'گزارش نهایی', 'یافته‌ها و کار بعدی را در چند پاراگراف خلاصه کن.'),
   ],

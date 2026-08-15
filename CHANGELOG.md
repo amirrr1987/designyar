@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.37.0] - 2026-08-15
+
+### Changed
+
+- Prototype Colors: remove live WCAG contrast Alert; tip points to Test → Contrast
+- Heuristics form: Nielsen-10 pulse checks with Rate, live mood board, weak-spot tags
+
+## [0.36.2] - 2026-08-15
+
+### Added
+
+- Theory mode: each scheme hue shows a small light→dark shade strip (Paletton-style rectangles)
+
+## [0.36.1] - 2026-08-15
+
+### Changed
+
+- Theory mode: switching scheme or seed live-rebuilds the palette; only the main (seed) color is editable (derived hues + text/bg are read-only)
+
 ## [0.36.0] - 2026-08-15
 
 ### Changed

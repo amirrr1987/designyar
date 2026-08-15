@@ -85,6 +85,21 @@ export function adjustLightness(hex: string, delta: number): string {
   return hslToHex({ ...hsl, l: Math.max(0.08, Math.min(0.92, hsl.l + delta)) })
 }
 
+/**
+ * Paletton-style shade strip for one hue: lighter → base → darker.
+ * Middle index is the base color.
+ */
+export function shadeRamp(hex: string, count = 5): string[] {
+  const base = normalizeHex(hex, '#0f766e')
+  const steps = Math.max(3, count)
+  const mid = Math.floor(steps / 2)
+  const deltas: number[] = []
+  for (let i = 0; i < steps; i += 1) {
+    deltas.push((mid - i) * 0.12)
+  }
+  return deltas.map((delta) => (delta === 0 ? base : adjustLightness(base, delta)))
+}
+
 export function tintBackground(primaryHex: string): string {
   const rgb = parseHexColor(primaryHex)
   if (!rgb) return '#f8fafc'

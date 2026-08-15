@@ -38,8 +38,7 @@ import {
   type PaletteMode,
   type TheoryScheme,
 } from '@/types/prototype'
-import { contrastRatio, meetsWcagAa } from '@/utils/contrast'
-import { normalizeHex } from '@/utils/color-harmony'
+import { normalizeHex, parseHexColor, rgbToHex, shadeRamp } from '@/utils/color-harmony'
 import {
   APP_UI_FRAMEWORK,
   DESIGN_SYSTEM_STARTERS,
@@ -177,29 +176,9 @@ const primaryRamp = computed(() => {
   }
 })
 
-const textOnBgRatio = computed(() => contrastRatio(draft.text, draft.background))
-const textOnBgAa = computed(() =>
-  textOnBgRatio.value === null ? false : meetsWcagAa(textOnBgRatio.value),
-)
-
-const contrastMessage = computed(() => {
-  if (textOnBgRatio.value === null) {
-    return 'کد رنگ متن یا پس‌زمینه نامعتبر است (هگز ۶ رقمی مثل #1c1917).'
-  }
-  const ratioText = textOnBgRatio.value.toFixed(2)
-  return textOnBgAa.value
-    ? `کنتراست متن روی پس‌زمینه: ${ratioText} — مناسب WCAG AA`
-    : `کنتراست متن روی پس‌زمینه: ${ratioText} — کمتر از AA (۴٫۵)؛ متن یا پس‌زمینه را عوض کن`
-})
-
 function setPending(next: ColorPalette, source: 'theory' | 'system' | 'custom'): void {
   pendingPalette.value = next
   pendingSource.value = source
-}
-
-function proposeTheory(): void {
-  const seed = normalizeHex(draft.seed || draft.primary, '#0f766e')
-  setPending(buildPaletteFromTheory(seed, draft.theoryScheme), 'theory')
 }
 
 function proposeSystem(key: DesignSystemKey): void {
@@ -285,17 +264,6 @@ function coerceAiToCurrentTab(ai: ColorPalette): ColorPalette {
       mode: 'theory',
       theoryScheme: scheme,
       systemKey: '',
-      background: ai.background || built.background,
-      text: ai.text || built.text,
-      surface: ai.surface || built.surface,
-      textMuted: ai.textMuted || built.textMuted,
-      border: ai.border || built.border,
-      primary: ai.primary || built.primary,
-      accent: ai.accent || built.accent,
-      tertiary: ai.tertiary || built.tertiary,
-      quaternary:
-        scheme === 'tetrad' ? ai.quaternary || built.quaternary : built.quaternary,
-      swatches: built.swatches,
       seed,
     }
   }
@@ -340,13 +308,14 @@ function buildColorsAiExtraContext(): string {
     lines.push(
       'حالت theory — سبک Paletton:',
       `- theoryScheme قفل است: ${draft.theoryScheme} (${theorySchemeLabel(draft.theoryScheme)})`,
-      `- از seed فعلی «${draft.seed}» یا بهبود همان بذر استفاده کن.`,
+      `- فقط seed / primary (رنگ اصلی) را پیشنهاد یا بهبود بده («${draft.seed}»)؛ accent/tertiary/quaternary را از اصول همان طرح بساز.`,
       '- monochromatic (1-color): یک فام + سایه‌های روشن/تیره.',
       '- adjacent (3-colors): فام اصلی + دو همسایه روی چرخه (±۳۰°).',
       '- triad (3-colors): سه فام با فاصله ۱۲۰°.',
       '- tetrad (4-colors): چهار فام مربعی (۰/۹۰/۱۸۰/۲۷۰)؛ quaternary لازم است.',
       '- systemKey را خالی بگذار ("").',
       `- mode: theory و theoryScheme: ${draft.theoryScheme}`,
+      '- background و text را از seed مشتق کن (در UI فقط‌خواندنی‌اند).',
     )
   } else {
     const ds =
@@ -389,6 +358,22 @@ function clearModeEphemeral(): void {
   clearPreview()
 }
 
+/** Rebuild all theory roles from seed — only seed is user-editable in theory mode. */
+function applyTheoryFromSeed(rawSeed: string): void {
+  const seed = normalizeHex(rawSeed, draft.seed || draft.primary || '#0f766e')
+  clearModeEphemeral()
+  Object.assign(draft, buildPaletteFromTheory(seed, draft.theoryScheme))
+  persist()
+}
+
+/** Live update while typing only when hex is complete/valid. */
+function onSeedTextUpdate(raw: string): void {
+  draft.seed = raw
+  const parsed = parseHexColor(raw)
+  if (!parsed) return
+  applyTheoryFromSeed(rgbToHex(parsed))
+}
+
 function onModeChange(value: string | number): void {
   const mode = value as PaletteMode
   if (mode === draft.mode) return
@@ -405,6 +390,30 @@ function onTheoryChange(value: string | number): void {
   Object.assign(draft, buildPaletteFromTheory(seed, scheme))
   persist()
 }
+
+const theoryDerivedSwatches = computed(() => {
+  type Row = { key: string; label: string; value: string; shades: string[] }
+  const withShades = (key: string, label: string, value: string): Row => ({
+    key,
+    label,
+    value,
+    shades: shadeRamp(value, 5),
+  })
+
+  if (draft.theoryScheme === 'monochromatic') {
+    return [withShades('1', 'تک‌رنگ (اصلی)', draft.primary)]
+  }
+
+  const rows: Row[] = [
+    withShades('1', 'رنگ ۱ (اصلی)', draft.primary),
+    withShades('2', 'رنگ ۲', draft.accent),
+    withShades('3', 'رنگ ۳', draft.tertiary),
+  ]
+  if (draft.theoryScheme === 'tetrad') {
+    rows.push(withShades('4', 'رنگ ۴', draft.quaternary))
+  }
+  return rows
+})
 
 const previewText = computed(() => {
   if (!preview.value) return ''
@@ -503,10 +512,11 @@ function onAcceptAi(): void {
       </LiveStudioPreview>
 
       <Alert
-        :type="textOnBgAa ? 'success' : 'warning'"
+        type="info"
         show-icon
-        :message="contrastMessage"
         class="rounded-xl"
+        message="کنتراست را در مرحلهٔ تست بررسی کن"
+        description="اینجا فقط پالت را می‌سازی؛ سنجش خوانایی متن روی پس‌زمینه در فرم «کنتراست رنگ» مرحلهٔ تست است."
       />
 
       <div>
@@ -528,39 +538,59 @@ function onAcceptAi(): void {
             @change="onTheoryChange"
           />
           <Typography.Paragraph type="secondary" class="mb-2! mt-2! text-xs">
-            {{ theorySchemeLabel(draft.theoryScheme) }} + متن و پس‌زمینه جدا
+            {{ theorySchemeLabel(draft.theoryScheme) }} — فقط رنگ اصلی را عوض کن؛ بقیه از اصول ساخته
+            می‌شوند.
           </Typography.Paragraph>
           <Form layout="vertical">
-            <FormItem label="رنگ بذر (Seed)">
+            <FormItem label="رنگ اصلی (قابل ویرایش)">
               <div class="flex flex-wrap items-center gap-3">
                 <label
                   class="relative h-12 w-12 shrink-0 cursor-pointer overflow-hidden rounded-xl ring-2 ring-stone-200 ring-offset-2"
                   :style="{ backgroundColor: hexInputValue(draft.seed) }"
                 >
-                  <span class="sr-only">انتخاب بذر رنگ</span>
+                  <span class="sr-only">انتخاب رنگ اصلی</span>
                   <input
                     type="color"
                     class="absolute inset-0 cursor-pointer opacity-0"
                     :value="hexInputValue(draft.seed)"
-                    @input="
-                      draft.seed = ($event.target as HTMLInputElement).value;
-                      persist()
-                    "
+                    @input="applyTheoryFromSeed(($event.target as HTMLInputElement).value)"
                   />
                 </label>
                 <Input
-                  v-model:value="draft.seed"
+                  :value="draft.seed"
                   class="min-w-40 flex-1 font-mono"
                   placeholder="#0f766e"
-                  @blur="persist"
+                  @update:value="onSeedTextUpdate"
+                  @blur="applyTheoryFromSeed(draft.seed)"
                 />
               </div>
             </FormItem>
           </Form>
-          <Button type="default" block html-type="button" @click="proposeTheory">
-            <template #icon><ExperimentOutlined /></template>
-            پیشنهاد از اصول رنگ
-          </Button>
+          <Typography.Text class="mb-2 block text-stone-600">
+            رنگ‌های مشتق با سایه روشن/تیره (فقط نمایش)
+          </Typography.Text>
+          <Space wrap size="middle" class="w-full">
+            <div
+              v-for="item in theoryDerivedSwatches"
+              :key="item.key"
+              class="flex min-w-32 flex-col gap-1"
+            >
+              <div class="flex items-end gap-0.5" role="img" :aria-label="item.label">
+                <span
+                  v-for="(shade, shadeIndex) in item.shades"
+                  :key="`${item.key}-${shadeIndex}`"
+                  class="inline-block w-5 rounded-sm ring-1 ring-black/10"
+                  :class="shadeIndex === 2 ? 'h-8' : 'h-5'"
+                  :style="{ backgroundColor: shade }"
+                  :title="shade"
+                />
+              </div>
+              <Typography.Text class="text-xs text-stone-600">{{ item.label }}</Typography.Text>
+              <Typography.Text class="font-mono text-xs text-stone-500">
+                {{ hexInputValue(item.value) }}
+              </Typography.Text>
+            </div>
+          </Space>
         </div>
       </template>
 
@@ -697,19 +727,25 @@ function onAcceptAi(): void {
         </template>
       </Alert>
 
-      <!-- Always: text + background -->
+      <!-- Text + background: editable outside theory; derived in theory -->
       <Form layout="vertical">
         <Typography.Title :level="5" class="mb-3!">متن و پس‌زمینه (جدا)</Typography.Title>
+        <Typography.Paragraph v-if="draft.mode === 'theory'" type="secondary" class="mb-3! text-xs">
+          در اصول رنگ از بذر محاسبه می‌شوند و فقط‌خواندنی‌اند.
+        </Typography.Paragraph>
         <FormItem label="پس‌زمینه (Background)">
           <div class="flex flex-wrap items-center gap-3">
             <label
-              class="relative h-12 w-12 shrink-0 cursor-pointer overflow-hidden rounded-xl ring-2 ring-stone-200 ring-offset-2"
+              class="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl ring-2 ring-stone-200 ring-offset-2"
+              :class="draft.mode === 'theory' ? 'cursor-default' : 'cursor-pointer'"
               :style="{ backgroundColor: hexInputValue(draft.background) }"
             >
               <span class="sr-only">پس‌زمینه</span>
               <input
                 type="color"
-                class="absolute inset-0 cursor-pointer opacity-0"
+                class="absolute inset-0 opacity-0"
+                :class="draft.mode === 'theory' ? 'pointer-events-none' : 'cursor-pointer'"
+                :disabled="draft.mode === 'theory'"
                 :value="hexInputValue(draft.background)"
                 @input="
                   draft.background = ($event.target as HTMLInputElement).value;
@@ -720,6 +756,7 @@ function onAcceptAi(): void {
             <Input
               v-model:value="draft.background"
               class="min-w-40 flex-1 font-mono"
+              :readonly="draft.mode === 'theory'"
               @blur="persist"
             />
           </div>
@@ -727,13 +764,16 @@ function onAcceptAi(): void {
         <FormItem label="متن (Text)">
           <div class="flex flex-wrap items-center gap-3">
             <label
-              class="relative h-12 w-12 shrink-0 cursor-pointer overflow-hidden rounded-xl ring-2 ring-stone-200 ring-offset-2"
+              class="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl ring-2 ring-stone-200 ring-offset-2"
+              :class="draft.mode === 'theory' ? 'cursor-default' : 'cursor-pointer'"
               :style="{ backgroundColor: hexInputValue(draft.text) }"
             >
               <span class="sr-only">متن</span>
               <input
                 type="color"
-                class="absolute inset-0 cursor-pointer opacity-0"
+                class="absolute inset-0 opacity-0"
+                :class="draft.mode === 'theory' ? 'pointer-events-none' : 'cursor-pointer'"
+                :disabled="draft.mode === 'theory'"
                 :value="hexInputValue(draft.text)"
                 @input="
                   draft.text = ($event.target as HTMLInputElement).value;
@@ -744,6 +784,7 @@ function onAcceptAi(): void {
             <Input
               v-model:value="draft.text"
               class="min-w-40 flex-1 font-mono"
+              :readonly="draft.mode === 'theory'"
               @blur="persist"
             />
           </div>
