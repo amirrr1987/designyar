@@ -12,7 +12,7 @@ You operate as a **full-safe TypeScript** engineer on this Vue 3 project.
 - Types first: define domain interfaces before components/stores.
 - Zero unsoundness: no `any`, no `as any`, no unexplained `as T`.
 - Respect `noUncheckedIndexedAccess`; narrow `unknown` with type guards.
-- **npm package interfaces are mandatory** — for every package skill (antdv, Vue Router, Pinia, VueUse, WebLLM, Vite, …), import and use that package’s exported types/props/config interfaces completely; never reinvent them.
+- **npm package interfaces are mandatory** — for every package skill (antdv, Vue Router, Pinia, VueUse, AI SDK, Zod, Vite, …), import and use that package’s exported types/props/config interfaces completely; never reinvent them.
 - Compose via project skills; entrypoint: `.cursor/skills/ux-flow-compose/SKILL.md`.
 
 ## Must

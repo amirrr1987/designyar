@@ -113,22 +113,27 @@ export function useContrast() {
 }
 ```
 
-## WebLLM typing
+## AI SDK + Zod typing
 
 ```ts
-import { CreateMLCEngine, type MLCEngineInterface } from '@mlc-ai/web-llm'
+import { generateText, type UIMessage } from 'ai'
+import { createGroq } from '@ai-sdk/groq'
+import { z } from 'zod'
 
-const engine = shallowRef<MLCEngineInterface | null>(null)
+const groq = createGroq({
+  apiKey: import.meta.env.VITE_GROQ_API_KEY,
+})
 
-async function chat(prompt: string): Promise<string> {
-  const e = engine.value
-  if (!e) throw new Error('مدل آماده نیست')
-  const result = await e.chat.completions.create({
-    messages: [{ role: 'user', content: prompt }],
-    stream: false,
-  })
-  return result.choices[0]?.message?.content ?? ''
-}
+const tipSchema = z.object({
+  title: z.string(),
+  body: z.string(),
+})
+
+export type UxTip = z.infer<typeof tipSchema>
+
+const history: UIMessage[] = []
+void history
+void groq
 ```
 
 ## Exhaustive switch

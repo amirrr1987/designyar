@@ -24,7 +24,7 @@ Use official exports — never local clones of message/result shapes. See [packa
 |------|---------------------|
 | Generate | `generateText`, `streamText` from `ai` |
 | Chat UI messages | `UIMessage`, `convertToModelMessages` |
-| Structured object | `Output` from `ai` (schema via Zod only if `zod` is installed) |
+| Structured object | `Output` from `ai` + Zod (`zod` is a dependency) |
 | Stream response helpers | `toUIMessageStreamResponse` / `createUIMessageStreamResponse` (server only — not this SPA) |
 
 ```ts
@@ -54,7 +54,7 @@ const history: UIMessage[] = []
 2. No Next.js routes, no `ai/react`, no `react-markdown`.
 3. Errors: `catch (e: unknown)` then `e instanceof Error ? e.message : String(e)`.
 4. Do not replace antdv `Form` / `Rule` with AI SDK types.
-5. Structured JSON from the model: `Output.object` + Zod schema **only** when `zod` is a dependency — not for persona/HMW form fields.
+5. Structured JSON from the model: `Output.object` + [zod](../zod/SKILL.md) — not for persona/HMW form fields (`Rule`).
 
 ## Checklist
 

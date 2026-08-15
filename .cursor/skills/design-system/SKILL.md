@@ -17,7 +17,7 @@ Token architecture, component specifications, systematic design, slide generatio
 
 ## UX Flow override (this repo — mandatory)
 
-Do **not** introduce Tailwind theme files, CSS variable systems, or `<style>` into `src/`. Map token thinking onto **antdv + package types**. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+Do **not** introduce a second token system (CSS-in-SFC, shadcn CSS vars) into `src/`. Map token thinking onto **antdv `ThemeConfig` + `@ant-design/colors`**. Optional Tailwind `@theme` lives only in `src/assets/css/main.css` ([tailwindcss](../tailwindcss/SKILL.md)). See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
 
 | Token layer (this skill) | UX Flow |
 |--------------------------|---------|

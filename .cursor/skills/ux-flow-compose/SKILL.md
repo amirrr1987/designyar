@@ -3,7 +3,7 @@ name: ux-flow-compose
 description: >
   Orchestrates all UX Flow project skills in the correct order with extreme full-safe
   TypeScript — when to load which skill, typed boundaries across Vue/Pinia/antdv/VueUse/
-  WebLLM/Vite tooling, mandatory use of each npm package’s official interfaces (e.g.
+  AI SDK/Zod/Vite tooling, mandatory use of each npm package’s official interfaces (e.g.
   ButtonProps), and a no-any checklist. Use when starting features, combining stack skills,
   full safe type, type-safe architecture, package interfaces, or composing ux-flow modules.
 ---
@@ -17,9 +17,9 @@ Master skill for this repo. **Do not invent parallel stacks.** Load sibling skil
 You are a **full-safe TypeScript** Vue engineer for UX Flow:
 
 1. No `any`, no `as any`, no bare `as unknown as T` without a validated narrow.
-2. Prefer inference + generics + exported library types (`ButtonProps`, `FormInstance`, `MLCEngineInterface`, …).
+2. Prefer inference + generics + exported library types (`ButtonProps`, `FormInstance`, `UIMessage`, `z.infer`, …).
 3. Honor `noUncheckedIndexedAccess` — index access is `T | undefined`; handle it.
-4. Product rules from [ux-flow](../ux-flow/SKILL.md): no custom CSS, Persian RTL, cmd confirmation, client-only.
+4. Product rules from [ux-flow](../ux-flow/SKILL.md): no SFC `<style>`, Persian RTL, cmd confirmation, client-only.
 5. Before coding UI, read [ant-design-vue](../ant-design-vue/SKILL.md) (named imports + `<Button>`).
 
 Also obey project rule `.cursor/rules/full-safe-type-ts.mdc`.
@@ -78,7 +78,6 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 
 ### B. App runtime (feature code)
 
-
 | Concern | Skill |
 |---------|--------|
 | SFC / Composition API | [vue](../vue/SKILL.md) |
@@ -89,9 +88,11 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 | Icons | [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) |
 | Color ramps | [ant-design-colors](../ant-design-colors/SKILL.md) |
 | Utility classes | [tailwindcss](../tailwindcss/SKILL.md) |
+| Runtime schemas | [zod](../zod/SKILL.md) |
 | AI SDK core | [ai](../ai/SKILL.md) |
-| Groq provider | [ai-sdk-groq](../ai-sdk-groq/SKILL.md) |
+| Groq provider (canonical) | [ai-sdk-groq](../ai-sdk-groq/SKILL.md) |
 | AI Vue composables | [ai-sdk-vue](../ai-sdk-vue/SKILL.md) |
+| Groq SDK (legacy `src/ai/` only) | [groq-sdk](../groq-sdk/SKILL.md) |
 
 ### C. Tooling (config / scripts / CI quality)
 
@@ -116,41 +117,20 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 | Format | [oxfmt](../oxfmt/SKILL.md) |
 | Script runners | [npm-run-all2](../npm-run-all2/SKILL.md) |
 | TS config loader | [jiti](../jiti/SKILL.md) |
-=======
-| Concern                      | Skill                                                    |
-| ---------------------------- | -------------------------------------------------------- |
-| SFC / Composition API        | [vue](../vue/SKILL.md)                                   |
-| Routes / Menu sync           | [vue-router](../vue-router/SKILL.md)                     |
-| Stores                       | [pinia](../pinia/SKILL.md)                               |
-| LocalStorage / browser utils | [vueuse-core](../vueuse-core/SKILL.md)                   |
-| UI components                | [ant-design-vue](../ant-design-vue/SKILL.md)             |
-| Icons                        | [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) |
-| Color ramps                  | [ant-design-colors](../ant-design-colors/SKILL.md)       |
-| In-browser AI                | [web-llm](../web-llm/SKILL.md)                           |
 
-### C. Tooling (config / scripts / CI quality)
+### D. Design / product (not npm packages)
 
-| Concern            | Skill                                                                    |
-| ------------------ | ------------------------------------------------------------------------ |
-| Dev server / build | [vite](../vite/SKILL.md)                                                 |
-| Vue SFC plugin     | [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md)                       |
-| DevTools plugin    | [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md)         |
-| TS compiler        | [typescript](../typescript/SKILL.md)                                     |
-| SFC typecheck      | [vue-tsc](../vue-tsc/SKILL.md)                                           |
-| App tsconfig       | [vue-tsconfig](../vue-tsconfig/SKILL.md)                                 |
-| Node tsconfig      | [tsconfig-node24](../tsconfig-node24/SKILL.md)                           |
-| Node types         | [types-node](../types-node/SKILL.md)                                     |
-| ESLint             | [eslint](../eslint/SKILL.md)                                             |
-| Vue ESLint         | [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md)                       |
-| Vue+TS ESLint      | [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) |
-| Vue parser         | [vue-eslint-parser](../vue-eslint-parser/SKILL.md)                       |
-| Prettier skip      | [eslint-config-prettier](../eslint-config-prettier/SKILL.md)             |
-| Oxlint bridge      | [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md)                 |
-| Oxlint             | [oxlint](../oxlint/SKILL.md)                                             |
-| Format             | [oxfmt](../oxfmt/SKILL.md)                                               |
-| Script runners     | [npm-run-all2](../npm-run-all2/SKILL.md)                                 |
-| TS config loader   | [jiti](../jiti/SKILL.md)                                                 |
+| When | Skill |
+|------|--------|
+| In-app UI ideas | [ui-styling](../ui-styling/SKILL.md) then remap to antdv + Tailwind utilities |
+| Tokens / ThemeConfig | [design-system](../design-system/SKILL.md) |
+| Brand / voice | [brand](../brand/SKILL.md) |
+| Logo / CIP / icons | [design](../design/SKILL.md) |
+| UX patterns catalog | [ui-ux-pro-max](../ui-ux-pro-max/SKILL.md) |
+| HTML slides / banners | [slides](../slides/SKILL.md) / [banner-design](../banner-design/SKILL.md) — artifacts outside `src/` |
+| End of a coding block | [phase-wrap-up-commit](../phase-wrap-up-commit/SKILL.md) |
 
+Every **runtime/devDependency in `package.json`** has a skill in B or C. Do not invent skills for packages that are not installed. Do not teach `@mlc-ai/web-llm` — it is not a dependency.
 
 Load **only** skills relevant to the current task after the product + typing baseline.
 
@@ -264,5 +244,5 @@ Before calling a step done:
 - Global `app.use(Antd)` + `a-*` tags (forbidden here)
 - Hand-rolled props/config that duplicate npm package types
 - Hand-rolled `localStorage` instead of VueUse
-- `groq-sdk` / WebLLM / Next.js `app/api/chat` instead of `ai` + `@ai-sdk/groq`
+- New `groq-sdk` call sites / WebLLM / Next.js `app/api/chat` instead of `ai` + `@ai-sdk/groq` (legacy Groq client: [groq-sdk](../groq-sdk/SKILL.md))
 - Disabling strictness in tsconfig to silence errors

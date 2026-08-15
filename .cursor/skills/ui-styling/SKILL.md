@@ -2,9 +2,8 @@
 name: ui-styling
 description: >
   UI styling guidance remapped for UX Flow — prefer ant-design-vue typed props
-  (ButtonProps, ThemeConfig, Space/Row/Col) over shadcn/ui and Tailwind. Upstream
-  references may mention Radix/Tailwind; in this repo those are research-only.
-  Use when building UI, layouts, themes, or styling patterns in the Vue SPA.
+  (ButtonProps, ThemeConfig, Space/Row/Col) plus Tailwind utilities; shadcn/ui is
+  research-only. Use when building UI, layouts, themes, or styling patterns in the Vue SPA.
 argument-hint: "[component or layout]"
 license: MIT
 metadata:
@@ -18,13 +17,13 @@ Comprehensive skill for creating beautiful, accessible user interfaces combining
 
 ## UX Flow override (this repo — mandatory)
 
-**Do not apply shadcn/ui, Radix, or Tailwind inside UX Flow `src/`.** Product UI is Vue 3 + **ant-design-vue** only (no custom CSS). See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+**Do not apply shadcn/ui or Radix inside UX Flow `src/`.** Product UI is Vue 3 + **ant-design-vue** + Tailwind **utilities** (no SFC `<style>`). See [package-interfaces.md](../ux-flow-compose/package-interfaces.md) and [tailwindcss](../tailwindcss/SKILL.md).
 
 | Upstream (this skill) | UX Flow |
 |-----------------------|---------|
 | shadcn `Button` + `className` | `<Button>` + `import type { ButtonProps } from 'ant-design-vue'` |
-| Tailwind spacing/layout | antdv `Space` / `Row` / `Col` / `Divider` props |
-| CSS variables / themes | `ThemeConfig` on `ConfigProvider` + `@ant-design/colors` |
+| Tailwind as a component kit | antdv first; Tailwind only for layout/spacing extras |
+| CSS variables / themes | `ThemeConfig` on `ConfigProvider` + `@ant-design/colors` + optional `@theme` |
 | Dialog / Sheet | `Modal` / `Drawer` + `ModalProps` / `DrawerProps` |
 | Form | `Form` / `FormItem` + `FormInstance` / `Rule` |
 

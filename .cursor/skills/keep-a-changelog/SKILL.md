@@ -67,7 +67,7 @@ Read current `version` from `package.json`.
 | Bump | When (UX Flow) |
 |------|----------------|
 | **MAJOR** (`x.0.0`) | Breaking change for users or stored data (e.g. wipe/rename LocalStorage schema without migration, remove a public flow). Rare before `1.0.0`. |
-| **MINOR** (`0.y.0` or `x.y.0`) | New capability / completed phase feature set (new Design Thinking module UI, WebLLM panel, export/import, …). Default for finishing a phase with user-visible features. |
+| **MINOR** (`0.y.0` or `x.y.0`) | New capability / completed phase feature set (new Design Thinking module UI, AI panel, export/import, …). Default for finishing a phase with user-visible features. |
 | **PATCH** (`x.y.z`) | Bug fixes, copy/RTL fixes, small non-breaking polish inside an already-released capability. |
 | **No bump** | Docs-only, skill/rules-only, comments, formatting with zero behavior change — still OK to note under `[Unreleased]` or skip. |
 
@@ -88,7 +88,7 @@ Suggested mapping (guidance, not automatic):
 | Phase 4 Ideate | `0.5.0` |
 | Phase 5 Prototype | `0.6.0` |
 | Phase 6 Test | `0.7.0` |
-| Phase 7 WebLLM | `0.8.0` |
+| Phase 7 AI (Groq) | `0.8.0` |
 | Phase 8 persistence | `0.9.0` → later `1.0.0` when stable |
 
 If the phase only fixed bugs on an already-bumped minor, do **PATCH** instead.

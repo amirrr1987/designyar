@@ -57,7 +57,7 @@ Phase titles (reference):
 | 4 | Ideate |
 | 5 | Prototype |
 | 6 | Test |
-| 7 | WebLLM |
+| 7 | AI assist (Groq) |
 | 8 | Persistence & export |
 
 If only a micro-phase finished (e.g. `0.3`), say Phase 0 **نیمه‌کاره** and list remaining `0.4` / `0.5`.

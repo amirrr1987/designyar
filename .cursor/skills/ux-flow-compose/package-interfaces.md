@@ -9,7 +9,7 @@ Use the package’s **official TypeScript exports** completely at every boundary
 ## What “complete” means
 
 1. **Props / options objects** — typed as `XxxProps`, `XxxOptions`, or the package’s config type.
-2. **Refs holding library instances** — `ref<FormInstance>()`, `ref<MLCEngineInterface | null>()`, not `ref<any>()`.
+2. **Refs holding library instances** — `ref<FormInstance>()`, `ref<Groq | null>()` only in legacy `src/ai/`, not `ref<any>()`.
 3. **Generics** — `useStorage<T>`, `TableColumnsType<Row>`, `RouteLocationNormalized`, etc.
 4. **Events / callbacks** — use package handler argument types when exporting or wrapping them.
 5. **Config entrypoints** — `defineConfig(...)` from Vite/ESLint/etc.; annotate with `UserConfig` / package types when not inferred.
@@ -35,7 +35,7 @@ Skills like `ui-styling`, `design-system`, `ui-ux-pro-max`, `brand`, `design`, `
 | shadcn `Button` / Tailwind classes | `ant-design-vue` `<Button>` + `ButtonProps` |
 | CSS variables / Tailwind theme | `ThemeConfig` + `@ant-design/colors` ramps |
 | Radix / shadcn Dialog | antdv `Modal` / `Drawer` + `ModalProps` |
-| Custom `<style>` / utility CSS in `src/` | **Forbidden** — Space / Row / Col / antdv props only |
+| Custom `<style>` in SFC / shadcn / Radix | **Forbidden** in `src/` — antdv props + [tailwindcss](../tailwindcss/SKILL.md) utilities only |
 | Standalone HTML slides/banners | OK as **artifacts outside app runtime**; do not import into Vue SFCs as CSS systems |
 
 When a design skill produces **in-app UI**, also open [ant-design-vue](../ant-design-vue/SKILL.md) and type every boundary with package interfaces.

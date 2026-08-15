@@ -14,7 +14,7 @@ Unified design skill: brand, tokens, UI, logo, CIP, slides, banners, social phot
 
 ## UX Flow override (this repo — mandatory)
 
-When routing **in-app UI** work, **do not** follow the `ui-styling` shadcn/Tailwind path. Remap to antdv + package interfaces. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
+When routing **in-app UI** work, **do not** follow the `ui-styling` shadcn path. Remap to antdv + Tailwind utilities + package interfaces. See [package-interfaces.md](../ux-flow-compose/package-interfaces.md).
 
 | Sub-skill route | UX Flow target |
 |-----------------|----------------|
@@ -31,7 +31,7 @@ const primaryBtn: ButtonProps = { type: 'primary' }
 
 ## Package interfaces (mandatory) — when coding the app
 
-Any code landing in `src/` must use Vue / antdv / Pinia / VueUse / WebLLM official types — never shadcn component prop twins.
+Any code landing in `src/` must use Vue / antdv / Pinia / VueUse / AI SDK / Zod official types — never shadcn component prop twins.
 
 ## When to Use
 

@@ -61,7 +61,7 @@ export const usePersonaStore = defineStore('persona', () => {
 | `stores/project.ts` | `project` | Name, current step, createdAt |
 | `stores/persona.ts` | `persona` | Empathize personas / research |
 | `stores/designSystem.ts` | `designSystem` | Colors, type, grid |
-| `stores/ai.ts` | `ai` | WebLLM prefs / last responses |
+| `stores/ai.ts` | `ai` | Groq prefs / last responses |
 
 ## Package interfaces (mandatory)
 

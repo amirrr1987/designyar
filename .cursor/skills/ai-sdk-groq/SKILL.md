@@ -10,7 +10,7 @@ description: >
 
 Package: `@ai-sdk/groq` ^4. Provider for [ai](../ai/SKILL.md). Official: [Groq provider](https://ai-sdk.dev/providers/ai-sdk-providers/groq).
 
-Replaces `groq-sdk` and WebLLM. Do not add those packages.
+Replaces new `groq-sdk` usage and WebLLM. Package `groq-sdk` is still installed for [`src/ai/groq-provider.ts`](../../../src/ai/groq-provider.ts) — see [groq-sdk](../groq-sdk/SKILL.md). Do not add `@mlc-ai/web-llm`.
 
 ## Project wiring
 
@@ -82,7 +82,7 @@ Default model for this app: `llama-3.3-70b-versatile` (same as Groq’s AI SDK s
 ## Rules
 
 1. Always `createGroq({ apiKey: import.meta.env.VITE_GROQ_API_KEY })` in Vite — do not rely on `GROQ_API_KEY`.
-2. No `groq-sdk`, no `@mlc-ai/web-llm`, no Next.js API route from [console.groq.com/docs/ai-sdk](https://console.groq.com/docs/ai-sdk/).
+2. No new `groq-sdk` files, no `@mlc-ai/web-llm`, no Next.js API route from [console.groq.com/docs/ai-sdk](https://console.groq.com/docs/ai-sdk/). Legacy client: [groq-sdk](../groq-sdk/SKILL.md).
 3. Do not invent a local `interface GroqConfig` — use `createGroq` argument types + `GroqLanguageModelChatOptions`.
 4. Narrow `import.meta.env.VITE_GROQ_API_KEY` (`string | undefined`) before calling.
 

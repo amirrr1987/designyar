@@ -34,7 +34,7 @@ Do not “fix” errors by:
 2. Fix type errors in `src/**/*.vue` and `src/**/*.ts` — do not weaken tsconfig to silence errors unless user asks.
 3. Incremental info goes to `node_modules/.tmp/*.tsbuildinfo` (see app/node tsconfigs).
 4. Pair with [typescript](../typescript/SKILL.md) and [vue-tsconfig](../vue-tsconfig/SKILL.md).
-5. antdv / Pinia / VueUse / WebLLM code must stay on **package** types — no `any` escapes.
+5. antdv / Pinia / VueUse / AI SDK / Zod code must stay on **package** types — no `any` escapes.
 
 ## Checklist
 
