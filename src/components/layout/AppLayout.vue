@@ -1,23 +1,32 @@
 <script setup lang="ts">
-import { Layout, Space } from 'ant-design-vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { Layout } from 'ant-design-vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
-import AppSider from '@/components/layout/AppSider.vue'
-import SoftGateModal from '@/components/shell/SoftGateModal.vue'
 
 const { Content } = Layout
+const route = useRoute()
+
+const isOnboarding = computed(() => route.meta.layout === 'onboarding')
 </script>
 
 <template>
-  <Layout style="height: 100vh">
-    <AppSider />
-    <Layout>
+  <Layout class="font-sans h-svh">
+    <div
+      v-if="isOnboarding"
+      class="flex min-h-svh w-full flex-col items-center justify-center p-4 md:p-8"
+    >
+      <div class="flex w-full max-w-3xl flex-col">
+        <RouterView />
+      </div>
+    </div>
+    <div v-else class="ms-auto me-auto flex h-svh w-full max-w-7xl flex-col">
       <AppHeader />
-      <Content style="padding: 24px; overflow: auto">
-        <Space direction="vertical" size="large" style="width: 100%">
+      <Content class="overflow-y-auto p-4">
+        <div class="flex w-full flex-col gap-6">
           <RouterView />
-        </Space>
+        </div>
       </Content>
-    </Layout>
-    <SoftGateModal />
+    </div>
   </Layout>
 </template>

@@ -1,6 +1,10 @@
-* {
-  margin: 0;
-  padding: 0;
-  font-family: 'Vazirmatn', sans-serif;
-  box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
+
+@layer theme, base, components, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@theme {
+  --font-sans: 'Vazirmatn', system-ui, sans-serif;
 }

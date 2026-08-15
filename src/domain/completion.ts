@@ -169,7 +169,7 @@ function isJobDone(id: JobId, s: CompletionSnapshot): boolean {
 function routeForJob(id: JobId): NextJob {
   switch (id) {
     case 'home.brief':
-      return job(id, 'home', '/')
+      return job(id, 'home', '/setup')
     case 'empathize.notes':
     case 'empathize.persona':
       return job(id, 'empathize', '/empathize')

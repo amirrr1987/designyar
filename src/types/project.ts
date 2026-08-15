@@ -41,6 +41,13 @@ export function createDefaultProject(): Project {
   }
 }
 
+/** True when any of name / title / description is filled. */
+export function projectHasBrief(project: Project): boolean {
+  return Boolean(
+    project.name.trim() || project.briefTitle.trim() || project.briefDescription.trim(),
+  )
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null
 }

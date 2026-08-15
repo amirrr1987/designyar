@@ -58,7 +58,9 @@ const aiButton: ButtonProps = { type: 'primary' }
       <Col :xs="24" :md="12" :lg="14">
         <Space wrap align="center" size="middle">
           <Space direction="vertical" :size="0">
-            <Title :level="5" style="margin: 0">{{ fa.brand }}</Title>
+            <RouterLink :to="{ name: 'home' }" class="text-inherit no-underline">
+              <Title :level="5" class="m-0">{{ fa.brand }}</Title>
+            </RouterLink>
             <Text type="secondary">
               {{ juniorSwitch ? 'مسیر ساده برای شروع UI/UX' : 'همراه Design Thinking' }}
             </Text>

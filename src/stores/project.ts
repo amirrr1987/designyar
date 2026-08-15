@@ -1,7 +1,12 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
 import { usePersistenceStore } from '@/stores/persistence'
-import { createDefaultProject, normalizeProject, type Project } from '@/types/project'
+import {
+  createDefaultProject,
+  normalizeProject,
+  projectHasBrief,
+  type Project,
+} from '@/types/project'
 import { getStepByNumber } from '@/constants/design-thinking-steps'
 import {
   buildCompletionSnapshot,
@@ -22,6 +27,7 @@ export const useProjectStore = defineStore('project', () => {
   const isJuniorMode = computed(() => project.value.experienceMode === 'junior')
   const schemaVersion = computed(() => project.value.schemaVersion)
   const currentStepMeta = computed(() => getStepByNumber(project.value.currentStep))
+  const hasBrief = computed(() => projectHasBrief(project.value))
 
   const completionProgress = computed((): ProjectProgress => {
     return getProjectProgress(buildCompletionSnapshot(persistence.document))
@@ -70,6 +76,7 @@ export const useProjectStore = defineStore('project', () => {
     isJuniorMode,
     schemaVersion,
     currentStepMeta,
+    hasBrief,
     completionProgress,
     setName,
     setBriefTitle,
