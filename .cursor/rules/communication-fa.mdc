@@ -1,0 +1,12 @@
+---
+description: Agent replies in clear Persian by default; code/identifiers stay English
+alwaysApply: true
+---
+
+# Communication
+
+- Default chat language with the user: **Persian**
+- Code, file paths, package names, commit subjects: English (conventional commits OK)
+- User-facing product UI strings: Persian
+- Be concise; bold only what matters
+- Never run Shell; show `pnpm` commands and wait for ✅

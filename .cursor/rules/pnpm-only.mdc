@@ -1,0 +1,19 @@
+---
+description: Prefer pnpm; never invent npm/yarn install when lockfile is pnpm
+alwaysApply: true
+---
+
+# Package manager
+
+This repo uses **pnpm** (`pnpm-lock.yaml`).
+
+When suggesting install/scripts, use:
+
+```bash
+pnpm install
+pnpm add <pkg>
+pnpm add -D <pkg>
+pnpm run <script>
+```
+
+Do not suggest `npm install` / `yarn` unless the user explicitly asks. Still **do not run** the command — show it and wait for ✅ (manual-commands-only).

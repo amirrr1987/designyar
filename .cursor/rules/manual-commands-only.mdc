@@ -25,7 +25,9 @@ The agent **must never** run terminal, shell, CMD, PowerShell, npm, git, or any 
 ```
 لطفاً این را اجرا کن:
 
-npm run type-check
+pnpm run type-check
 
 بعد بگو انجام دادم تا ادامه بدهم.
 ```
+
+Shell is also blocked by `.cursor/hooks.json` (`beforeShellExecution` → deny). Do not retry.

@@ -1,0 +1,11 @@
+---
+description: Vercel SPA rewrite — keep vercel.json as client-side router fallback
+alwaysApply: false
+globs: vercel.json
+---
+
+# Vercel SPA
+
+This app is a static Vite SPA. `vercel.json` must keep a catch-all rewrite to `index.html` so Vue Router deep links work.
+
+Do not add serverless API routes unless the user explicitly asks to leave the client-only architecture.

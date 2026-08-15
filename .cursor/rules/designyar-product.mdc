@@ -1,0 +1,13 @@
+---
+description: Designyar product — micro-forms, AI assist, keep core files
+alwaysApply: true
+---
+
+# Designyar product
+
+- Design Thinking → **one-job micro-forms** (wizard), not multi-tool dashboards
+- Every form: **بهبود / تکمیل با AI** + Accept / Edit / Reject (no silent overwrite)
+- Persian RTL UI; soft guidance only — **no SoftGate / PhaseShell locks**
+- **Keep:** `App.vue`, `AppLayout.vue`, `configProvider.store.ts`
+- **Out of scope:** native mobile, backend/sync API, WebLLM, Next.js chat API, server DevOps beyond static SPA
+- Build **phase / micro-phase** then ask before continuing — see `.cursor/skills/ux-flow/SKILL.md`

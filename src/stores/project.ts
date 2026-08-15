@@ -1,89 +1,42 @@
-import { computed } from 'vue'
 import { defineStore } from 'pinia'
-import { usePersistenceStore } from '@/stores/persistence'
+import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
   createDefaultProject,
-  normalizeProject,
-  projectHasBrief,
-  type Project,
+  type ProjectState,
+  type PhaseKey,
 } from '@/types/project'
-import { getStepByNumber } from '@/constants/design-thinking-steps'
-import {
-  buildCompletionSnapshot,
-  getProjectProgress,
-  type ProjectProgress,
-} from '@/domain/completion'
 
 export const useProjectStore = defineStore('project', () => {
-  const persistence = usePersistenceStore()
+  const project = useStorage<ProjectState>(STORAGE_KEYS.project, createDefaultProject())
 
-  const project = computed(() => normalizeProject(persistence.document.project))
-
-  const name = computed(() => project.value.name)
-  const briefTitle = computed(() => project.value.briefTitle)
-  const briefDescription = computed(() => project.value.briefDescription)
-  const currentStep = computed(() => project.value.currentStep)
-  const experienceMode = computed(() => project.value.experienceMode)
-  const isJuniorMode = computed(() => project.value.experienceMode === 'junior')
-  const schemaVersion = computed(() => project.value.schemaVersion)
-  const currentStepMeta = computed(() => getStepByNumber(project.value.currentStep))
-  const hasBrief = computed(() => projectHasBrief(project.value))
-
-  const completionProgress = computed((): ProjectProgress => {
-    return getProjectProgress(buildCompletionSnapshot(persistence.document))
-  })
-
-  function writeProject(next: Project): void {
-    persistence.patchProject(normalizeProject(next))
+  function setName(name: string): void {
+    project.value = {
+      ...project.value,
+      name,
+      updatedAt: new Date().toISOString(),
+    }
   }
 
-  function setName(value: string): void {
-    writeProject({ ...project.value, name: value })
+  function setPosition(phase: PhaseKey, formKey: string): void {
+    project.value = {
+      ...project.value,
+      currentPhase: phase,
+      currentFormKey: formKey,
+      updatedAt: new Date().toISOString(),
+    }
   }
 
-  function setBriefTitle(value: string): void {
-    writeProject({ ...project.value, briefTitle: value })
+  function touch(): void {
+    project.value = {
+      ...project.value,
+      updatedAt: new Date().toISOString(),
+    }
   }
 
-  function setBriefDescription(value: string): void {
-    writeProject({ ...project.value, briefDescription: value })
+  function hydrate(next: ProjectState): void {
+    project.value = next
   }
 
-  function patchBrief(patch: Partial<Pick<Project, 'briefTitle' | 'briefDescription'>>): void {
-    writeProject({ ...project.value, ...patch })
-  }
-
-  function setStep(step: number): void {
-    if (step < 1 || step > 5) return
-    writeProject({ ...project.value, currentStep: step })
-  }
-
-  function setExperienceMode(mode: Project['experienceMode']): void {
-    writeProject({ ...project.value, experienceMode: mode })
-  }
-
-  function reset(): void {
-    persistence.patchProject(createDefaultProject())
-  }
-
-  return {
-    project,
-    name,
-    briefTitle,
-    briefDescription,
-    currentStep,
-    experienceMode,
-    isJuniorMode,
-    schemaVersion,
-    currentStepMeta,
-    hasBrief,
-    completionProgress,
-    setName,
-    setBriefTitle,
-    setBriefDescription,
-    patchBrief,
-    setStep,
-    setExperienceMode,
-    reset,
-  }
+  return { project, setName, setPosition, touch, hydrate }
 })

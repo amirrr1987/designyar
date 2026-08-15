@@ -1,55 +1,60 @@
-import type { CompetitorRow } from './competitor'
-import { isCompetitorRowArray } from './competitor'
-import type { EmpathyMapsByPersona } from './empathy-map'
-import type { Persona } from './persona'
-import { isPersonaArray } from './persona'
+import { z } from 'zod'
 
-export interface EmpathizeState {
-  researchNotes: string
-  personas: Persona[]
-  empathyMaps: EmpathyMapsByPersona
-  empathySelectedPersona: string
-  competitors: CompetitorRow[]
-}
+export const personaSchema = z.object({
+  name: z.string(),
+  role: z.string(),
+  goals: z.string(),
+  pains: z.string(),
+})
+
+export const empathyMapSchema = z.object({
+  says: z.string(),
+  thinks: z.string(),
+  does: z.string(),
+  feels: z.string(),
+})
+
+export const competitorSchema = z.object({
+  name: z.string(),
+  strength: z.string(),
+  weakness: z.string(),
+})
+
+export const empathizeStateSchema = z.object({
+  researchGoal: z.string(),
+  persona: personaSchema,
+  empathyMap: empathyMapSchema,
+  researchNotes: z.string(),
+  competitors: z.array(competitorSchema),
+})
+
+export type Persona = z.infer<typeof personaSchema>
+export type EmpathyMap = z.infer<typeof empathyMapSchema>
+export type Competitor = z.infer<typeof competitorSchema>
+export type EmpathizeState = z.infer<typeof empathizeStateSchema>
 
 export function createDefaultEmpathizeState(): EmpathizeState {
   return {
+    researchGoal: '',
+    persona: { name: '', role: '', goals: '', pains: '' },
+    empathyMap: { says: '', thinks: '', does: '', feels: '' },
     researchNotes: '',
-    personas: [],
-    empathyMaps: {},
-    empathySelectedPersona: 'general',
-    competitors: [],
+    competitors: [{ name: '', strength: '', weakness: '' }],
   }
 }
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
-}
+export const researchGoalAiSchema = z.object({
+  researchGoal: z.string(),
+})
 
-function isEmpathyMaps(value: unknown): value is EmpathyMapsByPersona {
-  if (!isRecord(value)) return false
-  return Object.values(value).every((entry) => {
-    if (!isRecord(entry)) return false
-    const q = entry.quadrants
-    if (!isRecord(q)) return false
-    return (
-      typeof entry.personaId === 'string' &&
-      typeof entry.updatedAt === 'string' &&
-      typeof q.says === 'string' &&
-      typeof q.thinks === 'string' &&
-      typeof q.does === 'string' &&
-      typeof q.feels === 'string'
-    )
-  })
-}
+export const personaAiSchema = personaSchema
 
-export function isEmpathizeState(value: unknown): value is EmpathizeState {
-  if (!isRecord(value)) return false
-  return (
-    typeof value.researchNotes === 'string' &&
-    isPersonaArray(value.personas) &&
-    isEmpathyMaps(value.empathyMaps) &&
-    typeof value.empathySelectedPersona === 'string' &&
-    isCompetitorRowArray(value.competitors)
-  )
-}
+export const empathyMapAiSchema = empathyMapSchema
+
+export const researchNotesAiSchema = z.object({
+  researchNotes: z.string(),
+})
+
+export const competitorsAiSchema = z.object({
+  competitors: z.array(competitorSchema).min(1),
+})

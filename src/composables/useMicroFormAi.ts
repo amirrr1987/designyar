@@ -1,0 +1,71 @@
+import { computed, ref, type Ref } from 'vue'
+import type { z } from 'zod'
+import { runAiFormAssist } from '@/composables/useAiFormAssist'
+import { useAiStore } from '@/stores/ai'
+import { useProjectStore } from '@/stores/project'
+import type { AiAssistMode } from '@/types/ai'
+import type { DesignThinkingStepKey } from '@/constants/design-thinking-steps'
+import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
+
+export interface UseMicroFormAiOptions<TSchema extends z.ZodType> {
+  schema: TSchema
+  formTitle: string
+  phase: DesignThinkingStepKey
+  getCurrentValue: () => z.infer<TSchema>
+  extraContext?: () => string
+}
+
+export function useMicroFormAi<TSchema extends z.ZodType>(
+  options: UseMicroFormAiOptions<TSchema>,
+) {
+  const projectStore = useProjectStore()
+  const aiStore = useAiStore()
+
+  const loading = ref(false)
+  const errorMessage = ref('')
+  const preview = ref<z.infer<TSchema> | null>(null) as Ref<z.infer<TSchema> | null>
+
+  const phaseTitle = computed(() => {
+    const step = DESIGN_THINKING_STEPS.find((item) => item.key === options.phase)
+    return step?.title ?? options.phase
+  })
+
+  async function requestAssist(mode: AiAssistMode): Promise<void> {
+    loading.value = true
+    errorMessage.value = ''
+    preview.value = null
+    aiStore.clearLastError()
+
+    try {
+      const current = options.getCurrentValue()
+      const { data } = await runAiFormAssist({
+        schema: options.schema,
+        mode,
+        formTitle: options.formTitle,
+        phaseTitle: phaseTitle.value,
+        projectName: projectStore.project.name,
+        currentJson: JSON.stringify(current, null, 2),
+        extraContext: options.extraContext?.(),
+      })
+      preview.value = data
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e)
+      errorMessage.value = message
+      aiStore.setLastError(message)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  function clearPreview(): void {
+    preview.value = null
+  }
+
+  return {
+    loading,
+    errorMessage,
+    preview,
+    requestAssist,
+    clearPreview,
+  }
+}

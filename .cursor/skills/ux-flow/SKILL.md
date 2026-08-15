@@ -1,130 +1,126 @@
 ---
 name: ux-flow
 description: >
-  Builds the UX Flow Design Thinking helper (ui-ux-ai) client-side app — Vue 3, Pinia,
-  Vue Router, VueUse, Groq via AI SDK, Persian RTL UI. Use when working on UX Flow,
-  Design Thinking phases (Empathize, Define, Ideate, Prototype, Test), Groq, LocalStorage
-  persistence, project setup phases, or when the user mentions UX Flow / دیزاین یار.
+  Builds Designyar (دیزاین یار) — Design Thinking as simple one-job micro-forms
+  with per-form AI improve/complete (Groq). Vue 3, Pinia, Vue Router, VueUse,
+  AI SDK. Use for UX Flow / دیزاین یار / Empathize–Test / AI form assist.
 ---
 
-# UX Flow — project workflow
+# Designyar (دیزاین یار) — product workflow
 
-Client-only Vue app for Design Thinking. Package name: `ui-ux-ai`.
+Client-only Vue SPA (`ui-ux-ai`). Design Thinking → **فرم‌های ساده، مرحله‌ای، تک‌کاره**؛ در هر فرم دکمه **بهبود / تکمیل با AI**.
 
-Stack skills (read as needed): [vue](../vue/SKILL.md) · [ant-design-vue](../ant-design-vue/SKILL.md) · [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) · [ant-design-colors](../ant-design-colors/SKILL.md) · [tailwindcss](../tailwindcss/SKILL.md) · [vueuse-core](../vueuse-core/SKILL.md) · [pinia](../pinia/SKILL.md) · [vue-router](../vue-router/SKILL.md) · [zod](../zod/SKILL.md) · [ai](../ai/SKILL.md) · [ai-sdk-groq](../ai-sdk-groq/SKILL.md) · [ai-sdk-vue](../ai-sdk-vue/SKILL.md) · [groq-sdk](../groq-sdk/SKILL.md) (legacy `src/ai/` only).
+Stack skills: [vue](../vue/SKILL.md) · [ant-design-vue](../ant-design-vue/SKILL.md) · [ant-design-icons-vue](../ant-design-icons-vue/SKILL.md) · [ant-design-colors](../ant-design-colors/SKILL.md) · [tailwindcss](../tailwindcss/SKILL.md) · [vueuse-core](../vueuse-core/SKILL.md) · [pinia](../pinia/SKILL.md) · [vue-router](../vue-router/SKILL.md) · [zod](../zod/SKILL.md) · [ai](../ai/SKILL.md) · [ai-sdk-groq](../ai-sdk-groq/SKILL.md) · [ai-sdk-vue](../ai-sdk-vue/SKILL.md) · [groq-sdk](../groq-sdk/SKILL.md) (legacy `src/ai/` only).
 
-**Compose / full-safe TS:** start with [ux-flow-compose](../ux-flow-compose/SKILL.md) (skill load map + typing contracts). Project role rule: `.cursor/rules/full-safe-type-ts.mdc`.
+**Compose / full-safe TS:** [ux-flow-compose](../ux-flow-compose/SKILL.md). Rule: `.cursor/rules/full-safe-type-ts.mdc`.
 
-Tooling skills: [vite](../vite/SKILL.md) · [vitejs-plugin-vue](../vitejs-plugin-vue/SKILL.md) · [tailwindcss-vite](../tailwindcss-vite/SKILL.md) · [vite-plugin-vue-devtools](../vite-plugin-vue-devtools/SKILL.md) · [typescript](../typescript/SKILL.md) · [vue-tsc](../vue-tsc/SKILL.md) · [vue-tsconfig](../vue-tsconfig/SKILL.md) · [tsconfig-node24](../tsconfig-node24/SKILL.md) · [types-node](../types-node/SKILL.md) · [eslint](../eslint/SKILL.md) · [eslint-plugin-vue](../eslint-plugin-vue/SKILL.md) · [vue-eslint-config-typescript](../vue-eslint-config-typescript/SKILL.md) · [vue-eslint-parser](../vue-eslint-parser/SKILL.md) · [eslint-config-prettier](../eslint-config-prettier/SKILL.md) · [eslint-plugin-oxlint](../eslint-plugin-oxlint/SKILL.md) · [oxlint](../oxlint/SKILL.md) · [oxfmt](../oxfmt/SKILL.md) · [npm-run-all2](../npm-run-all2/SKILL.md) · [jiti](../jiti/SKILL.md).
+**Phase end:** [keep-a-changelog](../keep-a-changelog/SKILL.md).
 
-**Phase end:** always run [keep-a-changelog](../keep-a-changelog/SKILL.md) — SemVer `package.json` + Keep a Changelog `CHANGELOG.md`.
+## Product principles
+
+1. **One job per screen** — هر micro-form فقط یک کار اصلی.
+2. **Progressive disclosure** — جزئیات پیشرفته در مرحلهٔ بعد یا مخفی.
+3. **Soft guidance** — راهنمایی بله؛ قفل سخت خیر (بدون SoftGate / shell پیچیده).
+4. **AI = assist** — پیشنهاد می‌دهد؛ کاربر Accept / Edit / Reject می‌کند.
+5. **Persian UX writing** — کوتاه، روشن؛ jargon انگلیسی فقط وقتی لازم.
+6. **WCAG-oriented** — label، keyboard، contrast؛ [wcag-antdv](../wcag-antdv/SKILL.md) + [persian-rtl](../persian-rtl/SKILL.md).
+
+## Out of scope (PO confirmed)
+
+| Area | Status |
+|------|--------|
+| Native mobile (RN/Flutter/…) | ❌ نه — فقط responsive وب |
+| Backend / auth server / sync API | ❌ نه — LocalStorage + Groq کلاینت |
+| WebLLM / Next.js `app/api/chat` | ❌ استفاده نمی‌شود |
+| SoftGate / PhaseShell / dashboard شلوغ | ❌ نه — wizard تک‌کاره |
+| DevOps سروری فراتر از static SPA | ❌ نه — `vercel.json` rewrite کافی است |
 
 ## Critical behavior
 
-1. **No SFC `<style>`** — antdv components + Tailwind utilities ([tailwindcss](../tailwindcss/SKILL.md); skip Preflight).
-2. **Command confirmation** — before any terminal command (`npm`, `pnpm`, git network, etc.), show the exact command and **wait** for user `✅` / confirmation. Do not run it first.
-3. **Step-by-step** — finish one module/phase before the next; announce what you build; ask before continuing.
-4. **No backend** — browser only; LocalStorage + Groq (client). No `@mlc-ai/web-llm`.
-5. **Persian UI** + RTL everywhere user-facing.
-6. **TypeScript** + Composition API + `<script setup>` for all Vue/TS files.
+1. **No SFC `<style>`** — antdv + Tailwind utilities ([tailwindcss](../tailwindcss/SKILL.md)).
+2. **Command confirmation** — show command → wait ✅ (agent never runs Shell).
+3. **Step-by-step** — یک فاز/micro-phase؛ اعلام کن؛ قبل از بعدی بپرس.
+4. **No backend** — browser only; LocalStorage + Groq client.
+5. **Persian UI** + RTL.
+6. **TypeScript** + Composition API + `<script setup>`.
 
 ### Workflow loop
 
 ```
-1. Announce what you're about to build
-2. If terminal needed → show command → WAIT for confirmation
-3. After confirmation → continue
-4. Show / write the file
-5. When the phase is complete → keep-a-changelog (version + CHANGELOG)
-6. Ask to proceed to the next step / phase
+1. Announce micro-phase
+2. If terminal needed → show command → WAIT ✅
+3. Types first → store → form view → AiFormAssist
+4. When micro-phase done → ask before next
+5. Phase close → keep-a-changelog
 ```
 
 ## Tech stack (installed)
 
-From `package.json` — do **not** re-scaffold with `npm create` unless the user asks:
+Do **not** re-scaffold unless asked. See `package.json`.
 
 | Package | Role |
 |---------|------|
-| `vue` | UI framework |
-| `ant-design-vue` | UI components only |
+| `vue` | UI |
+| `ant-design-vue` | Components |
 | `@ant-design/icons-vue` | Icons |
 | `@ant-design/colors` | Color scales |
-| `@vueuse/core` | Composables / `useStorage` |
+| `@vueuse/core` | `useStorage` + utils |
 | `pinia` | State |
-| `vue-router` | Routes |
-| `tailwindcss` | Utility classes (v4 CSS-first) |
-| `@tailwindcss/vite` | Vite plugin for Tailwind |
-| `ai` | Vercel AI SDK core |
-| `@ai-sdk/groq` | Groq provider (canonical) |
-| `@ai-sdk/vue` | `useChat` / Vue composables |
-| `zod` | Runtime schemas / AI structured output |
-| `groq-sdk` | Legacy Groq client in `src/ai/` — do not add new call sites |
+| `vue-router` | Routes (wizard steps) |
+| `tailwindcss` / `@tailwindcss/vite` | Utilities |
+| `ai` / `@ai-sdk/groq` / `@ai-sdk/vue` | AI (canonical) |
+| `zod` | Schemas / AI structured output |
+| `groq-sdk` | Legacy only in `src/ai/` |
 
-Phase 0 = configure existing project files, not a new Vite app.
+## Keep / rebuild
+
+**Keep (do not rewrite casually):**
+
+- `src/App.vue`
+- `src/components/layout/AppLayout.vue` — فقط layout + `RouterView`؛ بدون SoftGate
+- `src/stores/configProvider.store.ts`
+
+**Rebuild target:** بقیهٔ `src/` از صفر روی مدل micro-form (مرحله‌ای).
 
 ## Target `src/` structure
 
 ```
 src/
 ├── components/
-│   ├── layout/          # AppHeader, AppSider, AppLayout
-│   ├── empathize/       # PersonaBuilder, PersonaCard, EmpathyMap, ResearchNotes, CompetitorTable
-│   ├── define/          # ProblemStatement, POVBuilder, HMWQuestions
-│   ├── ideate/          # BrainstormBoard, UserflowCanvas, SitemapTree, CardSorting
-│   ├── prototype/       # WireframeBuilder, ColorPalette, TypographyScale, GridConfigurator, ComponentLibrary
-│   ├── test/            # ContrastChecker, WCAGChecklist, HeuristicEval, UsabilityReport
-│   └── shared/          # AIPanel, StepProgress, ProjectDashboard
-├── ai/                  # Groq provider (legacy groq-sdk until AI SDK migration)
-├── views/               # Home, Empathize, Define, Ideate, Prototype, Test
-├── stores/              # project, persona, designSystem, ai
-├── composables/         # useAiAssist, useContrast, useWCAG, useGrid, usePersona
-├── utils/               # contrast, wcag-rules, grid-calculator, persona-templates, spacing-scale
-├── constants/           # design-thinking-steps, wcag-checklist, heuristic-rules, color-presets
+│   ├── layout/           # AppLayout (kept), AppHeader, AppSider (minimal)
+│   ├── forms/            # one folder per DT phase
+│   │   ├── empathize/    # PersonaForm, EmpathyMapForm, …
+│   │   ├── define/
+│   │   ├── ideate/
+│   │   ├── prototype/
+│   │   └── test/
+│   └── shared/           # AiFormAssist, FormStepNav, StepProgress
+├── ai/                   # migrate to AI SDK; legacy groq-sdk until touched
+├── views/                # thin route shells → host current micro-form
+├── stores/               # project, phase stores, ai prefs; + configProvider (kept)
+├── composables/          # useAiFormAssist, …
+├── utils/                # prompts, parsers, a11y helpers
+├── constants/            # design-thinking-steps, form registry
+├── types/                # domain first
 ├── router/index.ts
-├── App.vue
+├── App.vue               # kept
 └── main.ts
 ```
 
-## Phases (build order)
+**Forbidden product patterns:** SoftGateModal، PhaseShell قفل‌کننده، داشبورد شلوغ چندوظیفه، `AIPanel` سراسری بدون اتصال به فرم.
 
-### Phase 0 — Project setup
-- Wire `reset.css`, Pinia, router, RTL/`lang=fa`
-- `ConfigProvider` + named antdv imports (antdv skill)
-- Router for 5 Design Thinking steps + home
-- Pinia store shells + VueUse readiness
+## Micro-form contract
 
-### Phase 1 — Layout & navigation
-- `Layout` / sider / header
-- `Menu` for 5 steps
-- `Steps` progress
-- RTL
+هر micro-form:
 
-### Phase 2 — Empathize (همدلی)
-- Persona form (`Form`, `Input`, `Select`, `InputNumber`)
-- Templates, empathy map (`Card` + `Row`/`Col`), research notes, competitor `Table`
-
-### Phase 3 — Define (تعریف مسئله)
-- Problem statement, POV, HMW list (`List` + `Input`)
-
-### Phase 4 — Ideate (ایده‌پردازی)
-- Brainstorm (`Card` + `Tag`), userflow, sitemap `Tree`, card sorting (`Transfer` / VueUse DnD)
-
-### Phase 5 — Prototype (پروتوتایپ)
-- Color palette, typography scale (`Slider`), grid calculator, spacing (8pt), component checklist
-
-### Phase 6 — Test (تست)
-- Contrast checker, WCAG checklist, heuristic eval (`Rate` + `Form`), usability report
-
-### Phase 7 — AI assist (Groq)
-- `AIPanel` + composable wrapping [ai](../ai/SKILL.md) / [ai-sdk-groq](../ai-sdk-groq/SKILL.md)
-- Existing `src/ai/groq-provider.ts` is [groq-sdk](../groq-sdk/SKILL.md) legacy — migrate when touching it
-- Features: persona suggestions, note analysis, UX tips, microcopy, summaries
-- Structured JSON: [zod](../zod/SKILL.md) + `Output.object`
-
-### Phase 8 — Persistence & export
-- `useStorage` for all modules
-- JSON export/import
-- Auto-save
+| Element | Rule |
+|---------|------|
+| Title | یک خط — کار فعلی |
+| Hint | یک جمله UX Writer |
+| Fields | حداقل ضروری |
+| Primary CTA | ذخیره / بعدی |
+| AI CTA | «بهبود با AI» یا «تکمیل با AI» |
+| AI preview | Accept / Edit / Reject — بدون overwrite خاموش |
 
 ## Design Thinking steps
 
@@ -133,34 +129,58 @@ src/
 export const DESIGN_THINKING_STEPS = [
   { key: 'empathize', title: 'همدلی', icon: 'HeartOutlined', description: 'درک کاربر و نیازهای او', route: '/empathize', color: '#f5222d' },
   { key: 'define', title: 'تعریف مسئله', icon: 'AimOutlined', description: 'تعریف دقیق مسئله و دیدگاه کاربر', route: '/define', color: '#fa8c16' },
-  { key: 'ideate', title: 'ایده‌پردازی', icon: 'BulbOutlined', description: 'تولید ایده و طراحی معماری اطلاعات', route: '/ideate', color: '#fadb14' },
-  { key: 'prototype', title: 'پروتوتایپ', icon: 'ExperimentOutlined', description: 'ساخت نمونه اولیه و دیزاین سیستم', route: '/prototype', color: '#52c41a' },
-  { key: 'test', title: 'تست', icon: 'CheckCircleOutlined', description: 'ارزیابی و تست کاربردپذیری', route: '/test', color: '#1890ff' },
-]
+  { key: 'ideate', title: 'ایده‌پردازی', icon: 'BulbOutlined', description: 'تولید ایده و معماری اطلاعات', route: '/ideate', color: '#fadb14' },
+  { key: 'prototype', title: 'پروتوتایپ', icon: 'ExperimentOutlined', description: 'نمونه اولیه و دیزاین سیستم', route: '/prototype', color: '#52c41a' },
+  { key: 'test', title: 'تست', icon: 'CheckCircleOutlined', description: 'ارزیابی کاربردپذیری', route: '/test', color: '#1890ff' },
+] as const
 ```
 
-Map icon string names to components from `@ant-design/icons-vue`.
+Map icon names → `@ant-design/icons-vue`.
 
-## Persistence (VueUse)
+### Suggested micro-forms (build order inside each phase)
 
-Use `useStorage` from `@vueuse/core` for **all** persistence:
+| Phase | Micro-forms (one job each) |
+|-------|----------------------------|
+| Empathize | هدف پژوهش → پرسونا → نقشه همدلی → یادداشت → رقبا |
+| Define | بیانیه مسئله → POV → HMW |
+| Ideate | طوفان فکری → جریان کاربر → سایت‌مپ → کارت‌سورت |
+| Prototype | رنگ → تایپ → گرید → فاصله → وایرفریم/چک‌لیست |
+| Test | کنتراست → WCAG → هیوریستیک → گزارش |
+
+## Build phases (agent order)
+
+### Phase 0 — Foundation
+- `main.ts`, router shell, reset/fonts, Pinia
+- Keep App / AppLayout / configProvider
+- Form registry + empty routes
+
+### Phase 1 — Layout & wizard chrome
+- Minimal header/sider یا step indicator
+- `FormStepNav` + `StepProgress`
+- RTL
+
+### Phase 2–6 — Empathize → Test
+- Types → store (`useStorage`) → one micro-form at a time → AiFormAssist
+
+### Phase 7 — AI assist (Groq)
+- Shared `AiFormAssist` + composable: [ai](../ai/SKILL.md) + [ai-sdk-groq](../ai-sdk-groq/SKILL.md)
+- Structured output: [zod](../zod/SKILL.md)
+- Per-form prompts in `utils/ai-prompts.ts`
+
+### Phase 8 — Persistence & export
+- Typed snapshot export/import + auto-save via stores
+
+## Persistence
 
 ```ts
 import { useStorage } from '@vueuse/core'
 
-const personas = useStorage('ux-flow-personas', [])
-const project = useStorage('ux-flow-project', {
-  name: '',
-  currentStep: 1,
-  createdAt: new Date().toISOString(),
-})
+const personas = useStorage<Persona[]>('ux-flow-personas', [])
 ```
 
-Prefer Pinia stores that wrap `useStorage` so UI and AI share one source of truth.
+Prefer Pinia wrapping `useStorage` so UI و AI یک منبع حقیقت دارند.
 
 ## AI assist (canonical)
-
-New AI work uses `ai` + `@ai-sdk/groq` (not WebLLM, not new `groq-sdk` files):
 
 ```ts
 import { streamText } from 'ai'
@@ -169,43 +189,29 @@ import { createGroq } from '@ai-sdk/groq'
 const groq = createGroq({
   apiKey: import.meta.env.VITE_GROQ_API_KEY,
 })
-
-export async function streamAssist(prompt: string, onDelta: (t: string) => void): Promise<string> {
-  const key = import.meta.env.VITE_GROQ_API_KEY
-  if (typeof key !== 'string' || key.length === 0) {
-    throw new Error('VITE_GROQ_API_KEY تنظیم نشده')
-  }
-  const result = streamText({
-    model: groq('llama-3.3-70b-versatile'),
-    prompt,
-  })
-  let full = ''
-  for await (const delta of result.textStream) {
-    full += delta
-    onDelta(full)
-  }
-  return full
-}
 ```
 
-Legacy `src/ai/groq-provider.ts` stays until migrated — see [groq-sdk](../groq-sdk/SKILL.md).
+- Input: پروژه + دادهٔ همان فرم + فاز
+- Output: Zod schema هم‌شکل state فرم
+- Errors: پیام فارسی؛ بدون WebLLM
+
+Legacy `src/ai/groq-provider.ts` — تا مهاجرت؛ call site جدید ممنوع.
 
 ## Success criteria
 
-- [ ] Runs entirely in the browser
-- [ ] Only antdv for UI (no custom CSS)
-- [ ] RTL Persian interface
-- [ ] Data in LocalStorage
-- [ ] Five Design Thinking stages + navigation
-- [ ] Groq assistance panel (AI SDK; legacy groq-sdk only in `src/ai/`)
-- [ ] Static deployable (Vercel / Netlify / GitHub Pages)
-- [ ] Responsive via `Row` / `Col`
+- [ ] Browser-only SPA
+- [ ] antdv + Tailwind؛ بدون `<style>`
+- [ ] RTL فارسی
+- [ ] LocalStorage
+- [ ] پنج فاز DT به‌صورت micro-form
+- [ ] AI improve/complete روی هر فرم با Accept
+- [ ] Static deploy
+- [ ] Responsive (`Row`/`Col` + Tailwind)
 
 ## Reminders
 
-1. Always ask before terminal commands
-2. Never write custom CSS — antdv props only
-3. Build one component / file at a time (unless user asks for a batch)
-4. Test each phase before moving on
-5. Persian copy; TypeScript; `<script setup>`
-6. End of each phase → [keep-a-changelog](../keep-a-changelog/SKILL.md) (SemVer + CHANGELOG)
+1. Ask before terminal commands
+2. One micro-form / file batch per approval
+3. Types first
+4. Phase end → changelog
+5. Chat با کاربر فارسی؛ کد انگلیسی

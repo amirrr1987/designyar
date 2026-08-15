@@ -1,0 +1,20 @@
+---
+description: Prefer official @Docs for antdv, AI SDK, Vue, Pinia, Zod, Tailwind, Vite
+alwaysApply: false
+globs: src/**/*.{ts,vue}
+---
+
+# Official docs first
+
+When unsure of an API, prefer Cursor **@Docs** / official docs over inventing types:
+
+| Stack | Docs |
+| ----- | ---- |
+| UI | ant-design-vue (antdv.com) |
+| AI | ai-sdk.dev + Groq provider page |
+| Vue / Pinia / VueUse | vuejs.org / pinia.vuejs.org / vueuse.org |
+| Schemas | zod.dev |
+| CSS utilities | tailwindcss.com (v4 CSS-first) |
+| Build | vite.dev |
+
+Always use **package TypeScript exports** at call sites — never hand-roll twins of library props/config.

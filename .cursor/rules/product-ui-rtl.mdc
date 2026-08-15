@@ -1,0 +1,15 @@
+---
+description: Product UI — antdv named imports, Tailwind utilities, no SFC style, Persian RTL
+alwaysApply: true
+---
+
+# Product UI (UX Flow)
+
+- Components: named imports from `ant-design-vue`, PascalCase tags (`Button`, not `a-button`)
+- Types: `ButtonProps`, `MenuProps`, `ThemeConfig`, `FormInstance`, `Rule` from the package
+- Layout: antdv `Space` / `Row` / `Col` first; Tailwind utilities for extras
+- **No** SFC `<style>`; **no** shadcn / Radix
+- User-facing copy: Persian; `ConfigProvider` RTL / `fa_IR`
+- Tailwind RTL: `ms-*` `me-*` `ps-*` `pe-*` `start-*` `end-*` `text-start` — not `ml-*`/`mr-*` for layout
+- Fonts: Vazirmatn via existing CSS entry — do not add Inter/Roboto stacks
+- Icons: `@ant-design/icons-vue` only

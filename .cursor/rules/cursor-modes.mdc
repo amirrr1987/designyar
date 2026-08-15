@@ -1,0 +1,15 @@
+---
+description: Prefer Plan for large phases; Ask for read-only; Debug for bugs; Agent to implement
+alwaysApply: true
+---
+
+# Cursor modes (UX Flow)
+
+| Situation | Mode |
+| --------- | ---- |
+| Multi-file phase / architecture trade-offs | **Plan** first, then Agent |
+| Question only / explain code | **Ask** (no edits) |
+| Reproduce / root-cause bug | **Debug** when available |
+| Approved implementation | **Agent** |
+
+Slash helpers: `/plan-phase`, `/ask`, `/debug`. Do not start a huge phase in Agent without a short plan announcement.

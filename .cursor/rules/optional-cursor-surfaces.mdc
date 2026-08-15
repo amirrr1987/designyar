@@ -1,0 +1,14 @@
+---
+description: When to use Canvas, Automations, Loop, Cloud agents — optional Cursor surfaces
+alwaysApply: true
+---
+
+# Optional Cursor surfaces
+
+- **Canvas**: only for standalone audits (`/canvas-audit`) — not for routine UI code
+- **Automations**: only if user asks (`/automations`) — Agents Window finish path
+- **Loop**: session QA (`/loop-qa`) — no background shell loops (Shell denied)
+- **Cloud / background agents**: only if user asks (`/cloud-agent`)
+- **Notepads**: `.cursor/notepads/` via `/notepad`
+- **Autopilot / Split PRs / Bugbot / Security**: `/autopilot-pr` `/split-prs` `/bugbot` `/security-review`
+- **Memories**: `/memory` — personal; never store API keys

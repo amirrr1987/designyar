@@ -1,40 +1,26 @@
-export type ContrastLevel = 'AAA' | 'AA' | 'fail'
+/** Relative luminance helpers for contrast checks (WCAG). */
 
-export interface ContrastResult {
-  ratio: number
-  level: ContrastLevel
+function parseHex(color: string): { r: number; g: number; b: number } | null {
+  const normalized = color.trim().replace('#', '')
+  if (!/^[0-9a-fA-F]{6}$/.test(normalized)) return null
+  const r = Number.parseInt(normalized.slice(0, 2), 16)
+  const g = Number.parseInt(normalized.slice(2, 4), 16)
+  const b = Number.parseInt(normalized.slice(4, 6), 16)
+  if (Number.isNaN(r) || Number.isNaN(g) || Number.isNaN(b)) return null
+  return { r, g, b }
 }
 
-/** Parse `#rgb` / `#rrggbb` to 0–1 RGB channels. */
-export function parseHexColor(hex: string): { r: number; g: number; b: number } | null {
-  const raw = hex.trim().replace(/^#/, '')
-  if (!/^[0-9a-fA-F]{3}$|^[0-9a-fA-F]{6}$/.test(raw)) return null
-
-  const full =
-    raw.length === 3
-      ? raw
-          .split('')
-          .map((c) => `${c}${c}`)
-          .join('')
-      : raw
-
-  const r = Number.parseInt(full.slice(0, 2), 16)
-  const g = Number.parseInt(full.slice(2, 4), 16)
-  const b = Number.parseInt(full.slice(4, 6), 16)
-  if ([r, g, b].some((n) => Number.isNaN(n))) return null
-  return { r: r / 255, g: g / 255, b: b / 255 }
+function channelToLinear(channel: number): number {
+  const c = channel / 255
+  return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
 }
 
-function channelLuminance(c: number): number {
-  return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
-}
-
-export function relativeLuminance(hex: string): number | null {
-  const rgb = parseHexColor(hex)
+function relativeLuminance(hex: string): number | null {
+  const rgb = parseHex(hex)
   if (!rgb) return null
-  const r = channelLuminance(rgb.r)
-  const g = channelLuminance(rgb.g)
-  const b = channelLuminance(rgb.b)
+  const r = channelToLinear(rgb.r)
+  const g = channelToLinear(rgb.g)
+  const b = channelToLinear(rgb.b)
   return 0.2126 * r + 0.7152 * g + 0.0722 * b
 }
 
@@ -47,15 +33,6 @@ export function contrastRatio(foreground: string, background: string): number | 
   return (lighter + 0.05) / (darker + 0.05)
 }
 
-export function contrastLevel(ratio: number): ContrastLevel {
-  if (ratio >= 7) return 'AAA'
-  if (ratio >= 4.5) return 'AA'
-  return 'fail'
-}
-
-export function evaluateContrast(foreground: string, background: string): ContrastResult | null {
-  const ratio = contrastRatio(foreground, background)
-  if (ratio === null) return null
-  const rounded = Math.round(ratio * 100) / 100
-  return { ratio: rounded, level: contrastLevel(rounded) }
+export function meetsWcagAa(ratio: number, largeText = false): boolean {
+  return largeText ? ratio >= 3 : ratio >= 4.5
 }

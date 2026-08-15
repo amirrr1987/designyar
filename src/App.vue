@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import { ConfigProvider } from 'ant-design-vue'
-import faIR from 'ant-design-vue/es/locale/fa_IR'
 import AppLayout from '@/components/layout/AppLayout.vue'
-import { appTheme } from '@/theme/app-theme'
+import { useConfigProviderStore } from './stores/configProvider.store'
+
+const configProviderStore = useConfigProviderStore()
 </script>
 
 <template>
-  <ConfigProvider :locale="faIR" direction="rtl" component-size="middle" :theme="appTheme">
+  <ConfigProvider
+    :locale="configProviderStore.locale"
+    :direction="configProviderStore.direction"
+    :component-size="configProviderStore.componentSize"
+    :theme="configProviderStore.theme"
+  >
     <AppLayout />
   </ConfigProvider>
 </template>

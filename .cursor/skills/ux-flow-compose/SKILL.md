@@ -24,6 +24,8 @@ You are a **full-safe TypeScript** Vue engineer for UX Flow:
 
 Also obey project rule `.cursor/rules/full-safe-type-ts.mdc`.
 
+Repo contract: [`AGENTS.md`](../../../AGENTS.md). Cursor kit: rules, hooks (shell deny), commands, `ux-flow-reviewer` agent.
+
 ## Package interfaces mandate (every npm skill)
 
 Each skill under `.cursor/skills/` that documents an **npm package** must drive code that **fully uses that package’s TypeScript surface** — props, return types, config types, event payloads, generics. Do not invent parallel interfaces.
@@ -127,8 +129,12 @@ When editing any npm-package skill, keep a **Package interfaces (mandatory)** se
 | Brand / voice | [brand](../brand/SKILL.md) |
 | Logo / CIP / icons | [design](../design/SKILL.md) |
 | UX patterns catalog | [ui-ux-pro-max](../ui-ux-pro-max/SKILL.md) |
+| Persian RTL UI | [persian-rtl](../persian-rtl/SKILL.md) |
+| WCAG / a11y Test phase | [wcag-antdv](../wcag-antdv/SKILL.md) |
 | HTML slides / banners | [slides](../slides/SKILL.md) / [banner-design](../banner-design/SKILL.md) — artifacts outside `src/` |
 | End of a coding block | [phase-wrap-up-commit](../phase-wrap-up-commit/SKILL.md) |
+
+Repo Cursor kit (commands, hooks, agents): [`AGENTS.md`](../../../AGENTS.md).
 
 Every **runtime/devDependency in `package.json`** has a skill in B or C. Do not invent skills for packages that are not installed. Do not teach `@mlc-ai/web-llm` — it is not a dependency.
 
@@ -137,16 +143,16 @@ Load **only** skills relevant to the current task after the product + typing bas
 ## Feature workflow (compose)
 
 ```
-1. Announce module (ux-flow phase)
+1. Announce micro-phase (one-job form per ux-flow)
 2. If terminal needed → show command → WAIT for ✅
 3. Read domain skills (vue + pinia + antdv + …)
-4. Define types FIRST (models, props, store state, API shapes)
-5. Implement with named antdv imports / PascalCase tags
+4. Define types FIRST (models, props, store state, Zod AI shapes)
+5. Implement form + AiFormAssist with named antdv / PascalCase
 6. Persist via useStorage inside Pinia (typed generics)
 7. Run type-check mindset: code must pass vue-tsc --build
 8. End of work → load phase-wrap-up-commit (phase status + commit message text)
 9. Phase done → load keep-a-changelog (SemVer + CHANGELOG.md)
-10. Ask before next file/phase
+10. Ask before next micro-form / phase
 ```
 
 ## Full-safe type contracts
@@ -246,3 +252,7 @@ Before calling a step done:
 - Hand-rolled `localStorage` instead of VueUse
 - New `groq-sdk` call sites / WebLLM / Next.js `app/api/chat` instead of `ai` + `@ai-sdk/groq` (legacy Groq client: [groq-sdk](../groq-sdk/SKILL.md))
 - Disabling strictness in tsconfig to silence errors
+- SoftGate / PhaseShell / multi-job dashboards instead of one-job micro-forms ([ux-flow](../ux-flow/SKILL.md))
+- Silent AI overwrite without Accept / Edit / Reject
+- Rewriting kept cores casually: `App.vue`, `AppLayout.vue`, `configProvider.store.ts`
+- Native mobile / backend sync — out of scope unless PO explicitly expands

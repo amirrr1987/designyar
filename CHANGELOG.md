@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.0] - 2026-08-15
+
+### Added
+
+- **Micro-form wizard:** Design Thinking as one-job forms (Empathize → Test) with prev/next
+- **AiFormAssist** on every form — improve/complete via `ai` + `@ai-sdk/groq` + Zod; Accept/Reject
+- Form registry, WizardChrome, StepProgress; Home project name + JSON export/import (client backup until backend)
+- Cursor contract: `designyar-product` rule, ux-flow skill aligned to micro-forms
+
+### Changed
+
+- Rebuilt `src/` around micro-forms; kept `App.vue`, `AppLayout.vue`, `configProvider.store.ts`
+- LocalStorage keys moved to `designyar:*` (previous keys not migrated)
+
+### Removed
+
+- SoftGate / PhaseShell dashboard flow and legacy multi-tool phase UIs
+
 ## [0.30.0] - 2026-08-11
 
 ### Added

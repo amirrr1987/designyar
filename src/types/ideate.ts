@@ -1,93 +1,41 @@
-export interface IdeaCard {
-  id: string
-  title: string
-  detail: string
-  votes: number
-  tags: string[]
-  createdAt: string
-}
+import { z } from 'zod'
 
-export type FlowNodeKind = 'start' | 'action' | 'decision' | 'end'
+export const cardGroupSchema = z.object({
+  name: z.string(),
+  items: z.array(z.string()),
+})
 
-export interface FlowNode {
-  id: string
-  kind: FlowNodeKind
-  label: string
-  /** Optional next node id for linear/decision edges. */
-  nextId?: string
-}
+export const ideateStateSchema = z.object({
+  ideas: z.array(z.string()),
+  userflow: z.string(),
+  sitemap: z.string(),
+  cardSort: z.array(cardGroupSchema),
+})
 
-export interface SitemapNode {
-  key: string
-  title: string
-  children?: SitemapNode[]
-}
+export type CardGroup = z.infer<typeof cardGroupSchema>
+export type IdeateState = z.infer<typeof ideateStateSchema>
 
-export interface SortCard {
-  id: string
-  label: string
-}
-
-export interface SortCategory {
-  id: string
-  title: string
-  cardIds: string[]
-}
-
-export interface CardSortState {
-  cards: SortCard[]
-  categories: SortCategory[]
-  /** Cards not yet assigned to a category. */
-  unassignedIds: string[]
-}
-
-export function createEmptyCardSortState(): CardSortState {
+export function createDefaultIdeateState(): IdeateState {
   return {
-    cards: [],
-    categories: [
-      { id: 'cat-must', title: 'باید باشد', cardIds: [] },
-      { id: 'cat-should', title: 'بهتر است باشد', cardIds: [] },
-      { id: 'cat-could', title: 'می‌تواند باشد', cardIds: [] },
-    ],
-    unassignedIds: [],
+    ideas: [''],
+    userflow: '',
+    sitemap: '',
+    cardSort: [{ name: 'گروه ۱', items: [''] }],
   }
 }
 
-export function isIdeaCard(value: unknown): value is IdeaCard {
-  if (typeof value !== 'object' || value === null) return false
-  const v = value as Record<string, unknown>
-  return (
-    typeof v.id === 'string' &&
-    typeof v.title === 'string' &&
-    typeof v.detail === 'string' &&
-    typeof v.votes === 'number' &&
-    Array.isArray(v.tags) &&
-    v.tags.every((t) => typeof t === 'string') &&
-    typeof v.createdAt === 'string'
-  )
-}
+export const brainstormAiSchema = z.object({
+  ideas: z.array(z.string()).min(1),
+})
 
-export function isFlowNodeKind(value: unknown): value is FlowNodeKind {
-  return value === 'start' || value === 'action' || value === 'decision' || value === 'end'
-}
+export const userflowAiSchema = z.object({
+  userflow: z.string(),
+})
 
-export function isFlowNode(value: unknown): value is FlowNode {
-  if (typeof value !== 'object' || value === null) return false
-  const v = value as Record<string, unknown>
-  const nextOk = v.nextId === undefined || typeof v.nextId === 'string'
-  return typeof v.id === 'string' && isFlowNodeKind(v.kind) && typeof v.label === 'string' && nextOk
-}
+export const sitemapAiSchema = z.object({
+  sitemap: z.string(),
+})
 
-function isSitemapNode(value: unknown): value is SitemapNode {
-  if (typeof value !== 'object' || value === null) return false
-  const v = value as Record<string, unknown>
-  if (typeof v.key !== 'string' || typeof v.title !== 'string') return false
-  if (v.children === undefined) return true
-  return Array.isArray(v.children) && v.children.every(isSitemapNode)
-}
-
-export function isSitemapNodeArray(value: unknown): value is SitemapNode[] {
-  return Array.isArray(value) && value.every(isSitemapNode)
-}
-
-export { isSitemapNode }
+export const cardSortAiSchema = z.object({
+  cardSort: z.array(cardGroupSchema).min(1),
+})

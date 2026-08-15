@@ -1,90 +1,35 @@
-import { computed } from 'vue'
 import { defineStore } from 'pinia'
-import { usePersistenceStore } from '@/stores/persistence'
-import type { HeuristicEvalMap } from '@/types/heuristic-eval'
-import type { ContrastCheckRecord } from '@/types/test-state'
-import { createDefaultTestState } from '@/types/test-state'
+import { useStorage } from '@vueuse/core'
+import { STORAGE_KEYS } from '@/constants/storage-keys'
+import {
+  createDefaultTestState,
+  type ContrastPair,
+  type HeuristicItem,
+  type TestState,
+} from '@/types/test'
 
 export const useTestStore = defineStore('test', () => {
-  const persistence = usePersistenceStore()
+  const state = useStorage<TestState>(STORAGE_KEYS.test, createDefaultTestState())
 
-  const wcagChecked = computed({
-    get: () => persistence.document.test.wcagChecked,
-    set: (value: string[]) => {
-      persistence.patchTest({ wcagChecked: value })
-    },
-  })
-
-  const heuristicEval = computed({
-    get: () => persistence.document.test.heuristicEval,
-    set: (value: HeuristicEvalMap) => {
-      persistence.patchTest({ heuristicEval: value })
-    },
-  })
-
-  const usabilityReportSummary = computed({
-    get: () => persistence.document.test.usabilityReportSummary,
-    set: (value: string) => {
-      persistence.patchTest({ usabilityReportSummary: value })
-    },
-  })
-
-  const contrastCheck = computed({
-    get: () => {
-      const value = persistence.document.test.contrastCheck
-      return value !== null && value !== undefined ? value : null
-    },
-    set: (value: ContrastCheckRecord | null) => {
-      persistence.patchTest({ contrastCheck: value })
-    },
-  })
-
-  function setWcagChecked(ids: string[]): void {
-    persistence.patchTest({ wcagChecked: ids })
+  function setContrast(contrast: ContrastPair): void {
+    state.value = { ...state.value, contrast }
   }
 
-  function toggleWcag(id: string, checked: boolean): void {
-    if (checked) {
-      if (wcagChecked.value.includes(id)) return
-      persistence.patchTest({ wcagChecked: [...wcagChecked.value, id] })
-      return
-    }
-    persistence.patchTest({
-      wcagChecked: wcagChecked.value.filter((x) => x !== id),
-    })
+  function setWcag(wcag: Record<string, boolean>): void {
+    state.value = { ...state.value, wcag }
   }
 
-  function setHeuristicEval(map: HeuristicEvalMap): void {
-    persistence.patchTest({ heuristicEval: map })
+  function setHeuristics(heuristics: HeuristicItem[]): void {
+    state.value = { ...state.value, heuristics }
   }
 
-  function setUsabilityReportSummary(value: string): void {
-    persistence.patchTest({ usabilityReportSummary: value })
+  function setReport(report: string): void {
+    state.value = { ...state.value, report }
   }
 
-  function saveContrastCheck(record: ContrastCheckRecord): void {
-    persistence.patchTest({ contrastCheck: record })
+  function hydrate(next: TestState): void {
+    state.value = next
   }
 
-  function clearContrastCheck(): void {
-    persistence.patchTest({ contrastCheck: null })
-  }
-
-  function reset(): void {
-    persistence.setTest(createDefaultTestState())
-  }
-
-  return {
-    wcagChecked,
-    heuristicEval,
-    usabilityReportSummary,
-    contrastCheck,
-    setWcagChecked,
-    toggleWcag,
-    setHeuristicEval,
-    setUsabilityReportSummary,
-    saveContrastCheck,
-    clearContrastCheck,
-    reset,
-  }
+  return { state, setContrast, setWcag, setHeuristics, setReport, hydrate }
 })
