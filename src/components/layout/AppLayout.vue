@@ -2,7 +2,7 @@
 import { Layout, Space } from 'ant-design-vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppSider from '@/components/layout/AppSider.vue'
-import StepProgress from '@/components/shared/StepProgress.vue'
+import SoftGateModal from '@/components/shell/SoftGateModal.vue'
 
 const { Content } = Layout
 </script>
@@ -12,12 +12,12 @@ const { Content } = Layout
     <AppSider />
     <Layout>
       <AppHeader />
-      <Content style="overflow: auto; padding: 16px">
-        <Space direction="vertical" size="middle" style="width: 100%">
-          <StepProgress />
+      <Content style="padding: 24px; overflow: auto">
+        <Space direction="vertical" size="large" style="width: 100%">
           <RouterView />
         </Space>
       </Content>
     </Layout>
+    <SoftGateModal />
   </Layout>
 </template>

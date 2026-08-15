@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import {
+  Alert,
   Button,
   Card,
   Descriptions,
@@ -15,8 +16,10 @@ import {
   Tag,
 } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDesignSystemStore } from '@/stores/designSystem'
 import { SPACING_8PT, buildSpacingScale, toSpacingTokenRows } from '@/utils/spacing-scale'
+import { fa } from '@/content/fa'
 
 const designStore = useDesignSystemStore()
 const { spacing } = storeToRefs(designStore)
@@ -38,7 +41,14 @@ function applyCanonical8pt(): void {
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="fa.prototypeTools.spacing.alertMessage"
+      :description="fa.prototypeTools.spacing.alertDescription"
+    />
+    <AiSectionAssist action="review-design-system" label="بازبینی فاصله با AI" section="فاصله‌گذاری" />
     <Card size="small" title="فاصله‌گذاری (Spacing)">
       <Form layout="inline">
         <FormItem label="واحد پایه (px)">

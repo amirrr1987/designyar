@@ -2,11 +2,18 @@
 import { computed } from 'vue'
 import { Card, Form, FormItem, Input, InputNumber, Slider, Space, Typography } from 'ant-design-vue'
 import { storeToRefs } from 'pinia'
+import AiSectionAssist from '@/components/shared/AiSectionAssist.vue'
 import { useDesignSystemStore } from '@/stores/designSystem'
+import { useProjectStore } from '@/stores/project'
+import { fa } from '@/content/fa'
 
 const { Title, Paragraph, Text } = Typography
 const designStore = useDesignSystemStore()
+const projectStore = useProjectStore()
 const { typography } = storeToRefs(designStore)
+const copy = fa.prototypeTools.type
+const job = fa.getJob('prototype.type')
+const isJunior = computed(() => projectStore.isJuniorMode)
 
 const STEP_COUNT = 6
 
@@ -48,10 +55,21 @@ function titleLevel(index: number): 1 | 2 | 3 | 4 | 5 {
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
-    <Card size="small" title="مقیاس تایپوگرافی">
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Paragraph v-if="job && isJunior" type="secondary" style="margin-bottom: 0">
+      <Text strong>{{ fa.whyHeading }}</Text>
+      {{ ' ' }}{{ job.why }}
+    </Paragraph>
+
+    <AiSectionAssist
+      action="review-design-system"
+      :label="copy.aiLabel"
+      section="تایپوگرافی"
+    />
+
+    <Card size="small" :title="copy.tab">
       <Form layout="vertical">
-        <FormItem label="اندازه پایه (px)">
+        <FormItem :label="copy.baseSize">
           <InputNumber
             :value="typography.baseSize"
             :min="10"
@@ -59,7 +77,7 @@ function titleLevel(index: number): 1 | 2 | 3 | 4 | 5 {
             @update:value="onBaseChange"
           />
         </FormItem>
-        <FormItem :label="`نسبت مدولار (${typography.ratio})`">
+        <FormItem :label="`${copy.ratio} (${typography.ratio})`">
           <Slider
             :value="typography.ratio"
             :min="1.1"
@@ -68,13 +86,13 @@ function titleLevel(index: number): 1 | 2 | 3 | 4 | 5 {
             @update:value="onRatioChange"
           />
         </FormItem>
-        <FormItem label="فونت">
+        <FormItem v-if="!isJunior" :label="copy.font">
           <Input :value="typography.fontFamily" @update:value="onFontFamilyChange" />
         </FormItem>
       </Form>
     </Card>
 
-    <Card size="small" title="پیش‌نمایش">
+    <Card size="small" :title="copy.preview">
       <Space direction="vertical">
         <Space
           v-for="(size, index) in previewSteps"

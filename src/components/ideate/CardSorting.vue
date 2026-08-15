@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import {
+  Alert,
   Button,
   Card,
   Col,
@@ -18,7 +19,9 @@ import {
 } from 'ant-design-vue'
 import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue'
 import { storeToRefs } from 'pinia'
+import AiAssistButton from '@/components/shared/AiAssistButton.vue'
 import { useIdeateStore } from '@/stores/ideate'
+import { fa } from '@/content/fa'
 
 const ideateStore = useIdeateStore()
 const { cardSort } = storeToRefs(ideateStore)
@@ -86,7 +89,15 @@ function currentCategoryId(cardId: string): string | undefined {
 </script>
 
 <template>
-  <Space direction="vertical" size="large">
+  <Space direction="vertical" size="large" style="width: 100%">
+    <Alert
+      type="info"
+      show-icon
+      :message="`${fa.optionalLabel}: ${fa.ideateTools.cardsort.alertMessage}`"
+      :description="fa.ideateTools.cardsort.alertDescription"
+    />
+    <AiAssistButton action="suggest-card-sort" label="پیشنهاد کارت‌ها با AI" section="مرتب‌سازی کارت" />
+
     <Card size="small" title="افزودن کارت محتوا">
       <Space wrap>
         <Input v-model:value="draftLabel" placeholder="مثلاً فیلتر قیمت" @press-enter="onAddCard" />

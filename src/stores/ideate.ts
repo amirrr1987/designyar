@@ -1,5 +1,6 @@
+import { computed } from 'vue'
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
+import { usePersistenceStore } from '@/stores/persistence'
 import {
   createEmptyCardSortState,
   type CardSortState,
@@ -15,12 +16,35 @@ function createId(): string {
 }
 
 export const useIdeateStore = defineStore('ideate', () => {
-  const ideas = useStorage<IdeaCard[]>('ux-flow-ideas', [])
-  const flowNodes = useStorage<FlowNode[]>('ux-flow-userflow', [])
-  const sitemap = useStorage<SitemapNode[]>('ux-flow-sitemap', [
-    { key: 'home', title: 'خانه', children: [] },
-  ])
-  const cardSort = useStorage<CardSortState>('ux-flow-card-sort', createEmptyCardSortState())
+  const persistence = usePersistenceStore()
+
+  const ideas = computed({
+    get: () => persistence.document.ideate.ideas,
+    set: (value: IdeaCard[]) => {
+      persistence.patchIdeate({ ideas: value })
+    },
+  })
+
+  const flowNodes = computed({
+    get: () => persistence.document.ideate.flowNodes,
+    set: (value: FlowNode[]) => {
+      persistence.patchIdeate({ flowNodes: value })
+    },
+  })
+
+  const sitemap = computed({
+    get: () => persistence.document.ideate.sitemap,
+    set: (value: SitemapNode[]) => {
+      persistence.patchIdeate({ sitemap: value })
+    },
+  })
+
+  const cardSort = computed({
+    get: () => persistence.document.ideate.cardSort,
+    set: (value: CardSortState) => {
+      persistence.patchIdeate({ cardSort: value })
+    },
+  })
 
   function addIdea(input: { title: string; detail: string; tags?: string[] }): IdeaCard {
     const idea: IdeaCard = {
@@ -31,12 +55,12 @@ export const useIdeateStore = defineStore('ideate', () => {
       tags: input.tags ?? [],
       createdAt: new Date().toISOString(),
     }
-    ideas.value = [...ideas.value, idea]
+    persistence.patchIdeate({ ideas: [...ideas.value, idea] })
     return idea
   }
 
   function removeIdea(id: string): void {
-    ideas.value = ideas.value.filter((i) => i.id !== id)
+    persistence.patchIdeate({ ideas: ideas.value.filter((i) => i.id !== id) })
   }
 
   function voteIdea(id: string): void {
@@ -46,7 +70,7 @@ export const useIdeateStore = defineStore('ideate', () => {
     if (!current) return
     const copy = [...ideas.value]
     copy[index] = { ...current, votes: current.votes + 1 }
-    ideas.value = copy
+    persistence.patchIdeate({ ideas: copy })
   }
 
   function addFlowNode(kind: FlowNodeKind, label: string): FlowNode {
@@ -61,9 +85,9 @@ export const useIdeateStore = defineStore('ideate', () => {
       const lastIndex = copy.length - 1
       const last = copy[lastIndex]
       if (last) copy[lastIndex] = { ...last, nextId: node.id }
-      flowNodes.value = [...copy, node]
+      persistence.patchIdeate({ flowNodes: [...copy, node] })
     } else {
-      flowNodes.value = [...flowNodes.value, node]
+      persistence.patchIdeate({ flowNodes: [...flowNodes.value, node] })
     }
     return node
   }
@@ -75,48 +99,56 @@ export const useIdeateStore = defineStore('ideate', () => {
     if (!current) return
     const copy = [...flowNodes.value]
     copy[index] = { ...current, ...patch }
-    flowNodes.value = copy
+    persistence.patchIdeate({ flowNodes: copy })
   }
 
   function removeFlowNode(id: string): void {
-    flowNodes.value = flowNodes.value
-      .filter((n) => n.id !== id)
-      .map((n) => (n.nextId === id ? { ...n, nextId: undefined } : n))
+    persistence.patchIdeate({
+      flowNodes: flowNodes.value
+        .filter((n) => n.id !== id)
+        .map((n) => (n.nextId === id ? { ...n, nextId: undefined } : n)),
+    })
   }
 
   function setSitemap(nodes: SitemapNode[]): void {
-    sitemap.value = nodes
+    persistence.patchIdeate({ sitemap: nodes })
   }
 
   function addSitemapChild(parentKey: string | null, title: string): void {
     const node: SitemapNode = { key: createId(), title: title.trim(), children: [] }
     if (parentKey === null) {
-      sitemap.value = [...sitemap.value, node]
+      persistence.patchIdeate({ sitemap: [...sitemap.value, node] })
       return
     }
-    sitemap.value = mapSitemap(sitemap.value, (n) => {
-      if (n.key !== parentKey) return n
-      return { ...n, children: [...(n.children ?? []), node] }
+    persistence.patchIdeate({
+      sitemap: mapSitemap(sitemap.value, (n) => {
+        if (n.key !== parentKey) return n
+        return { ...n, children: [...(n.children ?? []), node] }
+      }),
     })
   }
 
   function updateSitemapTitle(key: string, title: string): void {
-    sitemap.value = mapSitemap(sitemap.value, (n) =>
-      n.key === key ? { ...n, title: title.trim() } : n,
-    )
+    persistence.patchIdeate({
+      sitemap: mapSitemap(sitemap.value, (n) =>
+        n.key === key ? { ...n, title: title.trim() } : n,
+      ),
+    })
   }
 
   function removeSitemapNode(key: string): void {
-    sitemap.value = removeFromSitemap(sitemap.value, key)
+    persistence.patchIdeate({ sitemap: removeFromSitemap(sitemap.value, key) })
   }
 
   function addSortCard(label: string): SortCard {
     const card: SortCard = { id: createId(), label: label.trim() }
-    cardSort.value = {
-      ...cardSort.value,
-      cards: [...cardSort.value.cards, card],
-      unassignedIds: [...cardSort.value.unassignedIds, card.id],
-    }
+    persistence.patchIdeate({
+      cardSort: {
+        ...cardSort.value,
+        cards: [...cardSort.value.cards, card],
+        unassignedIds: [...cardSort.value.unassignedIds, card.id],
+      },
+    })
     return card
   }
 
@@ -139,18 +171,26 @@ export const useIdeateStore = defineStore('ideate', () => {
       }
     }
 
-    cardSort.value = { ...cardSort.value, categories, unassignedIds }
+    persistence.patchIdeate({
+      cardSort: { ...cardSort.value, categories, unassignedIds },
+    })
   }
 
   function removeSortCard(cardId: string): void {
-    cardSort.value = {
-      cards: cardSort.value.cards.filter((c) => c.id !== cardId),
-      categories: cardSort.value.categories.map((cat) => ({
-        ...cat,
-        cardIds: cat.cardIds.filter((id) => id !== cardId),
-      })),
-      unassignedIds: cardSort.value.unassignedIds.filter((id) => id !== cardId),
-    }
+    persistence.patchIdeate({
+      cardSort: {
+        cards: cardSort.value.cards.filter((c) => c.id !== cardId),
+        categories: cardSort.value.categories.map((cat) => ({
+          ...cat,
+          cardIds: cat.cardIds.filter((id) => id !== cardId),
+        })),
+        unassignedIds: cardSort.value.unassignedIds.filter((id) => id !== cardId),
+      },
+    })
+  }
+
+  function resetCardSort(): void {
+    persistence.patchIdeate({ cardSort: createEmptyCardSortState() })
   }
 
   return {
@@ -171,6 +211,7 @@ export const useIdeateStore = defineStore('ideate', () => {
     addSortCard,
     assignSortCard,
     removeSortCard,
+    resetCardSort,
   }
 })
 

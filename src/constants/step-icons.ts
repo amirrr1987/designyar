@@ -1,6 +1,7 @@
 import type { Component } from 'vue'
 import {
   AimOutlined,
+  AuditOutlined,
   BulbOutlined,
   CheckCircleOutlined,
   ExperimentOutlined,
@@ -17,6 +18,7 @@ export const STEP_ICON_MAP: Record<string, Component> = {
   ExperimentOutlined,
   CheckCircleOutlined,
   HomeOutlined,
+  AuditOutlined,
 }
 
 export function resolveStepIcon(name: string): Component {

@@ -2,10 +2,11 @@
 import { ConfigProvider } from 'ant-design-vue'
 import faIR from 'ant-design-vue/es/locale/fa_IR'
 import AppLayout from '@/components/layout/AppLayout.vue'
+import { appTheme } from '@/theme/app-theme'
 </script>
 
 <template>
-  <ConfigProvider :locale="faIR" direction="rtl" component-size="middle">
+  <ConfigProvider :locale="faIR" direction="rtl" component-size="middle" :theme="appTheme">
     <AppLayout />
   </ConfigProvider>
 </template>

@@ -1,80 +1,72 @@
 import { computed } from 'vue'
 import { defineStore } from 'pinia'
-import { useStorage } from '@vueuse/core'
-import {
-  createDefaultDesignSystem,
-  rampFromSeed,
-  type ColorPaletteConfig,
-  type DesignSystem,
-  type GridConfig,
-  type SpacingConfig,
-  type TypographyConfig,
+import { usePrototypeStore } from '@/stores/prototype'
+import type {
+  ColorPaletteConfig,
+  DesignSystem,
+  GridConfig,
+  SpacingConfig,
+  TypographyConfig,
 } from '@/types/design-system'
 
+/**
+ * Backward-compatible facade — design tokens live in `prototype` document slice.
+ * Prefer `usePrototypeStore` in new code.
+ */
 export const useDesignSystemStore = defineStore('designSystem', () => {
-  const designSystem = useStorage<DesignSystem>(
-    'ux-flow-design-system',
-    createDefaultDesignSystem(),
-  )
+  const prototype = usePrototypeStore()
 
-  const palette = computed(() => designSystem.value.palette)
-  const typography = computed(() => designSystem.value.typography)
-  const grid = computed(() => designSystem.value.grid)
-  const spacing = computed(() => designSystem.value.spacing)
-  const primaryColor = computed(() => palette.value.primary[5] ?? palette.value.seed)
+  const designSystem = computed({
+    get: () => prototype.designSystem,
+    set: (value: DesignSystem) => {
+      prototype.replaceDesignSystem(value)
+    },
+  })
+
+  const palette = computed(() => prototype.palette)
+  const typography = computed(() => prototype.typography)
+  const grid = computed(() => prototype.grid)
+  const spacing = computed(() => prototype.spacing)
+  const primaryColor = computed(() => prototype.primaryColor)
 
   function setPalette(paletteConfig: ColorPaletteConfig): void {
-    designSystem.value = { ...designSystem.value, palette: paletteConfig }
+    prototype.setPalette(paletteConfig)
   }
 
   function generatePrimaryFromSeed(seed: string): void {
-    const primary = rampFromSeed(seed)
-    setPalette({
-      ...designSystem.value.palette,
-      seed,
-      primary,
-    })
+    prototype.generatePrimaryFromSeed(seed)
   }
 
   function setAccentFromSeed(seed: string): void {
-    setPalette({
-      ...designSystem.value.palette,
-      accent: rampFromSeed(seed),
-    })
+    prototype.setAccentFromSeed(seed)
   }
 
   function setTypography(typographyConfig: TypographyConfig): void {
-    designSystem.value = { ...designSystem.value, typography: typographyConfig }
+    prototype.setTypography(typographyConfig)
   }
 
   function patchTypography(patch: Partial<TypographyConfig>): void {
-    designSystem.value = {
-      ...designSystem.value,
-      typography: { ...designSystem.value.typography, ...patch },
-    }
+    prototype.patchTypography(patch)
   }
 
   function setGrid(gridConfig: GridConfig): void {
-    designSystem.value = { ...designSystem.value, grid: gridConfig }
+    prototype.setGrid(gridConfig)
   }
 
   function patchGrid(patch: Partial<GridConfig>): void {
-    designSystem.value = {
-      ...designSystem.value,
-      grid: { ...designSystem.value.grid, ...patch },
-    }
+    prototype.patchGrid(patch)
   }
 
   function setSpacing(spacingConfig: SpacingConfig): void {
-    designSystem.value = { ...designSystem.value, spacing: spacingConfig }
+    prototype.setSpacing(spacingConfig)
   }
 
   function replace(next: DesignSystem): void {
-    designSystem.value = next
+    prototype.replaceDesignSystem(next)
   }
 
   function reset(): void {
-    designSystem.value = createDefaultDesignSystem()
+    prototype.resetDesignSystem()
   }
 
   return {

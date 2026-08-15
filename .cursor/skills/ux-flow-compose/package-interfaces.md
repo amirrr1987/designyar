@@ -1,6 +1,6 @@
 # Package interfaces mandate
 
-Companion to [SKILL.md](SKILL.md). Applies to **every** UX Flow skill that documents an npm package.
+Companion to [SKILL.md](SKILL.md). Applies to **every** UX Flow skill that documents an npm package, and to **design skills** when they emit code into this app.
 
 ## Principle
 
@@ -26,6 +26,20 @@ export interface SaveButtonProps extends /* or Pick<> */ ButtonProps {
 }
 ```
 
+## Design skills → this repo (mandatory remap)
+
+Skills like `ui-styling`, `design-system`, `ui-ux-pro-max`, `brand`, `design`, `slides`, `banner-design` may mention shadcn/ui, Tailwind, CSS variables, or Chart.js.
+
+| Upstream suggestion | UX Flow implementation |
+|---------------------|------------------------|
+| shadcn `Button` / Tailwind classes | `ant-design-vue` `<Button>` + `ButtonProps` |
+| CSS variables / Tailwind theme | `ThemeConfig` + `@ant-design/colors` ramps |
+| Radix / shadcn Dialog | antdv `Modal` / `Drawer` + `ModalProps` |
+| Custom `<style>` / utility CSS in `src/` | **Forbidden** — Space / Row / Col / antdv props only |
+| Standalone HTML slides/banners | OK as **artifacts outside app runtime**; do not import into Vue SFCs as CSS systems |
+
+When a design skill produces **in-app UI**, also open [ant-design-vue](../ant-design-vue/SKILL.md) and type every boundary with package interfaces.
+
 ## Skill author checklist
 
 Every npm-package `SKILL.md` must include:
@@ -34,3 +48,8 @@ Every npm-package `SKILL.md` must include:
 - [ ] Table or list of primary exported types
 - [ ] At least one typed code sample using those exports
 - [ ] Checklist item: “uses package interfaces (no hand-rolled twins)”
+
+Every design skill used in this repo must include:
+
+- [ ] Section **UX Flow override** (or equivalent) remapping to antdv / package interfaces
+- [ ] Explicit ban on shadcn / Tailwind / custom CSS inside `src/`

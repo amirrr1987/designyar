@@ -1,9 +1,11 @@
 import { computed } from 'vue'
-import { useStorage } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 import { WCAG_CHECKLIST } from '@/constants/wcag-checklist'
+import { useTestStore } from '@/stores/test'
 
 export function useWCAG() {
-  const checkedIds = useStorage<string[]>('ux-flow-wcag-checked', [])
+  const testStore = useTestStore()
+  const { wcagChecked: checkedIds } = storeToRefs(testStore)
 
   const total = WCAG_CHECKLIST.length
 
@@ -21,21 +23,17 @@ export function useWCAG() {
   }
 
   function toggle(id: string, checked: boolean): void {
-    if (checked) {
-      if (!checkedIds.value.includes(id)) {
-        checkedIds.value = [...checkedIds.value, id]
-      }
-      return
-    }
-    checkedIds.value = checkedIds.value.filter((x) => x !== id)
+    testStore.toggleWcag(id, checked)
   }
 
   function setChecked(ids: string[]): void {
-    checkedIds.value = ids.filter((id) => WCAG_CHECKLIST.some((item) => item.id === id))
+    testStore.setWcagChecked(
+      ids.filter((id) => WCAG_CHECKLIST.some((item) => item.id === id)),
+    )
   }
 
   function clear(): void {
-    checkedIds.value = []
+    testStore.setWcagChecked([])
   }
 
   return {
