@@ -37,7 +37,6 @@ export const useConfigProviderStore = defineStore('configProvider', () => {
     Input: {
       borderRadius: 10,
       controlHeight: 40,
-      paddingBlock: 8,
     },
   })
   const algorithm = ref<MappingAlgorithm | MappingAlgorithm[]>()

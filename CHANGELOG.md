@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.33.0] - 2026-08-15
+
+### Added
+
+- Semantic color palette roles (Primary / Accent / Background / Text) inside Prototype colors form
+- Harmony propose → Accept/Reject (Mono, Primary+Accent, Complementary, Analogous, Triadic)
+- Inline WCAG AA contrast check for text on background
+
+### Changed
+
+- Prototype state: `colors[]` → `palette` object (legacy array migrated on load)
+
 ## [0.32.0] - 2026-08-15
 
 ### Added

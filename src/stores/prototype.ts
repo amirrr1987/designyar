@@ -2,9 +2,11 @@ import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
 import { STORAGE_KEYS } from '@/constants/storage-keys'
 import {
+  createDefaultColorPalette,
   createDefaultPrototypeState,
   normalizePrototypeState,
   wireframeBlocksToNotes,
+  type ColorPalette,
   type GridConfig,
   type PrototypeState,
   type TypographyScale,
@@ -19,11 +21,16 @@ export const usePrototypeStore = defineStore('prototype', () => {
 
   state.value = normalizePrototypeState(state.value)
 
-  function setColors(colors: string[]): void {
-    state.value = {
-      ...state.value,
-      colors: colors.length > 0 ? colors : createDefaultPrototypeState().colors,
+  function setPalette(palette: ColorPalette): void {
+    const parsed = {
+      ...createDefaultColorPalette(),
+      ...palette,
+      primary: palette.primary.trim() || createDefaultColorPalette().primary,
+      accent: palette.accent.trim() || createDefaultColorPalette().accent,
+      background: palette.background.trim() || createDefaultColorPalette().background,
+      text: palette.text.trim() || createDefaultColorPalette().text,
     }
+    state.value = { ...state.value, palette: parsed }
   }
 
   function setTypography(typography: TypographyScale): void {
@@ -60,7 +67,7 @@ export const usePrototypeStore = defineStore('prototype', () => {
 
   return {
     state,
-    setColors,
+    setPalette,
     setTypography,
     setGrid,
     setSpacingBase,

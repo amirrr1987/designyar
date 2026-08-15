@@ -156,15 +156,18 @@ export function normalizeEmpathizeState(raw: unknown): EmpathizeState {
       .map((item) => {
         if (!item || typeof item !== 'object') return null
         const m = item as Record<string, unknown>
-        return {
+        const entry: EmpathyMapEntry = {
           id: typeof m.id === 'string' ? m.id : createEntityId(),
           label: typeof m.label === 'string' ? m.label : '',
-          personaId: typeof m.personaId === 'string' ? m.personaId : undefined,
           says: typeof m.says === 'string' ? m.says : '',
           thinks: typeof m.thinks === 'string' ? m.thinks : '',
           does: typeof m.does === 'string' ? m.does : '',
           feels: typeof m.feels === 'string' ? m.feels : '',
-        } satisfies EmpathyMapEntry
+        }
+        if (typeof m.personaId === 'string') {
+          entry.personaId = m.personaId
+        }
+        return entry
       })
       .filter((item): item is EmpathyMapEntry => item !== null)
     if (list.length > 0) empathyMaps = list

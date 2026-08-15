@@ -39,6 +39,11 @@ const presetOptions: NonNullable<SegmentedProps['options']> = [
   { label: 'باز ۱۲', value: 12 },
 ]
 
+function onPresetChange(value: string | number): void {
+  draft.value = Number(value)
+  persist()
+}
+
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: spacingAiSchema,
   formTitle: 'فاصله‌گذاری',
@@ -113,12 +118,7 @@ function onAccept(): void {
             :value="draft"
             block
             :options="presetOptions"
-            @change="
-              (value) => {
-                draft.value = Number(value)
-                persist()
-              }
-            "
+            @change="onPresetChange"
           />
         </FormItem>
         <FormItem :label="`واحد پایه: ${draft}px`">

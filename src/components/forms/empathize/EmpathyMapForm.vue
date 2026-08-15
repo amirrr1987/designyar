@@ -79,6 +79,17 @@ function onPersonaSelect(index: number, personaId: string): void {
   persist()
 }
 
+function onPersonaValueUpdate(index: number, value: SelectProps['value']): void {
+  if (typeof value === 'string') {
+    onPersonaSelect(index, value)
+    return
+  }
+  const row = items.value[index]
+  if (!row) return
+  row.personaId = undefined
+  persist()
+}
+
 const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicroFormAi({
   schema: empathyMapsAiSchema,
   formTitle: 'نقشه همدلی',
@@ -165,15 +176,7 @@ function onAccept(): void {
               allow-clear
               placeholder="انتخاب پرسونا"
               class="w-full"
-              @update:value="
-                (value: string | undefined) => {
-                  if (typeof value === 'string') onPersonaSelect(index, value)
-                  else {
-                    item.personaId = undefined
-                    persist()
-                  }
-                }
-              "
+              @update:value="(value) => onPersonaValueUpdate(index, value)"
             />
           </FormItem>
           <FormItem label="برچسب / نام">

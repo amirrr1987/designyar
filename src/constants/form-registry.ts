@@ -56,7 +56,7 @@ export const FORM_REGISTRY: Record<DesignThinkingStepKey, readonly MicroFormMeta
     form(
       'colors',
       'پالت رنگ',
-      'رنگ اصلی و تاکیدی را انتخاب کن؛ پیش‌نمایش کارت زنده را ببین.',
+      'چهار نقش اصلی، تاکیدی، پس‌زمینه و متن را تنظیم کن؛ هارمونی فقط با پذیرش اعمال می‌شود.',
     ),
     form(
       'typography',

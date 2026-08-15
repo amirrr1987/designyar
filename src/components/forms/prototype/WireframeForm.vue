@@ -100,7 +100,7 @@ const { loading, errorMessage, preview, requestAssist, clearPreview } = useMicro
     JSON.stringify({
       sitemap: ideate.state.sitemap,
       userflow: ideate.state.userflow,
-      colors: store.state.colors,
+      colors: store.state.palette,
     }),
 })
 

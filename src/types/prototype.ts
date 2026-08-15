@@ -10,6 +10,26 @@ export const gridSchema = z.object({
   gutter: z.number(),
 })
 
+export const colorHarmonyModes = [
+  'monochromatic',
+  'primaryAccent',
+  'complementary',
+  'analogous',
+  'triadic',
+] as const
+
+export type ColorHarmonyMode = (typeof colorHarmonyModes)[number]
+
+export const colorPaletteSchema = z.object({
+  primary: z.string(),
+  accent: z.string(),
+  background: z.string(),
+  text: z.string(),
+  harmony: z.enum(colorHarmonyModes),
+})
+
+export type ColorPalette = z.infer<typeof colorPaletteSchema>
+
 export const wireframeBlockKinds = [
   'header',
   'nav',
@@ -31,7 +51,7 @@ export const wireframeBlockSchema = z.object({
 export type WireframeBlock = z.infer<typeof wireframeBlockSchema>
 
 export const prototypeStateSchema = z.object({
-  colors: z.array(z.string()),
+  palette: colorPaletteSchema,
   typography: typographySchema,
   grid: gridSchema,
   spacingBase: z.number(),
@@ -84,6 +104,38 @@ export function kindLabel(kind: WireframeBlockKind): string {
   return labels[kind]
 }
 
+export function harmonyLabel(mode: ColorHarmonyMode): string {
+  const labels: Record<ColorHarmonyMode, string> = {
+    monochromatic: 'تک‌رنگ (Monochromatic)',
+    primaryAccent: 'اصلی + تاکیدی',
+    complementary: 'مکمل (Complementary)',
+    analogous: 'هم‌خانواده (Analogous)',
+    triadic: 'سه‌گانه (Triadic)',
+  }
+  return labels[mode]
+}
+
+export function createDefaultColorPalette(): ColorPalette {
+  return {
+    primary: '#0f766e',
+    accent: '#14b8a6',
+    background: '#f8fafc',
+    text: '#1c1917',
+    harmony: 'primaryAccent',
+  }
+}
+
+export function paletteFromLegacyColors(colors: string[]): ColorPalette {
+  const defaults = createDefaultColorPalette()
+  return {
+    primary: colors[0] ?? defaults.primary,
+    accent: colors[1] ?? defaults.accent,
+    background: colors[2] ?? defaults.background,
+    text: colors[3] ?? defaults.text,
+    harmony: defaults.harmony,
+  }
+}
+
 export function createDefaultPrototypeState(): PrototypeState {
   const blocks: WireframeBlock[] = [
     createEmptyWireframeBlock('header', 'لوگو و عنوان محصول'),
@@ -93,13 +145,18 @@ export function createDefaultPrototypeState(): PrototypeState {
     createEmptyWireframeBlock('footer', 'لینک‌ها و کپی‌رایت'),
   ]
   return {
-    colors: ['#0f766e', '#14b8a6', '#f8fafc', '#1c1917'],
+    palette: createDefaultColorPalette(),
     typography: { baseSize: 16, scale: 1.25 },
     grid: { columns: 12, gutter: 16 },
     spacingBase: 8,
     wireframeBlocks: blocks,
     wireframeNotes: wireframeBlocksToNotes(blocks),
   }
+}
+
+function parsePalette(raw: unknown): ColorPalette | null {
+  const parsed = colorPaletteSchema.safeParse(raw)
+  return parsed.success ? parsed.data : null
 }
 
 export function normalizePrototypeState(raw: unknown): PrototypeState {
@@ -111,7 +168,6 @@ export function normalizePrototypeState(raw: unknown): PrototypeState {
         : createDefaultPrototypeState().wireframeBlocks
     return {
       ...parsed.data,
-      colors: parsed.data.colors.length > 0 ? parsed.data.colors : createDefaultPrototypeState().colors,
       wireframeBlocks: blocks,
       wireframeNotes:
         parsed.data.wireframeNotes.trim().length > 0
@@ -127,10 +183,13 @@ export function normalizePrototypeState(raw: unknown): PrototypeState {
   const record = raw as Record<string, unknown>
   const defaults = createDefaultPrototypeState()
 
-  const colors =
-    Array.isArray(record.colors) && record.colors.every((c) => typeof c === 'string')
-      ? (record.colors as string[])
-      : defaults.colors
+  let palette = defaults.palette
+  const fromObject = parsePalette(record.palette)
+  if (fromObject) {
+    palette = fromObject
+  } else if (Array.isArray(record.colors) && record.colors.every((c) => typeof c === 'string')) {
+    palette = paletteFromLegacyColors(record.colors as string[])
+  }
 
   const typography =
     record.typography && typeof record.typography === 'object'
@@ -197,7 +256,7 @@ export function normalizePrototypeState(raw: unknown): PrototypeState {
       : wireframeBlocksToNotes(wireframeBlocks)
 
   return {
-    colors: colors.length > 0 ? colors : defaults.colors,
+    palette,
     typography,
     grid,
     spacingBase,
@@ -206,9 +265,7 @@ export function normalizePrototypeState(raw: unknown): PrototypeState {
   }
 }
 
-export const colorsAiSchema = z.object({
-  colors: z.array(z.string()).min(2),
-})
+export const colorsAiSchema = colorPaletteSchema
 
 export const typographyAiSchema = typographySchema
 
