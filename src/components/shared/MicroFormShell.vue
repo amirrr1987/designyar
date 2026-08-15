@@ -2,6 +2,7 @@
 import { Alert, Space, Typography } from 'ant-design-vue'
 import AiFormAssist from '@/components/shared/AiFormAssist.vue'
 import FormStepNav from '@/components/shared/FormStepNav.vue'
+import { useFormWizard } from '@/composables/useFormWizard'
 import type { AiAssistMode } from '@/types/ai'
 
 interface Props {
@@ -29,6 +30,8 @@ const emit = defineEmits<{
   next: []
   prev: []
 }>()
+
+const { isFirstStep, isLastStep } = useFormWizard()
 </script>
 
 <template>
@@ -39,7 +42,7 @@ const emit = defineEmits<{
         {{ props.hint }}
       </Typography.Paragraph>
       <Typography.Text type="secondary" class="text-xs">
-        اگر هنوز آماده نیستی، می‌توانی با «بعدی» رد شوی.
+        اگر هنوز آماده نیستی، می‌توانی با «{{ isLastStep ? 'پایان' : 'بعدی' }}» رد شوی.
       </Typography.Text>
     </header>
 
@@ -68,6 +71,11 @@ const emit = defineEmits<{
       :message="props.errorMessage"
     />
 
-    <FormStepNav @prev="emit('prev')" @next="emit('next')" />
+    <FormStepNav
+      :is-first="isFirstStep"
+      :is-last="isLastStep"
+      @prev="emit('prev')"
+      @next="emit('next')"
+    />
   </Space>
 </template>

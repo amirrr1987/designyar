@@ -6,9 +6,11 @@ import StepProgress from '@/components/shared/StepProgress.vue'
 import { useFormWizard } from '@/composables/useFormWizard'
 import { getFormsForPhase } from '@/constants/form-registry'
 import { DESIGN_THINKING_STEPS } from '@/constants/design-thinking-steps'
+import type { DesignThinkingStepKey } from '@/constants/design-thinking-steps'
 
 const router = useRouter()
-const { phase, formKey, formIndex, phaseIndex, syncProjectPosition } = useFormWizard()
+const { phase, formKey, formIndex, phaseIndex, syncProjectPosition, goToPhase } =
+  useFormWizard()
 
 watch(
   [phase, formKey],
@@ -28,6 +30,10 @@ const phaseTitle = computed(() => {
   if (!phase.value) return ''
   return DESIGN_THINKING_STEPS.find((s) => s.key === phase.value)?.title ?? ''
 })
+
+async function onSelectPhase(nextPhase: DesignThinkingStepKey): Promise<void> {
+  await goToPhase(nextPhase)
+}
 </script>
 
 <template>
@@ -52,7 +58,10 @@ const phaseTitle = computed(() => {
     </header>
 
     <nav aria-label="پیشرفت فازهای طراحی">
-      <StepProgress :current-phase-index="phaseIndex" />
+      <StepProgress
+        :current-phase-index="phaseIndex"
+        @select="onSelectPhase"
+      />
     </nav>
 
     <RouterView />

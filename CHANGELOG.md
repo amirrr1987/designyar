@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.31.2] - 2026-08-15
+
+### Added
+
+- Done screen (`/done`) after last Test form
+- Clickable Design Thinking steps to jump phases
+- First/last form nav labels («خانه» / «پایان»)
+
 ## [0.31.1] - 2026-08-15
 
 ### Changed

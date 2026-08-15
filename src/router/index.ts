@@ -13,6 +13,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: 'خانه' },
   },
   {
+    path: '/done',
+    name: 'done',
+    component: () => import('@/views/DoneView.vue'),
+    meta: { title: 'پایان مسیر' },
+  },
+  {
     path: '/:phase',
     component: () => import('@/components/layout/WizardChrome.vue'),
     children: [

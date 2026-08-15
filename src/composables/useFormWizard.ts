@@ -60,6 +60,17 @@ export function useFormWizard() {
     return DESIGN_THINKING_STEPS.findIndex((step) => step.key === phase.value)
   })
 
+  const isFirstStep = computed(
+    () => phaseIndex.value === 0 && formIndex.value === 0,
+  )
+
+  const isLastStep = computed(() => {
+    if (phaseIndex.value < 0 || formIndex.value < 0) return false
+    const lastPhaseIndex = DESIGN_THINKING_STEPS.length - 1
+    const lastFormIndex = forms.value.length - 1
+    return phaseIndex.value === lastPhaseIndex && formIndex.value === lastFormIndex
+  })
+
   function syncProjectPosition(): void {
     if (!phase.value || !formKey.value) return
     projectStore.setPosition(phase.value, formKey.value)
@@ -73,6 +84,14 @@ export function useFormWizard() {
     })
   }
 
+  async function goToPhase(nextPhase: DesignThinkingStepKey): Promise<void> {
+    await goToForm(nextPhase, getDefaultFormKey(nextPhase))
+  }
+
+  async function goDone(): Promise<void> {
+    await router.push({ name: 'done' })
+  }
+
   async function goNext(): Promise<boolean> {
     if (!phase.value || formIndex.value < 0) return false
 
@@ -83,7 +102,10 @@ export function useFormWizard() {
     }
 
     const nextPhase = DESIGN_THINKING_STEPS[phaseIndex.value + 1]
-    if (!nextPhase) return false
+    if (!nextPhase) {
+      await goDone()
+      return true
+    }
     await goToForm(nextPhase.key, getDefaultFormKey(nextPhase.key))
     return true
   }
@@ -98,7 +120,10 @@ export function useFormWizard() {
     }
 
     const prevPhase = DESIGN_THINKING_STEPS[phaseIndex.value - 1]
-    if (!prevPhase) return false
+    if (!prevPhase) {
+      await router.push({ name: 'home' })
+      return true
+    }
     const prevForms = getFormsForPhase(prevPhase.key)
     const last = prevForms[prevForms.length - 1]
     if (!last) return false
@@ -113,8 +138,12 @@ export function useFormWizard() {
     currentMeta,
     formIndex,
     phaseIndex,
+    isFirstStep,
+    isLastStep,
     syncProjectPosition,
     goToForm,
+    goToPhase,
+    goDone,
     goNext,
     goPrev,
   }
