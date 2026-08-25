@@ -69,7 +69,7 @@ const groqOptions: GroqLanguageModelChatOptions = {
 }
 
 const { text } = await generateText({
-  model: groq('llama-3.3-70b-versatile'),
+  model: groq('openai/gpt-oss-120b'),
   prompt: 'پیشنهاد پرسونا',
   providerOptions: { groq: groqOptions },
 })
@@ -77,7 +77,7 @@ const { text } = await generateText({
 
 Prefer `satisfies GroqLanguageModelChatOptions` on `providerOptions.groq` when inlining.
 
-Default model for this app: `llama-3.3-70b-versatile` (same as Groq’s AI SDK sample). Browser search only on `openai/gpt-oss-20b` / `openai/gpt-oss-120b`.
+Default model for this app: `openai/gpt-oss-120b` (Groq replacement for retired `llama-3.3-70b-versatile`). Browser search only on `openai/gpt-oss-20b` / `openai/gpt-oss-120b`.
 
 ## Rules
 

@@ -9,7 +9,7 @@ export type AiPrefs = z.infer<typeof aiPrefsSchema>
 
 export function createDefaultAiPrefs(): AiPrefs {
   return {
-    lastModel: 'llama-3.3-70b-versatile',
+    lastModel: 'openai/gpt-oss-120b',
     lastError: '',
   }
 }

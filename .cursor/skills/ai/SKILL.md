@@ -32,12 +32,12 @@ import { generateText, streamText, type UIMessage } from 'ai'
 import { groq } from '@ai-sdk/groq'
 
 const { text } = await generateText({
-  model: groq('llama-3.3-70b-versatile'),
+  model: groq('openai/gpt-oss-120b'),
   prompt: 'یک جمله POV به فارسی بنویس.',
 })
 
 const result = streamText({
-  model: groq('llama-3.3-70b-versatile'),
+  model: groq('openai/gpt-oss-120b'),
   prompt: 'خلاصه یادداشت تحقیق',
 })
 

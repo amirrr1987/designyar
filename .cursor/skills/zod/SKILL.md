@@ -55,7 +55,7 @@ import { generateText, Output } from 'ai'
 import { groq } from '@ai-sdk/groq'
 
 const { output } = await generateText({
-  model: groq('llama-3.3-70b-versatile'),
+  model: groq('openai/gpt-oss-120b'),
   output: Output.object({ schema: personaSchema }),
   prompt: 'یک پرسونا به فارسی بساز',
 })
